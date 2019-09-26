@@ -152,7 +152,7 @@ table, th, td {
 <div class="body"> 
 
 <h1>72939 - LABQakIntro20202 | Using the QActor (meta)model</h1> 
-<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/LectureBologna1819.html" target="isslm">LabISS-lectures site</a></font> 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.issLabStart/userDocs/LectureCesena1920.html" target="isslm">LabISS-lectures site</a></font> 
  
  
 
@@ -162,8 +162,8 @@ table, th, td {
 <li>Download <a href="https://www.eclipse.org/Xtext/download.html" target="web">Eclipse Xtext</a>  and Install Eclipse plugin for Kotlin.</li>
 <li>Copy in <tt>dropins</tt> the files that constitute the support to the <bc>qak</bc> meta-model:<br/>
 <bc>it.unibo.Qactork_1.1.5.jar</bc>, <bc>it.unibo.Qactork.ui_1.1.5.jar</bc>, <bc>it.unibo.Qactork.ide_1.0.0.jar</bc>.
-<li>In an empty workspace, create a new project of type <tt>Kotlin project</tt> named <tt>it.unibo.eclipse.bls</tt>.</li>
-<li>Set the gradle to our <em>Gradle User Home</em> (<tt>Windows->Preferences->Gradle</tt>) </li>
+<li>In an empty workspace, create a new project of type <tt>Kotlin project</tt> (e.g. <tt>it.unibo.eclipse.bls</tt>).</li>
+<li>Set the gradle to your <em>Gradle User Home</em> (<tt>Windows->Preferences->Gradle</tt>) </li>
 <li>In <tt>src</tt>, create a file with name <tt>bls.qak</tt></li>
 </li>
 </ol>
@@ -192,8 +192,7 @@ an identifier that will represent the name of our system. Let us write <tt>Syste
 and then <em>save</em> the file. The workspace changes as  shown in the figure above, on the right.
 </p>
 The generated file <bc>bls.pl</bc> (a Button-Led system) includes the description of the structure of the
-system, as introduced in <a href="../../it.unibo.bls19d/userDocs/Lab6.html#infras" target="lecture">
-Lab6.html#Towards an infrastructure</a>. At the moment the file includes just a comment, since the system model is
+system. At the moment the file includes just a comment, since the system model is
 empty:
 
 <pre>
@@ -217,13 +216,15 @@ simple 'code' in the syntax driven editor window and save the file:
 The <tt>Qak-IDE</tt> generates:
 <ul>
 <li>A <bc>.gitignore</bc> and a 'generic' <bc>build.gradle</bc> file. 
-<font size="2">To see the <tt>.XXX</tt> files you must act on the <b>Filters</b> command in the <tt>ViewMenu</tt></font>.</li>
+<font size="2">To see the <tt>.XXX</tt> files you must act on the <b>Filters</b> command in the <tt>ViewMenu</tt></font>.<br/><br/></li>
 <li>A  context-specific gradle file (<bc>build_XXX.gradle</bc>) for each context.</li>
-<li>One package for each <tt>Context</tt> and for each <tt>QActor</tt>. Each package contains some source code written in <tt>Kotlin</tt>.</li>
+<li>One package for each <tt>Context</tt> and for each <tt>QActor</tt>. Each package contains some source code written in <tt>Kotlin</tt>.<br/><br/</li>
 <li>Each package related to a <tt>Context</tt> includes a class whose name starts with <bc>Main</bc>. This class includes the code that starts the actors
-working in that context.</li>
+working in that context.<br/><br/</li>
 
 </ul></m>
+
+For an overvew of Kotlin, tou can look at 
  </td>
 </tr>
 </table>
