@@ -27,7 +27,7 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     flatDir { //grazie Mattia Piretti
-       dirs '/C:/Didattica2018Work/iss2019Lab/libs'	//full path
+       dirs '/home/stefano/University/lss/iss2020Lab/it.unibo.issLabStart/resources'	//full path
    }
 }
 
@@ -64,9 +64,9 @@ dependencies {
     compile name: 'unibonoawtsupports'
 
 	//BLS
-	compile name: 'it.unibo.bls19Local-1.0'
+	//compile name: 'it.unibo.bls19Local-1.0'
 	//RADAR
-	compile name: 'radarPojo'
+	//compile name: 'radarPojo'
 	//RADAR GUI
 	// https://mvnrepository.com/artifact/org.pushingpixels/trident
 	compile group: 'org.pushingpixels', name: 'trident', version: '1.3'

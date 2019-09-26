@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<link rel="stylesheet" type="text/css" href="style.css">
+    
+<head>   
+<title>Lab 1 Stefano Righini</title>
+</head>
+    
+<body>
+<div id="top">
+    <h1>81614 - LABORATORIO DI SISTEMI SOFTWARE</h1>
+</div>  
+
+<div class="body"> 
+    <h2>Introduction</h2>
+    <table>
+        <tr>
+            <td>dopo il primo brainstorming ci sono due metodologie </td>
+            <td>
+                1 => non mi muovo finchè non ho le competenze tecnologiche <br>
+                2 => parto con l'analisi dei requisiti
+            </td>
+        </tr>
+        <tr>
+            <td>scoperta su come sono composti robot e console </td>
+            <td>di entrambi non mi interessa la componente fisica </td>
+        </tr>
+        <tr>
+            <td>assioma</td>
+            <td>mi interessa prima l'interazione tra i due elementi, il comportamento si crea di conseguenza</td>
+        </tr>
+        <tr>
+            <td>cosa abbiamo fatto?</td>
+            <td>analisi dei requisiti, concreta. Capisco COSA c'è nel sistema e COME interagiscono. <br>È però informale.</td>
+        </tr>
+        <tr>
+            <td>prossimo step</td>
+            <td>devo costruire un modello formale del sistema, comprensibile cioè da parte di una macchina</td>
+        </tr>
+    </table>
+
+    <br/><br/>
+
+    <!-- --------------------------------- -->
+
+    <h2>Pianificazione del lavoro</h2>
+    
+    <ol>
+        <li>
+            identifico le entità che sono presenti nel sistema richiesto
+            <ul>
+                <li>robot composto da motore e ruote</li>
+                <li>console con cui inviare i messaggi</li>
+            </ul>
+        </li>
+    </ol>
+    <br/><br/> 
+
+    <!-- --------------------------------- -->
+    
+    <h2>Domande</h2>
+    
+    <ol>
+        <li>
+            Il sistema software che devo fare è concentrato o distribuito? 
+            Mi serve per forza un nodo oppure ne posso avere anche di più?
+            <ol>
+                <li>Cosa intende il committente con console?</li>
+                <li>Cosa intende il committente con robot?</li>
+            </ol>	
+        </li>
+        <li>Le parti che compongono il sistema sono eterogenee o omogenee?</li>
+    </ol>
+    <br/><br/> 	
+
+    <!-- --------------------------------- -->
+
+    <h2>Risposte</h2>
+    
+    <ol>
+        <li>È distribuito dai requisiti. abbiamo almeno due nodi: una console e il robot</li>
+        <li>Le parti possono essere eteogenee, non c'è alcun vincolo</li>
+    </ol>	
+
+    <!-- --------------------------------- -->
+
+    <h2>Cosa il committente intende con console?</h2>
+    
+    <ol>
+        <li>
+            come è composta
+            <ul>
+                <li>è un'unita unica/atomica oppure composta?</li>
+            </ul>
+        </li>
+        <li>
+            come interagisce con il robot
+            <ul>
+                <li>la console invia dei messaggi oppure deve richiedere al robot che fare?</li>
+                <li>la console aspetta una risposta dal robot?</li>
+                <li>dov'è la console? vicino o lontano al robot?</li>
+            </ul>
+        </li>
+        <li>come si comporta</li>
+    </ol>		
+    <br/><br/>
+
+    <!-- --------------------------------- -->
+
+    <h2>Cosa il committente intende con robot?</h2>
+    
+    <ol>
+        <li>
+            come è composta
+            <ul>
+                <li>è un'unita composta da più elementi?</li>
+            </ul>
+        </li>
+        <li>come si comporta</li>
+        <li>come interagisce con il robot</li>
+    </ol>	
+        
+    <br/><br/>
+
+    <!-- --------------------------------- -->
+
+    <h2>Behaviour della console</h2>
+    <p>
+        La console richiede un input che può essere un umano o un'altra macchina. <br> 
+        Una volta ricevuto fa in modo che l'informazione fluisca da sè verso il robot in modo presumibilmente asincrono
+    </p>
+        
+    <br/><br/>
+
+    <!-- --------------------------------- -->
+
+    <h2>Behaviour della console</h2>
+    <p>
+        Acquisisce dei bit di informazione, li interpreta e infine li esegue. <br>
+        Sono certo quindi che nel robot deve esserci un interprete che deve capire il linguaggio dei requisiti
+    </p>
+</div>  
+
+<footer>
+    By Stefano Righini
+</footer> 
+</body>
+</html>
