@@ -90,6 +90,24 @@ bc{
     color: #990000;
 	background-color: #fcf8c7;
 }
+k{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #990000;
+	 
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	 
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	 
+}
 pre{
 	font-family: "Helvetica";
 	font-size: 70%;
@@ -123,14 +141,14 @@ table, th, td {
 </style>
 <head>
    
-<title>Lab9ISS</title></head>
+<title>LabVirtualRobot</title></head>
     
 <body>
 
 <div class="body"> 
 
-<h1>72939 - LAB9 | Interacting with a virtual robot</h1> 
-<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/LectureBologna1819.html" target="isslm">LabISS-lectures site</a></font> 
+<h1>LabVirtualRobot | Interacting with a virtual robot</h1> 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.issLabStart/userDocs/LectureCesena1920.html" target="isslm">LabISS-lectures site</a></font> 
 
 <h2>INTRODUCTION</h2>
 Our company (<tt>Unibo</tt>) has developed  a virtual environment (named <em>WEnv</em>) that includes a virtual robot.
@@ -162,7 +180,7 @@ The scene of the <tt>WEnv</tt> is built from a description can be easily defined
 </table></center>
 	
   
-The scene description is stroed in a configuration file (named <bc>sceneConfig.js</bc>) stored in the
+The scene description is stored in a configuration file (named <bc>sceneConfig.js</bc>) stored in the
 directory <tt>WebGLScene</tt>. For example the description of the scene on the right of the figure above is:
 <pre>
 const config = {
@@ -224,7 +242,7 @@ const config = {
 export default config;
 </pre>
 
-<h3>INTERACTION</h3> 
+<h3 id="interactionOutput">INTERACTION: Output</h3> 
 	
 The virtual robot accepts commands sent on a <tt>TCP</tt> connection on port <tt>8999</tt>.
 The commands are described in the file <tt>README.md</tt>.
@@ -239,10 +257,12 @@ turnLeft : `{ "type": "turnLeft", "arg": 300 }`
 
 stop : `{ "type": "alarm" }`
 </pre>
+
+<h3 id="interactionInput">INTERACTION: Input</h3> 
 Moreover, the virtual environment <em>sends</em> to the connected client (via <tt>TCP</tt> on port <tt>8999</tt>):
 <ul>
-<li>Data emitted by the sonars included in the scene when they detect the robot </li>
-<li>Data emitted by the sonars on board of the robot, when they detect an obstacle (fixed or mobile) </li>
+<li>Data emitted by the <em>sonars</em> <k>included in the scene</k> when they detect the robot </li>
+<li>Data emitted by the  <em>sonars</em> <k>on board</k> of the robot, when they detect an obstacle (fixed or mobile) </li>
 </ul>
 
 <pre>
@@ -259,21 +279,34 @@ collision : `{
 
 
 
-<h3>USING THE WENV ROBOT</h3>
+<h3>USING THE VirtualRobot</h3>
 
-Let us report an example of a client written in Node.js that sends some command to the robot:
+Examples of clients to send commands to the virtual robot:
 <center><table style="width:95%">
 <tbody>	
 
 <tr>
-<td style="width:40%">
-<a href="../src/clientToWenv.js" target="code">clientToWenv.js</a> (<tt>node clientToWenv.js localhost 8999</tt>)
+<td style="width:33%">
+<m>A client written in Node.js</m><br/>
+<a href="../resources/clientToWenv.js" target="code">clientToWenv.js</a> <br/>
+(<tt>node clientToWenv.js localhost 8999</tt>)
 </td>
-<td style="width:40%">
-<a href="../src/clientWenvTcpObj.kt" target="code">clientWenvTcpObj.kt</a>
+
+<td>
+<m>A client written in python</m><br/>
+<a href="../resources/clientToWenv.py" target="code">clientToWenv.py</a><br/>
+<m>See also the <a href="https://jupyter.org/">jupyter notebook</a> named  <br/>
+<a href="BasicRobotInteraction.ipynb" target="code">BasicRobotInteraction.ipynb</a>
+in project <tt>it.unibo.robot2020</tt></m>.  
 </td>
- </tr>
- 
+
+<td style="width:33%">
+<m>A client written in qak</m><br/>
+<a href="../resources/itunibo.robotVirtual/clientWenvObjTcp.kt" target="code">clientWenvObjTcp.kt</a>
+</td>
+</tr>
+
+
 </tbody>	
 </table></center>
 

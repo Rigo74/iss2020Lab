@@ -1,0 +1,24 @@
+System sysexample
+
+Dispatch cmd    : cmd(X)
+Dispatch ledCmd : ledCmd(X)  
+
+Context ctxSysExample ip [host="localhost"    port=8072]
+Context ctxBls        ip [host="192.168.1.8"  port=8075]
+
+QActor qa0 context ctxSysExample{   
+	State s0 initial{  
+		println("qa0 sends w to qacoded") 
+		forward qacoded -m cmd : cmd(w)
+		delay 500 
+		println("qa0 sends  ledCmd : ledCmd( on )  to the external led") 
+		forward led -m ledCmd : ledCmd( on )
+		delay 1000 
+		println("qa0 sends  ledCmd : ledCmd( off ) to the external led") 
+		forward led -m ledCmd : ledCmd( off )
+	}
+} 
+
+CodedQActor qacoded context ctxSysExample className "resources.qacoded" 
+
+ExternalQActor led context ctxBls

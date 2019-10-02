@@ -10,7 +10,7 @@ object logSimple {
 	val inputStream: InputStream = File("robLog.txt").inputStream() 
  
 	fun saveData(   data : String )   {		
-  		pw.append( "$data\n " )
+  		pw.append( "$data\n" )
 		pw.flush()
     }
 	
@@ -25,5 +25,9 @@ object logSimple {
 		inputStream.bufferedReader().useLines { lines -> line = lines.first() }
 		//println("      ... getFirstLine line=$line")
 		return line
+	}
+	fun getLastLine() : String {
+		var lines =  inputStream.bufferedReader().readLines()
+ 		return lines.last()
 	}
 }

@@ -35,7 +35,7 @@ import alice.tuprolog.*
 			println("clientWenvObjTcp | sending Msg $v   ")
 			var outS = "{'type': 'alarm', 'arg': 0 }"
 			when( v ){
-				"w"   -> outS = "{'type': 'moveForward',  'arg': -1 }"
+				"w"  -> outS = "{'type': 'moveForward',  'arg': -1 }"
     			"s"  -> outS = "{'type': 'moveBackward', 'arg': -1 }"
 				"a"  -> outS = "{'type': 'turnLeft', 'arg': 400 }"
  				"d"  -> outS = "{'type': 'turnRight', 'arg': 400 }"
@@ -59,7 +59,7 @@ import alice.tuprolog.*
                         val jsonObject = JSONObject(jsonMsgStr)
                         //println( "type: " + jsonObject.getString("type"));
                         when (jsonObject.getString("type")) {
-                            "webpage-ready" -> println("webpage-ready ")
+                            //"webpage-ready" -> println("webpage-ready ")
                             "sonar-activated" -> {
                                 //println("sonar-activated ")
                                 val jsonArg   = jsonObject.getJSONObject("arg")

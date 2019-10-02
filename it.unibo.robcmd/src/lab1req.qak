@@ -20,28 +20,35 @@ Dispatch cmd : cmd(X) // X = w | s | a ...
 Context ctxRobot   ip [ host= "localhost"   port= 8020 ] 
 Context ctxConsole ip [ host= "localhost"   port= 8030 ] 
 
-
-QActor console context ctxConsole {    
+QActor console context ctxConsole {       
 	State s0 initial {
 		println ( "hello from console" )
 		forward robot -m cmd : cmd( w )   
- 		delay 1000
+ 		delay 500
+		forward robot -m cmd : cmd( s )   
+ 		delay 500
 		forward robot -m cmd : cmd( h )   
-	} 
+	}   
 }
 
 QActor robot context ctxRobot {
 	State s0 initial {
-		//println ( "robot ready" )
+		run itunibo.robotVirtual.clientWenvObjTcp.initClientConn( myself )
+ 		//println ( "robot ready" )
 	}
+	Goto work
+	State work{
+		
+	}	
 	Transition t0 whenMsg cmd -> handleCmd
-	
+
 	State handleCmd{
  		printCurrentMessage
-		onMsg ( cmd : cmd(w) ) { 
-			//run itunibo.robcmd.robotState.robotGoingForward()		
-			println("the robot must execute ${payloadArg(0)}")	 
+		onMsg ( cmd : cmd(X) ) { 
+			run itunibo.robcmd.robotState.robotMove(payloadArg(0))					//change the model
+			run itunibo.robotVirtual.clientWenvObjTcp.sendMsg( payloadArg(0 )   )	//activate motors
 		}
  	}
 	Goto s0
 }
+

@@ -1,0 +1,38 @@
+/*
+*/
+
+System basicrobot  
+
+Dispatch cmd          : cmd(X) // X = w | s | a ... 
+Event  sonarRobot     : sonar( DISTANCE )	     //from  sonar on robot 
+Event  sonar          : sonar(SONAR, DISTANCE)	 //from sonar in the robot environment   
+
+Context ctxBasicRobot   ip [ host= "localhost"   port= 8020 ] 
+ 
+QActor basicrobot context ctxBasicRobot { 
+	State s0 initial {
+		run itunibo.robotVirtual.clientWenvObjTcp.initClientConn( myself )
+	}
+	Goto work
+	
+	State work{	println ( "robot waiting" ) 		
+	}	
+	Transition t0   
+		whenMsg   cmd        -> handleCmd
+		whenEvent sonarRobot -> handleObstacle 
+ 		 
+	State handleCmd{ 
+ 		printCurrentMessage  
+		onMsg ( cmd : cmd(X) ) { 
+			run itunibo.robotVirtual.clientWenvObjTcp.sendMsg( payloadArg(0 )   )	//move the virtual robot
+		}
+ 	}
+ 	Goto work
+ 	
+	State handleObstacle{
+		printCurrentMessage
+		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg( "h" )
+	}
+	Goto work
+}
+

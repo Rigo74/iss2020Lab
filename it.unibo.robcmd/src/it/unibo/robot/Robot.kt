@@ -18,15 +18,22 @@ class Robot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						itunibo.robotVirtual.clientWenvObjTcp.initClientConn(myself)
+					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("work") { //this:State
+					action { //it:State
 					}
 					 transition(edgeName="t00",targetState="handleCmd",cond=whenDispatch("cmd"))
 				}	 
 				state("handleCmd") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(w)"), 
+						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								println("the robot must execute ${payloadArg(0)}")
+								itunibo.robcmd.robotState.robotMove( payloadArg(0)  )
+								itunibo.robotVirtual.clientWenvObjTcp.sendMsg( payloadArg(0)  )
 						}
 					}
 					 transition( edgeName="goto",targetState="s0", cond=doswitch() )

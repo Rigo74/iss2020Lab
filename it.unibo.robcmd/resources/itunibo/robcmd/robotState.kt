@@ -16,5 +16,17 @@ object robotState {
 		itunibo.robcmd.logSimple.saveData( stateVal )
 		println("robot state updated to $stateVal")
 	}
+	
+	fun robotMove(  move : String ){
+		when (move ){
+			"w" -> stateVal = stateRepForward
+			"s" -> stateVal = stateRepBackward
+			"a" -> stateVal = stateRepRotateLeft
+			"d" -> stateVal = stateRepRotateRight
+			"h" -> stateVal = stateRepStopped
+		}
+ 		itunibo.robcmd.logSimple.saveData( stateVal )
+		println("robot state updated to $stateVal")
+	}
 	 
 }
