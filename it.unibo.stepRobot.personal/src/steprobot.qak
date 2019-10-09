@@ -1,0 +1,44 @@
+System robotstep  
+
+Dispatch cmd  :  cmd(X) // X = w | s | a ... 
+Dispatch step : step(X)
+Dispatch stop : stop(X)
+
+Context ctxStepRobot ip [host="localhost" port= 8030]
+ExternalContext ctxBasicRobot ip [host= "192.168.1.33" port= 8020] 
+ 
+QActor steprobot context ctxStepRobot { 
+	State s0 initial {
+	}
+	Goto work
+	
+	State work {
+		println("RobotStep: I'm working")		
+	}
+	Transition t0   
+		whenMsg step -> handleStep
+		whenMsg stop -> handleStop
+		
+	State handleStep {
+		println("RobotStep: do step")
+		//send cmd(w) to basicrobot
+		forward basicrobot -m cmd: cmd(w)	
+	}
+	Transition t1
+		whenTime 2000 -> handleStop
+		whenMsg stop -> handleStop
+		
+	State handleStop {
+		println("RobotStep: stop")
+		//send cmd(h) to basicrobot
+		forward basicrobot -m cmd: cmd(h)	
+	}
+	Goto work
+}
+
+ExternalQActor basicrobot context ctxBasicRobot
+
+
+
+
+
