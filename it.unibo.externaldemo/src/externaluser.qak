@@ -1,0 +1,44 @@
+System externaluser
+
+mqttBroker "localhost" : 1883
+ 
+Dispatch userCmd    : userCmd(X)
+
+Request cmd 		: cmd(X) // X =  w | s | a | d | h
+Reply   replytocmd  : replytocmd(X)
+Request info        : info(X)
+Reply   replytoinfo : replytoinfo(X)
+  
+Request cmd 		: cmd(X) // X =  w | s | a | d | h
+Reply   replytocmd  : replytocmd(X)
+
+/*
+ * WARNING: 
+ * if an external resource works in a MQTT-enabled QakContext,
+ * then also a request-caller must work via MQTT
+ */
+Context         ctxExternalUser      ip [ host= "localhost"      port= 8015 ] //-mqtt 
+ExternalContext ctxExternalResource  ip [ host= "192.168.1.12"   port= 8018 ] //-mqtt
+  
+ExternalQActor resource context ctxExternalResource 
+    
+QActor user context ctxExternalUser {
+	State s0 initial {    
+		 println("user forward userCmd ")  
+		 forward resource -m userCmd : userCmd(1)
+		 delay 1000
+		 println("user request cmd ")
+		 request resource -m cmd : cmd(a) 
+	}
+	Transition t0 
+		whenReply replytocmd -> handleReply 
+		
+	
+	State handleReply{
+		println("       --- handleReply ") 
+		printCurrentMessage
+		println("       --- handleReply ") 
+	}
+}
+
+

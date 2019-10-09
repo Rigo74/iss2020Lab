@@ -1,0 +1,129 @@
+System externalresource
+ 
+mqttBroker "localhost" : 1883 
+
+Dispatch userCmd    : userCmd(X)
+
+Request cmd 		: cmd(X) // X =  w | s | a | d | h
+Reply   replytocmd  : replytocmd(X)
+Request info        : info(X)
+Reply   replytoinfo : replytoinfo(X)
+     
+Context ctxExternalResource  ip [ host= "localhost"    port= 8018 ]  //-mqtt
+Context ctxLocalUser         ip [ host= "localhost"    port= 8013 ]  //-mqtt
+
+QActor resource context ctxExternalResource {
+	State s0 initial { 
+		 println("resource waiting ...") 	  	 
+	}
+	Transition t0  
+		whenMsg userCmd -> handleUserCmd
+		whenRequest cmd -> handleRequestCmd
+		//whenRequest cmd -> handleRequestCmdWithAsk
+	
+	State handleUserCmd{ 
+		println("       --- handleUserCmd ") 
+		printCurrentMessage
+		println("       --- handleUserCmd ") 
+	}	
+	Goto s0	 
+	
+	State handleRequestCmd{
+		onMsg( cmd : cmd(X) ){
+			["val ANSW = \"answerFor_${payloadArg(0)}\" "]
+			replyTo cmd with replytocmd : replytocmd( $ANSW ) 
+		}		 		
+	}
+	Goto s0	
+	 
+	State handleRequestCmdWithAsk{
+		printCurrentMessage
+		onMsg( cmd : cmd(xxx) ){
+			["val QUERY = \"queryFor_${payloadArg(0)}\" "]
+			askFor info request cmd : info($QUERY ) 
+		}		 
+		onMsg( cmd : cmd(a) ){
+			["val ANSW = \"answerFor_a\" "]
+			replyTo cmd with replytocmd : replytocmd( $ANSW ) 
+		}		 
+	}
+	Transition t0
+		whenReply replytoinfo -> handleReplyInfo
+ 
+	State handleReplyInfo{
+		println("       --- handleReplyInfo ") 
+		printCurrentMessage 
+		println("       --- handleReplyInfo ")
+		replyTo cmd with replytocmd : replytocmd( uuuuuuuuuu ) 
+	}
+	Goto s0	  
+}
+
+QActor localcaller1 context ctxLocalUser {
+	State s0 initial { 
+		 println("localcaller1 sending a dispatch ")	 
+		 forward resource -m userCmd : userCmd(a)
+		 println("localcaller1 sending a request ")	 
+		 request resource -m cmd : cmd(a) 	 
+	} 
+	Goto work
+	
+	State work{		
+		println("localcaller1 work .... ")	  
+	}
+	Transition t0 
+		whenReply replytocmd -> handleReply 
+ 
+	State handleReply{
+		println("       --- localcaller1 handleReply ") 
+		printCurrentMessage
+		println("       --- localcaller1 handleReply and terminates") 
+	} 
+}
+
+
+
+/*
+ * 1) localcaller1 in the same context
+ * 2) localcaller1 in a different context
+ * 3) ctxExternalResource using mqtt 
+ */
+ 
+/*  
+QActor localuser context ctxExternalResource {
+	State s0 initial { 
+		 println("localuser doing a request ")	 
+		 request resource -m cmd : cmd(xxx) 	 
+	} 
+	Goto work
+	
+	State work{		
+		println("localuser work .... ")	  
+	}
+	Transition t0 
+		whenReply replytocmd -> handleReply 
+		whenRequest info     -> handleRequestInfo
+		
+	State handleReply{
+		println("       --- localuser handleReply ") 
+		printCurrentMessage
+		println("       --- localuser handleReply and terminates") 
+	} 
+ 	
+	State handleRequestInfo{
+		println("       --- handleRequestInfo ") 
+		printCurrentMessage
+		println("       --- handleRequestInfo ") 
+		onMsg( info : info(X) ){
+			["val ANSW = \"answerTo_${payloadArg(0)}\" "]
+			replyTo info with replytoinfo : replytoinfo( $ANSW  ) 
+		}
+	} 
+//	Transition t0 
+//		whenReply replytocmd -> handleReply 
+	Goto work
+	
+}
+*/
+
+

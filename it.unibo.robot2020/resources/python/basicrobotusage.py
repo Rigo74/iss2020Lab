@@ -37,7 +37,7 @@ def read() :
     print( "received data:", data )
 
 def terminate() :
-    sock.close()
+    #sock.close()
     print("BYE")
 
 ###########################################    

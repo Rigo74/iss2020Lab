@@ -7,7 +7,6 @@ Dispatch goon : goon(X)
  
 Context ctxPrologExample ip [host="localhost" port=8090]
 
-
 QActor kb context ctxPrologExample{
 ["var CHAINCOUNTER = 1"]	
 

@@ -1,0 +1,57 @@
+System externalcallers
+
+mqttBroker "localhost" : 1883
+ 
+Dispatch userCmd    : userCmd(X)
+
+Request cmd 		: cmd(X) // X =  w | s | a | d | h
+Reply   replytocmd  : replytocmd(X)
+Request info        : info(X)
+Reply   replytoinfo : replytoinfo(X)
+  
+Request cmd 		: cmd(X) // X =  w | s | a | d | h
+Reply   replytocmd  : replytocmd(X)
+
+/*
+ * WARNING: 
+ * if an external resource works in a MQTT-enabled QakContext,
+ * then also a request-caller must work via MQTT
+ */
+Context         ctxExternalCallers   ip [ host= "localhost"      port= 8013 ] //-mqtt 
+ExternalContext ctxExternalResource  ip [ host= "192.168.1.12"   port= 8018 ] //-mqtt
+  
+ExternalQActor resource context ctxExternalResource 
+    
+QActor caller1 context ctxExternalCallers {
+	State s0 initial {    
+  		 println("caller1 request cmd ")
+		 request resource -m cmd : cmd(caller1) 
+	}
+	Transition t0 
+		whenReply replytocmd -> handleReply 
+		
+	
+	State handleReply{
+		println("       --- caller1 handleReply ") 
+		printCurrentMessage
+		println("       --- caller1 handleReply ") 
+	}
+}
+
+QActor caller2 context ctxExternalCallers {
+	State s0 initial {    
+  		 println("caller2 request cmd ")
+		 request resource -m cmd : cmd(caller2) 
+	}
+	Transition t0 
+		whenReply replytocmd -> handleReply 
+		
+	
+	State handleReply{
+		println("       --- caller2 handleReply ") 
+		printCurrentMessage
+		println("       --- caller2 handleReply ") 
+	}
+}
+
+

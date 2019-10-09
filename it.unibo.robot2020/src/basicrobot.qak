@@ -27,7 +27,7 @@ QActor basicrobot context ctxBasicRobot {
 	State work{	println ( "robot waiting" ) 		
 	}	
 	Transition t0   
-		whenMsg   cmd        -> handleCmd
+		whenMsg   cmd   -> handleCmd
 		whenEvent sonarRobot -> handleObstacle 
  		 
 	State handleCmd{ 

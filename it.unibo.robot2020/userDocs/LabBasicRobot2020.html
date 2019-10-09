@@ -317,7 +317,6 @@ QActor basicrobot context ctxBasicRobot {
 	
 	State work{	}	
 	<k>Transition t0 
-		whenEvent sonarRobot -> handleObstacle 
 		whenMsg cmd -> handleCmd
 		</k>
  		
@@ -442,7 +441,6 @@ QActor basicrobot context ctxBasicRobot {
 	}	
 	Transition t0   
 		whenMsg   cmd        -> handleCmd
-		whenEvent sonarRobot -> handleObstacle 
  		 
 	State handleCmd{ 
  		printCurrentMessage  
@@ -513,7 +511,34 @@ robot( virtual, "8999" ).
 </td>
 </tr>
 </table>
+
+<h2>Deployment</h2>  
+Looking at 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+LabQakIntro2020.html#Executable</a> , we can deploy the <em>basicrobot</em> 'microservice' as follows:
+<ol>
+<li>Edit the generated file <tt>build_ctxBasicRobot.gradle</tt> as follows: i) <b>uncomment line 19, line 91, lines 93-102</b> </li>
+<li>Set <b> mainClassName =</b> <tt>'it.unibo.ctxBasicRobot.MainCtxBasicRobotKt'</tt></li>
+<li>Run <pre> gradle   -b build_ctxBasicRobot.gradle distZip</pre> </li>
+<li>Unzip (somewhere) the file <tt>it.unibo.robot2020\build\distributions\it.unibo.robot2020-1.0.zip</tt> </li>
+<li>Set the <b>bin</b> directory as the working directory</li>
+<li>Copy the into the <tt>bin</tt> directory the files <kc>sysRules.pl</kc>, <kc>basicrobot.pl</kc> and <kc>basicRobotConfig.pl</kc> </li>
+<li>Edit <kc>basicRobotConfig.pl</kc> to denote the concrete robot to be used</li>
+<li>Execute <k>it.unibo.robot2020.bat</k></li>
+</ol>
  
+Now the <em>basicrobot</em>  should start and wait for a command.
+ 
+<h2>Sending commands</h2>  
+
+<h3>Using python</h3> 
+Open the <em>jupyter notebook</em> <tt>it.unibo.robot2020\userDocs\BasicRobotInteraction.ipynb</tt> and Run:<br/> 
+<ks>Interaction with the basicrobot qactor</ks>.
+
+<h3>Using qakactor without DSL</h3> 
+See <a href="../resources/itunibo/robot/cmdsender/cmdsender.kt" target="code">resources/itunibo.robot.cmdsender/cmdsender.kt</a>
+ 
+
 <br/><br/>
 </div>  
 <div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">

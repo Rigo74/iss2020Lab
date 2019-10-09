@@ -10,8 +10,8 @@ System bls
  
 Event    local_buttonCmd : local_buttonCmd(X) 
 Dispatch ledCmd : ledCmd(X)  
- 
-Context ctxBls ip [host="192.168.1.8" port=8075] 		 
+  
+Context ctxBls ip [host="localhost" port=8075] 		 
  
 QActor button context ctxBls {	//generates local_buttonCmd 
 	State s0 initial { 
@@ -52,7 +52,8 @@ QActor led context ctxBls {
 	}   
 	Transition t0     
 	    //whenTime 5000 -> tooLate  
-		whenMsg ledCmd and "counter++ < 5 || counter > 8" -> handleLedCmd
+		//whenMsg ledCmd and "counter++ < 5 || counter > 8" -> handleLedCmd
+		whenMsg ledCmd -> handleLedCmd
  	  
 	State  handleLedCmd{  
 		//printCurrentMessage   
