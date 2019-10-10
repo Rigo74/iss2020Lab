@@ -1,0 +1,67 @@
+/*
+ * This is a textual representation of a model expressed using the QAK language (meta-model)
+ * that describes the structure, interaction, behaviour of the software system according 
+ * to the requirements.
+ */
+
+System basicrobot
+
+//Dispatch cmd : cmd(X)
+Event cmd : cmd(X)
+
+Context ctxRobot ip [ host= "localhost"   port= 8018 ]
+
+QActor robot context ctxRobot {
+	State s0 initial {
+		println("robot start")
+		run itunibo.robotVirtual.clientWenvObjTcp.initClientConn(myself)
+	}
+	Goto work
+	
+	State work {
+		println("robot waiting...")
+	}
+	
+	Transition t0 
+		//whenMsg cmd -> handleCmd
+		whenEvent cmd -> handleCmd
+	
+	State handleCmd {
+		printCurrentMessage
+		onMsg(cmd : cmd(X)) {
+			[" val moveToDo = payloadArg(0) "]
+			run itunibo.robotVirtual.clientWenvObjTcp.sendMsg(moveToDo)
+		}
+	}
+	Goto work
+}
+
+QActor robotcallersimulator context ctxRobot {
+	State s0 initial {
+		println("robotCallerSimulator start")
+		//forward robot -m cmd : cmd(w)
+		emit cmd : cmd(w)
+		delay 1000
+		//forward robot -m cmd : cmd(w)
+		emit cmd : cmd(h)
+	}
+}
+
+QActor eventperceiver context  ctxRobot {
+	State s0 initial {
+	}
+	
+	Transition t0 
+		whenEvent cmd -> handleCmd
+	
+	State handleCmd {
+		printCurrentMessage
+	}
+	Goto s0
+}
+
+
+
+
+
+

@@ -30,7 +30,8 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 					action { //it:State
 						println("robot waiting")
 					}
-					 transition(edgeName="t03",targetState="handleCmd",cond=whenDispatch("cmd"))
+					 transition(edgeName="t00",targetState="handleCmd",cond=whenDispatch("cmd"))
+					transition(edgeName="t01",targetState="handleObstacle",cond=whenEvent("sonarRobot"))
 				}	 
 				state("handleCmd") { //this:State
 					action { //it:State
@@ -39,6 +40,13 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								itunibo.robot.robotSupport.move( payloadArg(0)  )
 						}
+					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("handleObstacle") { //this:State
+					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
+						itunibo.robot.robotSupport.move( "h"  )
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 

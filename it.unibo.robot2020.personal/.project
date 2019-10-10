@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>it.unibo.robotstep</name>
+	<name>it.unibo.basicrobot</name>
 	<comment></comment>
 	<projects/>
 	<natures>
@@ -26,7 +26,7 @@
 		<link>
 			<name>kotlin_bin</name>
 			<type>2</type>
-			<locationURI>org.jetbrains.kotlin.core.filesystem:/it.unibo.robotStep.personal/kotlin_bin</locationURI>
+			<locationURI>org.jetbrains.kotlin.core.filesystem:/it.unibo.robot2020/kotlin_bin</locationURI>
 		</link>
 	</linkedResources>
 	<filteredResources/>
