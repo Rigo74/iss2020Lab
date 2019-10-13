@@ -24,15 +24,22 @@ class Robotusage ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("work") { //this:State
 					action { //it:State
-						forward("cmd", "cmd(w)" ,"robot" ) 
 						delay(1000) 
-						forward("cmd", "cmd(d)" ,"robot" ) 
+						forward("cmd", "cmd(w)" ,"basicrobot" ) 
 						delay(1000) 
-						forward("cmd", "cmd(d)" ,"robot" ) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
 						delay(1000) 
-						forward("cmd", "cmd(w)" ,"robot" ) 
+						forward("cmd", "cmd(a)" ,"basicrobot" ) 
 						delay(1000) 
-						forward("cmd", "cmd(h)" ,"robot" ) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(d)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(s)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
 					}
 				}	 
 			}

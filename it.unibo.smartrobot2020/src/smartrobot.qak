@@ -1,0 +1,220 @@
+/*
+ * ================================================================
+ * This file includes A TEXTUAL REPRESENTATION of A MODEL 
+ * of the required software system expressed using 
+ * the language (metamodel) qak as the result of PROJECT PHASE.
+ * 
+ * ================================================================
+ */
+System smartrobot  
+
+Dispatch cmd  : cmd(X)
+ 
+Request  step      :  step(DURATION)
+Reply    stepdone  :  stepdone
+Reply    stepfail  :  stepfail(DURATION)
+Dispatch stop      :  stop 
+
+Event  sonarRobot  : sonar( DISTANCE )	     //from  sonar on robot 
+Event  obstacle    : obstacle( DISTANCE )
+
+Event tick         : tick(N)
+
+Context ctxSmartRobot ip [ host= "localhost"      port= 8020 ]
+Context ctxBasicRobot ip [ host= "192.168.1.12"   port= 8018 ]
+
+ExternalQActor basicrobot context ctxBasicRobot 
+
+/*
+ * ---------------------------------------------------------------------------
+ * smartrobot
+ * ---------------------------------------------------------------------------
+ */ 
+
+QActor smartrobot context ctxSmartRobot{
+[" 
+var StepTime = 1000L;  
+var Duration=0 
+"]  	
+	State s0 initial{
+		println("smartrobot start")
+	}
+	Goto work
+	
+	State work{
+		//println("smartrobot waiting ...")
+	}
+	Transition s0 
+			whenMsg cmd      -> handleCmd
+			whenRequest step -> doStep
+			whenMsg stop     -> handleStopNotExpected		 
+ 	
+ 	State handleStopNotExpected{
+ 		println("smartrobot | WARNING: the stop command should not be sent here")
+ 	}
+ 	Goto work
+ 
+ /*
+  * REQUIREMENT req-cmd
+  */
+	State handleCmd {
+		printCurrentMessage 
+		onMsg( cmd : cmd(X) ){
+ 			forward basicrobot -m cmd : cmd( $payloadArg(0) )
+		}
+	}
+	Goto work
+
+ /*
+  * ---------------------------------------------------------------------------
+  * REQUIREMENT req-step 
+  * ---------------------------------------------------------------------------
+  */
+	State doStep{ 
+ 		printCurrentMessage 
+		onMsg( step : step( T ) ){
+			["StepTime = payloadArg(0).toLong()"]
+			["startTimer()"]
+			forward basicrobot -m cmd : cmd( w )
+		}  
+	} 
+	Transition t0 
+		whenTimeVar StepTime  -> endStep	
+		whenMsg stop          -> stepStop		  
+		whenEvent obstacle    -> stepFail
+ 	
+	State endStep{  
+		forward basicrobot -m cmd : cmd( h ) 
+		println("smartrobot | step DONE")
+		replyTo step with stepdone : stepdone
+  	}
+	Goto work
+	 
+	State stepStop{ 
+		["Duration=getDuration()"]  //getDuration is built-in in the actor (with ref. to startTimer)
+		forward basicrobot -m cmd : cmd( h ) 
+		replyTo step with stepfail : stepfail($Duration)
+		println("smartrobot | stepStop Duration=$Duration ")
+ 	}
+	Goto work  	
+
+	State stepFail{ 
+		["Duration=getDuration()"]  //getDuration is built-in in the actor (with ref. to startTimer)
+		replyTo step with stepfail : stepfail($Duration)
+		println("smartrobot | stepFail Duration=$Duration ")
+ 	}
+	Goto work  	
+
+ /*
+  * REQUIREMENT req-stop
+  */
+  	State doStop {
+  		printCurrentMessage  
+  		 
+  	}
+	Goto work
+	
+}
+ 
+
+
+/*
+ * ---------------------------------------------------------------------------
+ * This actor is not part of the system.
+ * It is introduced to make testing easier.
+ * ---------------------------------------------------------------------------
+ */
+QActor smartrobotcaller context ctxSmartRobot { 
+	State s0 initial {	   
+		delay 1000
+		println("smartrobotcaller | doing a step")  
+		request  smartrobot  -m  step :  step(1500)
+  	} 
+  	Goto work
+  	
+  	State work{}
+	Transition t0 
+		whenReply  stepdone  -> anotherStep
+		whenReply  stepfail  -> stepFailed 
+		whenEvent  obstacle  -> perceiveObstacle	//just to see that events are propagated ...
+
+	State anotherStep{
+		println("smartrobotcaller | doing another step")  
+		request  smartrobot  -m  step :  step(2000)		
+//		delay 500
+//		forward smartrobot -m stop : stop
+	} 
+	Transition t0 
+		whenReply  stepdone  -> endOfStep
+		whenReply  stepfail  -> stepFailed
+	 
+	State endOfStep{ 
+ 		println("smartrobotcaller |  step DONE")
+   	}
+   	Transition t0 
+   			whenEvent  tick      -> perceiveTick     	//just to see that events are propagated ...
+   	
+ 	
+	State stepFailed{ 
+		onMsg(  stepfail : stepfail(DURATION)  ) {
+			println("smartrobotcaller | step request failed after Duration=${payloadArg(0)} ")
+		}		
+ 	}
+   	Transition t0 
+   			whenEvent  tick      -> perceiveTick     	//just to see that events are propagated ...
+ 	
+ 	State perceiveObstacle{
+ 		onMsg ( obstacle : obstacle(D) ){
+ 			println("smartrobotcaller | perceives obstacle at Distance=${payloadArg(0)} ")
+ 		}
+ 	} 
+    Goto work
+  
+
+ 	State perceiveTick{  
+ 		onMsg ( tick : tick(N) ){
+ 			println("smartrobotcaller | perceives tick ${payloadArg(0)}")
+ 		}
+ 	}
+   	Transition t0 
+   			whenEvent  tick      -> perceiveTick     	//just to see that events are propagated ...
+} 
+
+
+/*
+ * ---------------------------------------------------------------------------
+ * basicrobot
+ * ---------------------------------------------------------------------------
+
+
+QActor basicrobot context ctxSmartRobot{
+	State s0 initial{
+		println("basicrobot | start")
+	    solve( consult("basicRobotConfig.pl") ) 
+ 		solve( robot(R, PORT) )  //R = virtual | ... 
+  		ifSolved { 
+			//println( "USING:${getCurSol(\"R\")},port=${getCurSol(\"PORT\")}")
+  			run itunibo.robot.robotSupport.create( myself, @R, @PORT )	//@ is a shortcut
+  		} 		
+	}
+	Goto work
+	
+	State work{
+		//println("basicrobot | waiting ...")
+	}
+	Transition s0 
+			whenMsg cmd  -> handleCmd
+  
+ 
+//REQUIREMENT req-cmd
+ 	State handleCmd {
+		//printCurrentMessage 
+		onMsg( cmd : cmd(X) ){
+			[" val MoveToDo = payloadArg(0) "]
+ 			run itunibo.robot.robotSupport.move( payloadArg(0 )   )		
+		}
+	}
+	Goto work
+}
+ */
+ 

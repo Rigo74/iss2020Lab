@@ -15,23 +15,40 @@ class Robotcaller ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		var Counter = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("robotCallerSimulator start")
-						forward("step", "step(1000)" ,"basicrobot" ) 
-						delay(1100) 
+						println("robotcaller start")
+						forward("cmd", "cmd(w)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
+						delay(500) 
 						forward("cmd", "cmd(a)" ,"basicrobot" ) 
 						delay(500) 
 						forward("cmd", "cmd(d)" ,"basicrobot" ) 
 						delay(500) 
-						forward("step", "step(1000)" ,"basicrobot" ) 
-						delay(200) 
-						forward("stop", "stop(1)" ,"basicrobot" ) 
+						forward("cmd", "cmd(w)" ,"basicrobot" ) 
+						delay(1000) 
 						forward("cmd", "cmd(s)" ,"basicrobot" ) 
 						delay(1400) 
 						forward("cmd", "cmd(h)" ,"basicrobot" ) 
 					}
+					 transition( edgeName="goto",targetState="eventEmit", cond=doswitch() )
+				}	 
+				state("eventEmit") { //this:State
+					action { //it:State
+						delay(2000) 
+						Counter++
+						println("robotcaller emits tick $Counter")
+						emit("tick", "tick($Counter)" ) 
+					}
+					 transition( edgeName="goto",targetState="continueEmit", cond=doswitch() )
+				}	 
+				state("continueEmit") { //this:State
+					action { //it:State
+					}
+					 transition( edgeName="goto",targetState="eventEmit", cond=doswitch() )
 				}	 
 			}
 		}

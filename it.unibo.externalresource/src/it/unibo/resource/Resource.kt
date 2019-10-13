@@ -18,21 +18,51 @@ class Resource ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, sc
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("resource starts")
+						println("resource waiting ...")
 					}
-					 transition(edgeName="t00",targetState="handleMsg",cond=whenDispatch("userCmd"))
-					transition(edgeName="t01",targetState="handleRequest",cond=whenRequest("cmd"))
+					 transition(edgeName="t00",targetState="handleUserCmd",cond=whenDispatch("userCmd"))
+					transition(edgeName="t01",targetState="handleRequestCmd",cond=whenRequest("cmd"))
 				}	 
-				state("handleMsg") { //this:State
+				state("handleUserCmd") { //this:State
 					action { //it:State
+						println("       --- handleUserCmd ")
 						println("$name in ${currentState.stateName} | $currentMsg")
+						println("       --- handleUserCmd ")
 					}
 					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
 				}	 
-				state("handleRequest") { //this:State
+				state("handleRequestCmd") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val ANSW = "answerFor_${payloadArg(0)}" 
+								answer("cmd", "replytocmd", "replytocmd($ANSW)"   )  
+						}
+					}
+					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
+				}	 
+				state("handleRequestCmdWithAsk") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						answer("cmd", "replytocmd", "replytocmd(1)"   )  
+						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(xxx)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val QUERY = "queryFor_${payloadArg(0)}" 
+								replyreq("info", "cmd", "info($QUERY)"   )  
+						}
+						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(a)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val ANSW = "answerFor_a" 
+								answer("cmd", "replytocmd", "replytocmd($ANSW)"   )  
+						}
+					}
+					 transition(edgeName="t02",targetState="handleReplyInfo",cond=whenReply("replytoinfo"))
+				}	 
+				state("handleReplyInfo") { //this:State
+					action { //it:State
+						println("       --- handleReplyInfo ")
+						println("$name in ${currentState.stateName} | $currentMsg")
+						println("       --- handleReplyInfo ")
+						answer("cmd", "replytocmd", "replytocmd(uuuuuuuuuu)"   )  
 					}
 					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
 				}	 

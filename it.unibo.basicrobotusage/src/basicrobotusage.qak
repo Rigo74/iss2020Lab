@@ -9,13 +9,12 @@ Dispatch cmd  : cmd(X)
 Dispatch step : step(DURATION)
 Dispatch stop : stop(X)
  
-Context ctxRobotUsage ip [ host= "localhost"   port= 8018 ]
-ExternalContext ctxRobot      ip [ host= "localhost"   port= 8018 ]
+Context ctxRobotUsage      ip [ host= "localhost"      port= 8028 ]
+Context ctxBasicRobot      ip [ host= "192.168.1.12"   port= 8018 ]
+ 
+ExternalQActor basicrobot context ctxBasicRobot
 
-
-ExternalQActor robot context ctxRobot
-
-/*
+/* 
  * This actor is not part of the system.
  * It is introduced to make testing easier.
  */
@@ -25,17 +24,24 @@ QActor robotusage context ctxRobotUsage{
 		println("robotusage start")
 	}
 	Goto work
-	
+	   
 	State work{
-		forward robot -m cmd : cmd(w)
+		delay 1000
+		forward basicrobot -m cmd : cmd(w) 
  		delay 1000
-		forward robot -m cmd : cmd(d)
+ 		forward basicrobot -m cmd : cmd(h)
  		delay 1000
-		forward robot -m cmd : cmd(d)
+		forward basicrobot -m cmd : cmd(a) 
  		delay 1000
- 		forward robot -m cmd : cmd(w)
+ 		forward basicrobot -m cmd : cmd(h)
+ 		delay 1000
+		forward basicrobot -m cmd : cmd(d) 
+ 		delay 1000 
+ 		forward basicrobot -m cmd : cmd(h)  
+ 		delay 1000
+ 		forward basicrobot -m cmd : cmd(s)
   		delay 1000
- 		forward robot -m cmd : cmd(h)
+ 		forward basicrobot -m cmd : cmd(h)
 //		forward robot -m step : step(1000)
 		
 	}

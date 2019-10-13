@@ -15,6 +15,7 @@ class Sonarhandler ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		var obstacleFound = false
 		return { //this:ActionBasciFsm
 				state("init") { //this:State
 					action { //it:State
@@ -25,12 +26,16 @@ class Sonarhandler ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 				state("waitForEvents") { //this:State
 					action { //it:State
 					}
-					 transition(edgeName="t05",targetState="handleSonar",cond=whenEvent("sonarRobot"))
+					 transition(edgeName="t02",targetState="handleSonar",cond=whenEvent("sonarRobot"))
 				}	 
 				state("handleSonar") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						emit("obstacle", "obstacle(5)" ) 
+						if( checkMsgContent( Term.createTerm("sonar(DISTANCE)"), Term.createTerm("sonar(DISTANCE)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+									if( payloadArg(0).toInt() < 10 ) obstacleFound=true
+								if(obstacleFound){ emit("local_obstacle", "local_obstacle(${payloadArg(0)})" ) 
+								 }
+						}
 					}
 					 transition( edgeName="goto",targetState="waitForEvents", cond=doswitch() )
 				}	 

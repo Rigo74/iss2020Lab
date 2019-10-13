@@ -18,7 +18,7 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("basicrobot | start")
+						println("basicrobot start")
 						solve("consult('basicRobotConfig.pl')","") //set resVar	
 						solve("robot(R,PORT)","") //set resVar	
 						if(currentSolution.isSuccess()) { itunibo.robot.robotSupport.create(myself ,getCurSol("R").toString(), getCurSol("PORT").toString() )
@@ -28,25 +28,18 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("work") { //this:State
 					action { //it:State
+						println("basicrobot waiting ...")
 					}
-					 transition(edgeName="s00",targetState="handleCmd",cond=whenDispatch("cmd"))
-					transition(edgeName="s01",targetState="handleObstacle",cond=whenEvent("local_obstacle"))
+					 transition(edgeName="s06",targetState="handleCmd",cond=whenDispatch("cmd"))
 				}	 
 				state("handleCmd") { //this:State
 					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								 val MoveToDo = payloadArg(0) 
 								itunibo.robot.robotSupport.move( payloadArg(0)  )
 						}
-					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
-				}	 
-				state("handleObstacle") { //this:State
-					action { //it:State
-						itunibo.robot.robotSupport.move( "h"  )
-						println("basicrobot | stops (for safety) since  obstacle ")
-						emit("obstacle", "obstacle(5)" ) 
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
