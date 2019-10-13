@@ -1,7 +1,7 @@
 /*
- * This is a textual representation of a model expressed using the QAK language (meta-model)
- * that describes the structure, interaction, behaviour of the software system according 
- * to the requirements.
+ * This is a textual representation of a model expressed using the language (meta-model) QAK
+ * that describes the structure, the interaction and the behaviour of the software system 
+ * according to the requirements. This is the result of the project phase.
  */
 
 System basicrobot
@@ -9,7 +9,6 @@ System basicrobot
 Dispatch cmd  : cmd(X)
 Dispatch step : step(DURATION)
 Dispatch stop : stop
-//Event cmd : cmd(X)
 
 Context ctxRobot ip [ host= "localhost"   port= 8018 ]
 
@@ -25,12 +24,28 @@ QActor robot context ctxRobot {
 		println("robot waiting...")
 	}
 	
-	Transition t0 
+	Transition t0
+		/*
+		 * REQUIREMENT req-cmd
+		 * This allow the robot to handle the commands it receives.
+		 */
 		whenMsg cmd -> handleCmd
-		//whenEvent cmd -> handleCmd
+		/*
+		 * REQUIREMENT req-step
+		 * This allow to moves the robot forward for a prefixed time.
+		 */
 		whenMsg step -> doStep
+		/*
+	  	 * REQUIREMENT req-stop
+	  	 * This allow to stop any ongoing movement immediately when receiving 
+	  	 * the message "stop".
+	  	 */
 		whenMsg stop -> doStop
 	
+	/*
+  	 * REQUIREMENT req-cmd
+  	 * This allow to communicate the received command to the robot.
+  	 */
 	State handleCmd {
 		printCurrentMessage
 		onMsg(cmd : cmd(X)) {
@@ -39,8 +54,10 @@ QActor robot context ctxRobot {
 		}
 	}
 	Goto work
+
 	/*
   	 * REQUIREMENT req-step
+  	 * The command step moves the robot forward for a prefixed time.
   	 */
   	State doStep {
 		printCurrentMessage
@@ -50,19 +67,37 @@ QActor robot context ctxRobot {
 		}
 	}
 	
-	Transition t0 
-		whenTimeVar StepTime -> endStep	//req-step
-		whenMsg 	stop     -> endStep	//req-stop
-	
+	Transition t0
+		/*
+		 * REQUIREMENT req-step
+		 * This allow to stop any ongoing movement of the robot after a certain amount 
+		 * of a prefixed time expressed in seconds.
+		 */
+		whenTimeVar StepTime -> endStep
+		/*
+		 * REQUIREMENT req-stop
+		 * When the robot is performing a step this allow to immediately stop any ongoing 
+		 * movement.
+		 */
+		whenMsg 	stop     -> endStep
+		
+	/*
+  	 * REQUIREMENT req-step
+  	 * This will stop the any ongoing movement of the robot at the end of a step.
+  	 */
 	State endStep {
 		printCurrentMessage
 		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("h")
 	}
 	Goto work
 	
+	/*
+  	 * REQUIREMENT req-stop
+  	 * This will stop any ongoing movement immediately.
+  	 */
 	State doStop {
 		printCurrentMessage
-		//TODO 
+		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("h")
 	}
 	Goto work
 }
@@ -70,7 +105,6 @@ QActor robot context ctxRobot {
 QActor robotcallersimulator context ctxRobot {
 	State s0 initial {
 		println("robotCallerSimulator start")
-		//emit cmd : cmd(w) //for event communication
 		// go in step and back home
 		forward robot -m step : step(1000)
 		delay 1000
@@ -102,23 +136,6 @@ QActor robotcallersimulator context ctxRobot {
 		delay 1000
 	}
 }
-
-/*
-QActor eventperceiver context  ctxRobot {
-	State s0 initial {
-	}
-	
-	Transition t0 
-		//whenEvent cmd -> handleCmd
-		whenMsg cmd -> handleCmd
-	
-	State handleCmd {
-		printCurrentMessage
-	}
-	Goto s0
-}
-*/
-
 
 
 
