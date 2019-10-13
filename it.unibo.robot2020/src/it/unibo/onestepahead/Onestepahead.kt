@@ -32,7 +32,7 @@ class Onestepahead ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								StepTime = payloadArg(0).toLong()
 								startTimer()
-								forward("cmd", "cmd(w)" ,"basicrobotinmind" ) 
+								forward("cmd", "cmd(w)" ,"basicrobot" ) 
 						}
 						stateTimer = TimerActor("timer_doStep", 
 							scope, context!!, "local_tout_onestepahead_doStep", StepTime )
@@ -42,7 +42,7 @@ class Onestepahead ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 				}	 
 				state("endStep") { //this:State
 					action { //it:State
-						forward("cmd", "cmd(h)" ,"basicrobotinmind" ) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
 						println("onestepahead: onestep DONE")
 					}
 					 transition( edgeName="goto",targetState="s0", cond=doswitch() )

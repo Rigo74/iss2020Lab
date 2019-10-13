@@ -15,60 +15,11 @@ class Robot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
-		 var StepTime = 0L; 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						println("robot start")
-						itunibo.robotVirtual.clientWenvObjTcp.initClientConn(myself)
 					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
-				}	 
-				state("work") { //this:State
-					action { //it:State
-						println("robot waiting...")
-					}
-					 transition(edgeName="t00",targetState="handleCmd",cond=whenDispatch("cmd"))
-					transition(edgeName="t01",targetState="doStep",cond=whenDispatch("step"))
-					transition(edgeName="t02",targetState="doStop",cond=whenDispatch("stop"))
-				}	 
-				state("handleCmd") { //this:State
-					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								 val moveToDo = payloadArg(0) 
-								itunibo.robotVirtual.clientWenvObjTcp.sendMsg( moveToDo  )
-						}
-					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
-				}	 
-				state("doStep") { //this:State
-					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						if( checkMsgContent( Term.createTerm("step(DURATION)"), Term.createTerm("step(T)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								StepTime = payloadArg(0).toLong()
-								itunibo.robotVirtual.clientWenvObjTcp.sendMsg( "w"  )
-						}
-						stateTimer = TimerActor("timer_doStep", 
-							scope, context!!, "local_tout_robot_doStep", StepTime )
-					}
-					 transition(edgeName="t03",targetState="endStep",cond=whenTimeout("local_tout_robot_doStep"))   
-					transition(edgeName="t04",targetState="endStep",cond=whenDispatch("stop"))
-				}	 
-				state("endStep") { //this:State
-					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						itunibo.robotVirtual.clientWenvObjTcp.sendMsg( "h"  )
-					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
-				}	 
-				state("doStop") { //this:State
-					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 			}
 		}

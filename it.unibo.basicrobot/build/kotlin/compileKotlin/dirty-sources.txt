@@ -1,0 +1,4 @@
+/home/stefano/University/lss/iss2020Lab/it.unibo.basicrobot/src/it/unibo/robot/Robot.kt
+/home/stefano/University/lss/iss2020Lab/it.unibo.basicrobot/src/it/unibo/ctxRobot/MainCtxRobot.kt
+/home/stefano/University/lss/iss2020Lab/it.unibo.basicrobot/src/it/unibo/eventperceiver/Eventperceiver.kt
+/home/stefano/University/lss/iss2020Lab/it.unibo.basicrobot/src/it/unibo/robotcallersimulator/Robotcallersimulator.kt

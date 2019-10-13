@@ -32,7 +32,7 @@ import alice.tuprolog.*
 
  
         fun sendMsg(v: String) {
- 			//println("clientWenvObjTcp | sending Msg $v   ")
+ 			println("clientWenvObjTcp | sending Msg $v   ")
 			var outS = "{'type': 'alarm', 'arg': 0 }"
 //			val t = Term.createTerm(v) as Struct
 //			val ts = t.getArg(0).toString()
@@ -76,7 +76,7 @@ import alice.tuprolog.*
                             "collision" -> {
                                 val jsonArg = jsonObject.getJSONObject("arg")
                                 val objectName = jsonArg.getString("objectName")
-                                println("clientWenvObjTcp | collision objectName=$objectName")
+                                //println("clientWenvObjTcp | collision objectName=$objectName")
                                 //val m = MsgUtil.buildEvent( "tcp", "collision","collision($objectName)")
 								//println("clientWenvObjTcp | emit $m")
                                 //emitLocalStreamEvent( m )

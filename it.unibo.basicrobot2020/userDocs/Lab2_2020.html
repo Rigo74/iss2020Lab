@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+<style type="text/css">
+<!--
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+	width: 750px;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+k{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #990000;
+	 
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	 
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	 
+}
+pre{
+	font-family: "Helvetica";
+	font-size: 60%;
+	background-color: #fcf8c7;
+	border: 1px solid blue;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}    
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}       
+div.remark{
+	background-color: #FFFC33;     
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}  
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}         
+    
+  -->
+</style>
+    
+<head>
+   
+<title>Lab2_2020</title></head>
+    
+<body>
+<div id="top">
+<h1>Lab2_2020 | A basicrobot with step<font size="5"></font> </h1>
+</div>  
+
+<div class="body"> 
+<h2>Introduction</h2>
+This case-study is related to:
+<ul>
+<li>abstraction gap and conceptual spaces</li>
+<li>the design of proactive-reactive components</li>
+<li>the problem of putting the requirements into a ordered list and the definition of a product-backlog</li>
+<li>the problem of finding proper subsystems and their related models </li>
+</ul>
+
+ 
+<h2>Requirements</h2>
+<div class="req">
+Design and build a software system (<em>basicrobot</em>) that is able to receive via Internet commands (represented 
+in textual form), so that: 
+<ul>
+<li>the commands <k>w | s | h | a | d</k> move a <i>differential drive robot</i> (<em>robot</em>)  respectively
+<k>forward | backward | stop | left | right</k>  (<ks>req-cmd</ks>).  </li>
+<li>the command <k>step</k>  moves the <em>robot</em> forward for a prefixed time (e.g. <tt>2</tt> secs) (<ks>req-step</ks>).</li>
+</ul>
+Moreover, the <em>robot</em> must be always able to react 'immediately' to the <k>stop</k> command, by stopping 
+any ongoing movement (<ks>req-stop</ks>) .
+ 
+</div>	    
+
+<h3>Premise</h3>
+<m>
+We note that:
+<ul>
+<li>the system logically includes two components: the <em>robot</em> and another external component (let us name it <em>caller</em>) 
+that sends commands to the robot via Internet;</li>
+<li>there is no specification about the <em>caller</em>. Thus, we will assume that it will 'adapt' to the interaction rules
+established by the <em>robot</em>. However, we cannot assume that the <em>caller</em> will be coded in the same language used
+to build the software running on the <em>robot</em>; </li>
+<li>there is no specification about the <em>robot</em>. We will assumme here that the customer will provide a proper <k>API</k> to
+use some virtual or real robot; </li>
+</ul>
+Since we are going to write software for a <b>distributed, heterogeneous</b> system, the <i>conceptual space</i> of 'classical' object-oriented
+programming is not the best staring point to talk about the system. Rather, we could use an agent-based or an actor-based
+<i>conceptual space</i>, in which the interaction among components occurs only by means of messages represented as Strings. 
+<br/><br/>
+In the following, we will use the custom 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+qak metamodel</a> as our (starting) language to denote models of the system at the variuos stages of our development process.
+</m>
+<h2>Requirement analysis</h2>
+
+The key-point here is to understand well and to fix the logical way in which the robot accepts the commands. 
+<br/><br/>
+<m>
+Since, at these stage,  we aim at capturing <k>what</k> the system has to do,
+we must be - in absence of specific requirements -  totally <b>technology-independent</b> 
+(i.e. we cannot make reference to any concrete technological support for communications on the Internet).
+<br/>
+Thus, we consider appropriate to 'think' about the system by adopting the <ks>conceptual space</ks> of the
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+qak metamodel</a>, in which the components of a software system are 'actors' able to exchange information as messages of three different (main) types:
+
+<ul>
+<li>dispatch</li>
+<li>request</li>
+<li>event</li>
+</ul>
+</m>
+
+<kc>After a discussion with the customer</kc>, we can define the logical architecture of the system as follows: 
+<br/><br/>
+<a href="../src/basicrobotreq.qak">basicrobotreq.qak</a>
+
+<h3>Notes</h3>
+In this model:
+<ul>
+<li>the <em>basicrobot</em> works as a sort of <a href="https://en.wikipedia.org/wiki/Microservices" target ="web">Microservice</a>
+on the TCP-port <tt>8018</tt>, exploiting the <tt>qak-infrastructure</tt>. 
+This is useful for fast prototyping; however, the final infrastructural support has to be defined later, by the project designer;
+</li>
+<li>each state is associated with a specific, named requirement. This is very useful for <kc>requirement traceability</kc>;</li>
+<li>we exploit the 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.robot2020/userDocs/LabVirtualRobot.html" target="code">
+Virtual Robot</a> available in our company, in order to show a working (<k>mock</k>) prototype to the customer;</li>
+<li>we leave the <k>doStep</k> state still under-specified, since the <ks>req-step</ks> seems 'more demanding' than the <ks>req-cmd</ks>.</li>
+</ul>
+
+ 
+
+<h2>Problem analysis</h2>
+
+<h3>The requirement  <ks>req-cmd</k></h3>
+From the <i>functional</i> point of view, the <em>basicrobot</em> is a <k>translator</k> of commands expressed in the user-language 
+(<tt>w | s | h | a | d</tt>) into commands expressed in the language of the concrete <em>robot</em> to be used. 
+<br/><br/>
+During the execution of a command expressed in the <i>user-language</i>, the  <em>basicrobot</em>  
+could hit an <k>obstacle</k> (either fixed or moving). Since no specification is given in the requirements about this problematic,
+at the moment we assume <k>absence of obtacles</k>.
+<br/><br/>
+Moreover, we can assume that the robot is moving on a flat 
+(<a href="https://en.wikipedia.org/wiki/Euclidean_space" target="web">euclidean</a>) space.
+<br/><br/>
+Under these assumptions, we can use the model defined in the requirement-analysis phase as it is.
+
+<h3>The requirement  <ks>req-step</k></h3>
+The <ks>req-step</ks> entails the 'problematic' to define a <kc>proactive</kc> behavior (for a given time), without loosing the 
+capability to be <kc>reactive</kc> to the <k>stop</k> command according to the <ks>req-stop</ks>.
+<br/><br/>
+The 'problematic' to define a <kc>proactive</kc> behavior for a given time implies the need to 'react' to an event sent by
+a timer. The 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html#whenTime" target="web">
+whenTime</a> primitive gives us the required expressive power:
+
+<table style="width:100%" border="1">
+<tr>
+<td style="width:50%">
+<m>A model 'wired' on  <tt>2-second</tt>  specification:</m>
+<pre>
+	State doStep{
+		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("w")
+ 	}
+	Transition t0 
+		<k>whenTime</k>   2000 -> endStep		//<ks>req-step</ks>
+		whenMsg stop    -> endStep		//<ks>req-stop</ks>
+		
+	State endStep{ 
+		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("h")
+ 	}
+	Goto work		
+</pre>
+
+</td>
+
+<td>
+<m>A model in which the step time is set by the caller:</m>
+<pre>
+QActor robot context ctxRobot{
+<ks>[" 
+var StepTime = 0L;  
+"]</ks>    
+...
+	State doStep{
+ 		onMsg(  step :  step( T ) ){
+			<ks> ["StepTime = payloadArg(0).toLong()"]</ks> 
+ 			run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("w")
+		}
+	}
+	Transition t0 
+		<k>whenTimeVar</k>  StepTime -> endStep	//<ks>req-step</ks>
+		whenMsg stop          -> endStep	//<ks>req-stop</ks>
+		
+	State endStep{ 
+		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("h") 
+ 	}
+	Goto work		
+</pre>
+
+</td>
+</table>
+
+
+
+<h2>Test plans</h2> 
+
+<h2>Project</h2> 
+
+<h2>Testing</h2> 
+
+<h2>Deployment</h2> 
+Following the same steps described in <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.robot2020/userDocs/LabBasicRobot2020.html" target="web">
+LabBasicRobot2020.html</a>, build the file <tt>it.unibo.basicrobot-1.0.zip</tt> (command <tt>gradle -b build_ctxBasicRobot.gradle distZip</tt>) 
+and then execute <k>it.unibo.basicrobot.bat</k>.
+<h2>Maintenance</h2> 
+	      	
+<br/><br/> 	
+</div>  
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
+By studentName email: student@studio.unibo.it  
+<img src="./img/emiglio.png" alt="mbot" width="8%" height="8%">
+</div> 
+ 
+</body>
+</html>

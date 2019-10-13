@@ -1,0 +1,47 @@
+/*
+ * ================================================================
+ * This file includes A TEXTUAL REPRESENTATION of A MODEL 
+ * ================================================================
+ */
+System basicrobotusage
+
+Dispatch cmd  : cmd(X)
+Dispatch step : step(DURATION)
+Dispatch stop : stop(X)
+ 
+Context ctxRobotUsage ip [ host= "localhost"   port= 8018 ]
+ExternalContext ctxRobot      ip [ host= "localhost"   port= 8018 ]
+
+
+ExternalQActor robot context ctxRobot
+
+/*
+ * This actor is not part of the system.
+ * It is introduced to make testing easier.
+ */
+
+QActor robotusage context ctxRobotUsage{
+	State s0 initial{
+		println("robotusage start")
+	}
+	Goto work
+	
+	State work{
+		forward robot -m cmd : cmd(w)
+ 		delay 1000
+		forward robot -m cmd : cmd(d)
+ 		delay 1000
+		forward robot -m cmd : cmd(d)
+ 		delay 1000
+ 		forward robot -m cmd : cmd(w)
+  		delay 1000
+ 		forward robot -m cmd : cmd(h)
+//		forward robot -m step : step(1000)
+		
+	}
+	
+	
+	
+}
+
+ 
