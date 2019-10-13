@@ -6,12 +6,15 @@
 
 System basicrobot
 
-//Dispatch cmd : cmd(X)
-Event cmd : cmd(X)
+Dispatch cmd  : cmd(X)
+Dispatch step : step(DURATION)
+Dispatch stop : stop
+//Event cmd : cmd(X)
 
 Context ctxRobot ip [ host= "localhost"   port= 8018 ]
 
 QActor robot context ctxRobot {
+	[" var StepTime = 0L; "]
 	State s0 initial {
 		println("robot start")
 		run itunibo.robotVirtual.clientWenvObjTcp.initClientConn(myself)
@@ -23,8 +26,10 @@ QActor robot context ctxRobot {
 	}
 	
 	Transition t0 
-		//whenMsg cmd -> handleCmd
-		whenEvent cmd -> handleCmd
+		whenMsg cmd -> handleCmd
+		//whenEvent cmd -> handleCmd
+		whenMsg step -> doStep
+		whenMsg stop -> doStop
 	
 	State handleCmd {
 		printCurrentMessage
@@ -34,32 +39,85 @@ QActor robot context ctxRobot {
 		}
 	}
 	Goto work
+	/*
+  	 * REQUIREMENT req-step
+  	 */
+  	State doStep {
+		printCurrentMessage
+		onMsg(  step :  step( T ) ){
+			 ["StepTime = payloadArg(0).toLong()"] 
+ 			 run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("w")
+		}
+	}
+	
+	Transition t0 
+		whenTimeVar StepTime -> endStep	//req-step
+		whenMsg 	stop     -> endStep	//req-stop
+	
+	State endStep {
+		printCurrentMessage
+		run itunibo.robotVirtual.clientWenvObjTcp.sendMsg("h")
+	}
+	Goto work
+	
+	State doStop {
+		printCurrentMessage
+		//TODO 
+	}
+	Goto work
 }
 
 QActor robotcallersimulator context ctxRobot {
 	State s0 initial {
 		println("robotCallerSimulator start")
-		//forward robot -m cmd : cmd(w)
-		emit cmd : cmd(w)
+		//emit cmd : cmd(w) //for event communication
+		// go in step and back home
+		forward robot -m step : step(1000)
 		delay 1000
-		//forward robot -m cmd : cmd(w)
-		emit cmd : cmd(h)
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		forward robot -m step : step(1000)
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		
+		// go in step and stop before time exceed
+		forward robot -m step : step(10000)
+		delay 1000
+		forward robot -m stop : stop
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		forward robot -m cmd : cmd(w)
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
+		forward robot -m cmd : cmd(d)
+		delay 1000
 	}
 }
 
+/*
 QActor eventperceiver context  ctxRobot {
 	State s0 initial {
 	}
 	
 	Transition t0 
-		whenEvent cmd -> handleCmd
+		//whenEvent cmd -> handleCmd
+		whenMsg cmd -> handleCmd
 	
 	State handleCmd {
 		printCurrentMessage
 	}
 	Goto s0
 }
-
+*/
 
 
 

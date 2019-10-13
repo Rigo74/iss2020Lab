@@ -19,7 +19,7 @@ class Eventperceiver ( name: String, scope: CoroutineScope ) : ActorBasicFsm( na
 				state("s0") { //this:State
 					action { //it:State
 					}
-					 transition(edgeName="t01",targetState="handleCmd",cond=whenEvent("cmd"))
+					 transition(edgeName="t03",targetState="handleCmd",cond=whenDispatch("cmd"))
 				}	 
 				state("handleCmd") { //this:State
 					action { //it:State

@@ -13,6 +13,7 @@ System basicrobot
 
 Dispatch cmd  : cmd(X)
 Dispatch step : step(DURATION)
+Dispatch stop : stop
 //Event cmd : cmd(X)
 
 
@@ -31,6 +32,7 @@ QActor robot context ctxRobot{
 	Transition s0 
 			whenMsg cmd  -> handleCmd
 			whenMsg step -> doStep
+			whenMsg stop -> doStop
  /*
   * REQUIREMENT req-cmd
   */
@@ -43,12 +45,17 @@ QActor robot context ctxRobot{
 	
 		}
 	}
-	Goto work if "goon" else s0
+	Goto work
 
  /*
   * REQUIREMENT req-step
   */
   	State doStep {
+		printCurrentMessage
+		//TODO 
+	}
+	Goto work
+	State doStop {
 		printCurrentMessage
 		//TODO 
 	}
