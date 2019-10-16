@@ -58,11 +58,6 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Didattica2018Work/iss2019Lab/libs/it.unibo.qakactor-1.1.jar">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="C:/Didattica2018Work/iss2019Lab/libs/unibonoawtsupports.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
@@ -178,5 +173,6 @@
 			<attribute name="gradle_used_by_scope" value="test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Didattica2018Work/iss2019Lab/libs/it.unibo.qakactor-1.2.jar"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>

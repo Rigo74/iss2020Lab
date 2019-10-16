@@ -14,16 +14,17 @@ Request  step      :  step(DURATION)
 Reply    stepdone  :  stepdone
 Reply    stepfail  :  stepfail(DURATION)
 Dispatch stop      :  stop 
-
+ 
 Event  sonarRobot  : sonar( DISTANCE )	     //from  sonar on robot 
 Event  obstacle    : obstacle( DISTANCE )
+Event  alarm       : alarm(V)
 
-Event tick         : tick(N)
+Event tick         : tick(N) 
 
-Context ctxSmartRobot ip [ host= "localhost"      port= 8020 ]
-Context ctxBasicRobot ip [ host= "192.168.1.12"   port= 8018 ]
+Context ctxSmartRobot ip [ host= "localhost"     port= 8020 ]
+Context ctxBasicRobot ip [ host= "192.168.1.6"   port= 8018 ]
 
-ExternalQActor basicrobot context ctxBasicRobot 
+ExternalQActor basicrobot context ctxBasicRobot  
 
 /*
  * ---------------------------------------------------------------------------
@@ -38,6 +39,11 @@ var Duration=0
 "]  	
 	State s0 initial{
 		println("smartrobot start")
+		delay 1000
+		forward basicrobot -m cmd : cmd( a )
+		delay 1000
+		forward basicrobot -m cmd : cmd( d )
+		delay 1000
 	}
 	Goto work
 	
@@ -116,14 +122,29 @@ var Duration=0
 	
 }
  
-
-
+ QActor smartperceiver context ctxSmartRobot{
+	State s0 initial{ 
+		println("perceiver start")
+	}
+	Transition t0 
+		whenEvent obstacle -> handleEvent
+		whenEvent alarm    -> handleEvent
+ 	
+	State handleEvent{
+		println("perceiver handleEvent ")
+		printCurrentMessage
+	}
+ 	Transition t0 
+		whenEvent obstacle -> handleEvent
+		whenEvent alarm    -> handleEvent
+ }
+ 
 /*
  * ---------------------------------------------------------------------------
  * This actor is not part of the system.
  * It is introduced to make testing easier.
  * ---------------------------------------------------------------------------
- */
+
 QActor smartrobotcaller context ctxSmartRobot { 
 	State s0 initial {	   
 		delay 1000
@@ -179,42 +200,5 @@ QActor smartrobotcaller context ctxSmartRobot {
    	Transition t0 
    			whenEvent  tick      -> perceiveTick     	//just to see that events are propagated ...
 } 
-
-
-/*
- * ---------------------------------------------------------------------------
- * basicrobot
- * ---------------------------------------------------------------------------
-
-
-QActor basicrobot context ctxSmartRobot{
-	State s0 initial{
-		println("basicrobot | start")
-	    solve( consult("basicRobotConfig.pl") ) 
- 		solve( robot(R, PORT) )  //R = virtual | ... 
-  		ifSolved { 
-			//println( "USING:${getCurSol(\"R\")},port=${getCurSol(\"PORT\")}")
-  			run itunibo.robot.robotSupport.create( myself, @R, @PORT )	//@ is a shortcut
-  		} 		
-	}
-	Goto work
-	
-	State work{
-		//println("basicrobot | waiting ...")
-	}
-	Transition s0 
-			whenMsg cmd  -> handleCmd
-  
- 
-//REQUIREMENT req-cmd
- 	State handleCmd {
-		//printCurrentMessage 
-		onMsg( cmd : cmd(X) ){
-			[" val MoveToDo = payloadArg(0) "]
- 			run itunibo.robot.robotSupport.move( payloadArg(0 )   )		
-		}
-	}
-	Goto work
-}
  */
- 
+

@@ -27,6 +27,19 @@ class Qa0 ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope){
 						println("qa0 sends  ledCmd : ledCmd( off ) to the external led")
 						forward("ledCmd", "ledCmd(off)" ,"led" ) 
 					}
+					 transition( edgeName="goto",targetState="s1", cond=doswitch() )
+				}	 
+				state("s1") { //this:State
+					action { //it:State
+						println("qa0 waiting ... ")
+					}
+					 transition(edgeName="t00",targetState="handleAlarm",cond=whenEvent("alarm"))
+				}	 
+				state("handleAlarm") { //this:State
+					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
+					}
+					 transition( edgeName="goto",targetState="s1", cond=doswitch() )
 				}	 
 			}
 		}

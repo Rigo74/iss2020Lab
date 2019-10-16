@@ -76,17 +76,14 @@ import alice.tuprolog.*
                             "collision" -> {
                                 val jsonArg = jsonObject.getJSONObject("arg")
                                 val objectName = jsonArg.getString("objectName")
-                                println("		--- clientWenvObjTcp | collision objectName=$objectName")
-                                //val m = MsgUtil.buildEvent( "tcp", "collision","collision($objectName)")
+                                //println("		--- clientWenvObjTcp | collision objectName=$objectName")
+                                val m = MsgUtil.buildEvent( "tcp", "obstacle","obstacle($objectName)")
 								//println("clientWenvObjTcp | emit $m")
                                 //emitLocalStreamEvent( m )
- 							     actor.emit("sonarRobot","sonar(5)"
-									.replace("TARGET", objectName
-									.replace("-", "")));
+								actor.emit(m)
                            }
                         }
                     } catch (e: IOException) {
-                        //e.printStackTrace()
 						println("		--- clientWenvObjTcp | ERROR $e   ")
 						System.exit(1)
                     }

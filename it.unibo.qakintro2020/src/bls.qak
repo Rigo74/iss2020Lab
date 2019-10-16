@@ -8,7 +8,7 @@
 
 System bls   
  
-Event    local_buttonCmd : local_buttonCmd(X) 
+Event    local_buttonCmd : local_buttonCmd(X)  
 Dispatch ledCmd : ledCmd(X)  
   
 Context ctxBls ip [host="localhost" port=8075] 		 

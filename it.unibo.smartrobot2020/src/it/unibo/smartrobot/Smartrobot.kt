@@ -22,6 +22,11 @@ class Smartrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("s0") { //this:State
 					action { //it:State
 						println("smartrobot start")
+						delay(1000) 
+						forward("cmd", "cmd(a)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(d)" ,"basicrobot" ) 
+						delay(1000) 
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 

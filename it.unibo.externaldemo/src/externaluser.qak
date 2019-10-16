@@ -17,8 +17,8 @@ Reply   replytocmd  : replytocmd(X)
  * if an external resource works in a MQTT-enabled QakContext,
  * then also a request-caller must work via MQTT
  */
-Context         ctxExternalUser      ip [ host= "localhost"      port= 8015 ] //-mqtt 
-ExternalContext ctxExternalResource  ip [ host= "192.168.1.12"   port= 8018 ] //-mqtt
+Context ctxExternalUser      ip [ host= "localhost"      port= 8015 ] //-mqtt 
+Context ctxExternalResource  ip [ host= "192.168.1.12"   port= 8018 ] //-mqtt
   
 ExternalQActor resource context ctxExternalResource 
     

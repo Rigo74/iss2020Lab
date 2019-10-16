@@ -10,5 +10,6 @@ class qacoded( name : String ) : ActorBasic( name ){
 
     override suspend fun actorBody(msg : ApplMessage){
         println("	$name handles $msg ")
+		emit("alarm", "alarm(fire)")
     }
 }

@@ -18,7 +18,7 @@ Reply   replytocmd  : replytocmd(X)
  * then also a request-caller must work via MQTT
  */
 Context         ctxExternalCallers   ip [ host= "localhost"      port= 8013 ] //-mqtt 
-ExternalContext ctxExternalResource  ip [ host= "192.168.1.12"   port= 8018 ] //-mqtt
+Context ctxExternalResource  ip [ host= "192.168.1.12"   port= 8018 ] //-mqtt
   
 ExternalQActor resource context ctxExternalResource 
     

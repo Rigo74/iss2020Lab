@@ -1,53 +1,67 @@
 /*
  * ================================================================
- * This file includes A TEXTUAL REPRESENTATION of A MODEL 
+ * This exmaple shows that
+ * the caller of an External QActor can perceive events emitted
+ * by (any actor working in the context of ) the External QActor.
+ * These events can be perceived also by any QActor working
+ * in the context of the caller.
  * ================================================================
  */
-System basicrobotusage
+System -trace basicrobotusage
 
-Dispatch cmd  : cmd(X)
-Dispatch step : step(DURATION)
-Dispatch stop : stop(X)
- 
-Context ctxRobotUsage      ip [ host= "localhost"      port= 8028 ]
-Context ctxBasicRobot      ip [ host= "192.168.1.12"   port= 8018 ]
+Dispatch cmd       : cmd(X)
+Event  obstacle    : obstacle( DISTANCE )
+Event  alarm       : alarm(V)  
+
+
+Context ctxRobotUsage  ip [ host= "localhost"     port= 8048 ]
+Context ctxBasicRobot  ip [ host= "192.168.1.6"   port= 8018 ] 
+Context ctxSmartRobot  ip [ host= "192.168.1.6"   port= 8020 ] 
  
 ExternalQActor basicrobot context ctxBasicRobot
-
-/* 
- * This actor is not part of the system.
- * It is introduced to make testing easier.
- */
+ExternalQActor smartrobot context ctxSmartRobot
 
 QActor robotusage context ctxRobotUsage{
-	State s0 initial{
+	State s0 initial{ 
 		println("robotusage start")
 	}
 	Goto work
-	   
-	State work{
-		delay 1000
-		forward basicrobot -m cmd : cmd(w) 
- 		delay 1000
- 		forward basicrobot -m cmd : cmd(h)
- 		delay 1000
-		forward basicrobot -m cmd : cmd(a) 
- 		delay 1000
- 		forward basicrobot -m cmd : cmd(h)
- 		delay 1000
-		forward basicrobot -m cmd : cmd(d) 
- 		delay 1000 
- 		forward basicrobot -m cmd : cmd(h)  
- 		delay 1000
- 		forward basicrobot -m cmd : cmd(s)
-  		delay 1000
- 		forward basicrobot -m cmd : cmd(h)
-//		forward robot -m step : step(1000)
-		
+ 
+ 	State work{
+		delay 1000   
+		forward basicrobot -m cmd : cmd( a )
+		delay 1000  
+		forward smartrobot -m cmd : cmd( d )
+		delay 1000  
+		println("robotusage send w to smartrobot")
+		forward smartrobot -m cmd : cmd( w )
+		delay 1000  
+		forward smartrobot -m cmd : cmd( h )
+		delay 1000  
+  	}
+	Transition t0 
+		whenEvent obstacle -> handleObstacle
+			
+	State handleObstacle{
+		printCurrentMessage 
+		println("robotusage handleObstacle ")
 	}
-	
-	
-	
-}
+ }
+ 
+ QActor callerfriend context ctxRobotUsage{
+	State s0 initial{ 
+		println("callerfriend start")
+	}
+	Transition t0 
+		whenEvent obstacle -> handleObstacle
+ 	
+	State handleObstacle{
+		printCurrentMessage
+		println("callerfriend handleObstacle ")
+		emit alarm : alarm(obstacle)
+	}
+ 	Transition t0 
+		whenEvent obstacle -> handleObstacle
+ }
 
  

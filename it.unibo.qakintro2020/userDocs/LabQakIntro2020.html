@@ -319,7 +319,7 @@ It is preferable to <bc>run</bc> custom objects.
 
 
  
-<h3 id="whenTine">About <k>whenTime</k></h3>
+<h3 id="whenTime">About <k>whenTime</k></h3>
 
 The transition-condition <bc>whenTime</bc> is implemented by creating in dynamic way a <bc>TimerActor</bc>. 
 When the given time expires, the timer that emits a <em>system-event</em>  with a name that starts with the prefix <bc>local_tout</bc>; afterwards it terminates.
@@ -354,7 +354,7 @@ by defining the  method <k>actorBody</k> ao to implement the behavior of a <tt>F
 <tr>
 <td width="20%">
 <center>
-<img src="./img/ActorBasic.png" alt="ActorBasic" width="130" height="100"></center> 
+<img src="./img/actorBasic.png" alt="actorBasic" width="130" height="100"></center> 
 </td>
 <td width="40%">
 
@@ -639,7 +639,7 @@ intercepts <tt>local_buttonCmd</tt> events with a minimum delay
 
 
 
-<h2>Coded and External actors</h2> 
+<h2 id="coded">Coded actors</h2> 
 A qak model  cam include actors written in Koltin by the application designer, as extensions of the <k>ActorBasic</k> class
 provided by the qak-infrastructure. For example:
 <center><table style="width:98%">
@@ -673,14 +673,14 @@ class <k>qacoded( name : String ) : ActorBasic</k>( name ){
 </pre>
 
 The code of <em>ActorBasic</em> is defined in <br/>
-<tt>it.unibo.qakactor-1.0.jar</tt>.
+<tt>it.unibo.qakactor-1.2.jar</tt>.
 </td>
 </tr>
 </table>
 </center>
 
-<br/>
-Moreover, a qak model  cam make reference to qak actors already running on a different node. 
+<h2 id="external">External actors</h2> 
+Moreover, a <tt>qak</tt> model  cam make reference to <tt>qak</tt> actors already running on a different node. 
 <br/>
 
 Let us consider the following example:<br/><br/>

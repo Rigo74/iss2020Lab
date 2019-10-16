@@ -1,52 +1,45 @@
 /*
  * ================================================================
- * This file includes A TEXTUAL REPRESENTATION of A MODEL 
- * of the required software system expressed using 
- * the language (metamodel) qak as the result of PROJECT PHASE.
- * 
+ * This file includes (A TEXTUAL REPRESENTATION of) A MODEL 
+ * of the software system (expressed using the language/metamodel qak)
+ * as the result of PROJECT PHASE.
  * ================================================================
  */
-System basicrobot 
+System  basicrobot 
 
-Dispatch cmd  : cmd(X)
-Dispatch step : step(DURATION)
-Dispatch stop : stop(X)
- 
-Event  sonarRobot     : sonar( DISTANCE )	     //from  sonar on robot 
-Event  local_obstacle : local_obstacle( DISTANCE )
-Event  obstacle       : obstacle( DISTANCE )
-  
-Event tick            : tick(N)
+Dispatch cmd     : cmd(X)
+Event  obstacle  : obstacle( DISTANCE )
+Event  alarm     : alarm( V )  
 
 Context ctxBasicRobot ip [ host= "localhost"   port= 8018 ]
 
+/*
+ * The robotadapter is a QActor defined in kotlin
+ * that 'transforms' a cmd:cmd(X) into a command to the
+ * concrete robot specified in basicRobotConfig.pl
+ */
+CodedQActor robotadapter context ctxBasicRobot 
+				className "itunibo.robot.robotAdapterQa"
+
 QActor basicrobot context ctxBasicRobot{
 	State s0 initial{
-		println("basicrobot | start")
-	    solve( consult("basicRobotConfig.pl") ) 
- 		solve( robot(R, PORT) )  //R = virtual | ... 
-  		ifSolved { 
-			//println( "USING:${getCurSol(\"R\")},port=${getCurSol(\"PORT\")}")
-  			run itunibo.robot.robotSupport.create( myself, @R, @PORT )	//@ is a shortcut
-  		} 		
+		println("basicrobot | starts (with robotadapter in the same context)")
 	}
 	Goto work
 	
-	State work{
-		//println("basicrobot | waiting ...")
-	}
-	Transition s0 
-			whenMsg cmd              -> handleCmd
-			whenEvent local_obstacle -> handleObstacle
-  
+	State work{ }
+	Transition t0 
+			whenMsg cmd        -> handleCmd
+			whenEvent obstacle -> handleObstacle
+   
  /*
-  * REQUIREMENT req-cmd
+  * REQUIREMENT req-cmd 
   */
 	State handleCmd {
-		//printCurrentMessage 
-		onMsg( cmd : cmd(X) ){
-			[" val MoveToDo = payloadArg(0) "]
- 			run itunibo.robot.robotSupport.move( payloadArg(0 )   )		
+		//println("basicrobot | handleCmd ")
+		printCurrentMessage 
+		onMsg( cmd : cmd(X) ){  //redirect the command to the robotadapter
+ 			forward robotadapter -m cmd : cmd( $payloadArg(0 ) )
 		}
 	}
 	Goto work
@@ -55,87 +48,26 @@ QActor basicrobot context ctxBasicRobot{
  * Introduced after problem analysis
  */	
 	State handleObstacle{
-		run itunibo.robot.robotSupport.move( "h" )		
+		forward robotadapter -m cmd : cmd( h )
 		println("basicrobot | stops (for safety) since  obstacle ")
-		emit obstacle : obstacle(5)
 	}
 	Goto work 
 }  
 
-/* 
- * ---------------------------------------------------------------------------
- * sonarhandler: looks at the sonar and generates the event obstacle
- * ---------------------------------------------------------------------------
-*/
- QActor sonarhandler context ctxBasicRobot{   
- ["var obstacleFound = false"] 
-  	State init initial{
-		println("sonarhandler STARTS ... ")
-	}         
-	Goto waitForEvents 
-	   
- 	State waitForEvents{  }      
-   	Transition t0 
-   		whenEvent sonarRobot -> handleSonar  
- 	
- 	State handleSonar{
- 		//printCurrentMessage    
- 		onMsg( sonarRobot : sonar(DISTANCE)){
- 			["	if( payloadArg(0).toInt() < 10 ) obstacleFound=true
-			"]
- 			if "obstacleFound"{ emit local_obstacle : local_obstacle( $payloadArg(0) )}
- 		}
-   	}
- 	Goto waitForEvents
- } 
-
-
-
 /*
- * ---------------------------------------------------------------------------
- * This actor is not part of the system.
- * It is introduced to make testing easier.
- * ---------------------------------------------------------------------------
+ * The actor sentinel is sensible to alarm events emitted by the external world
  */
- 
-QActor robotcaller context ctxBasicRobot{
-["var Counter = 0"]	
-	State s0 initial{
-		println("robotcaller start")
-		forward basicrobot -m cmd : cmd(w) 
-  		delay 1000  
- 		forward basicrobot -m cmd  : cmd(h)
- 		delay 500
- 		forward basicrobot -m cmd : cmd(a)
-		delay 500
- 		forward basicrobot -m cmd : cmd(d)
- 		delay 500
- 		forward basicrobot -m cmd : cmd(w) 	//should hit a boundary
-  		delay 1000  
-   		forward basicrobot -m cmd : cmd(s)
-		delay 1400
- 		forward basicrobot -m cmd : cmd(h)
+ QActor sentinel context ctxBasicRobot{
+	State s0 initial{ 
+		println("sentinel start")
 	}
-	Goto eventEmit
-	
-	/*
-	 * Test that events emitted by any actor in the context of basicrobot
-	 * can be perceived by any actor working in the context 
-	 * of a caller of basicrobot
-	 */
-	State eventEmit{
-		delay 2000
-		["Counter++"]
-		println("robotcaller emits tick $Counter")
-		emit tick : tick($Counter)		  
+	Transition t0 
+		whenEvent alarm -> handleAlarm
+ 	
+	State handleAlarm{
+		printCurrentMessage
+		println("sentinel handleAlarm ")
 	}
-	//Goto eventEmit	//WARNING: this saturates the msgqueue of robotcaller if send the event to the emitter
-	Goto continueEmit
-	
-	State continueEmit{
- 	}
-	Goto eventEmit	//WARNING: thi saturates the msgqueue of robotcaller
-
-}
-
- 
+ 	Transition t0 
+		whenEvent alarm -> handleAlarm
+ }
