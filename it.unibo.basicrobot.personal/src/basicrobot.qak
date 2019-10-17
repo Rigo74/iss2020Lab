@@ -1,0 +1,85 @@
+/*
+ * This is a textual representation of a model expressed using the language (meta-model) QAK
+ * that describes the structure, the interaction and the behaviour of the software system 
+ * according to the requirements. This is the result of the project phase.
+ */
+ 
+/*
+ * ================================================================
+ * This file includes (A TEXTUAL REPRESENTATION of) A MODEL 
+ * of the software system (expressed using the language/metamodel qak)
+ * as the result of PROJECT PHASE.
+ * ================================================================
+ */
+
+System  basicrobot
+
+Dispatch cmd     : cmd(X)
+Event  obstacle  : obstacle( DISTANCE )
+Event  alarm     : alarm( V )  
+
+Context ctxBasicRobot ip [ host= "localhost"   port= 8018 ]
+
+/*
+ * The robotadapter is a QActor defined in kotlin
+ * that 'transforms' a cmd:cmd(X) into a command to the
+ * concrete robot specified in basicRobotConfig.pl
+ */
+CodedQActor robotadapter context ctxBasicRobot 
+				className "itunibo.robot.robotAdapterQa"
+
+QActor basicrobot context ctxBasicRobot{
+	State s0 initial{
+		println("basicrobot | starts (with robotadapter in the same context)")
+	}
+	Goto work
+
+	State work{ }
+	Transition t0 
+			whenMsg cmd        -> handleCmd
+			whenEvent obstacle -> handleObstacle
+
+ /*
+  * REQUIREMENT req-cmd 
+  */
+	State handleCmd {
+		//println("basicrobot | handleCmd ")
+		printCurrentMessage 
+		onMsg( cmd : cmd(X) ){  //redirect the command to the robotadapter
+ 			forward robotadapter -m cmd : cmd( $payloadArg(0 ) )
+		}
+	}
+	Goto work
+	
+/*
+ * Introduced after problem analysis
+ */	
+	State handleObstacle{
+		forward robotadapter -m cmd : cmd( h )
+		println("basicrobot | stops (for safety) since  obstacle ")
+	}
+	Goto work 
+}
+
+/*
+ * The actor sentinel is sensible to alarm events emitted by the external world
+ */
+ QActor sentinel context ctxBasicRobot{
+	State s0 initial{ 
+		println("sentinel start")
+	}
+	Transition t0 
+		whenEvent alarm -> handleAlarm
+ 	
+	State handleAlarm{
+		printCurrentMessage
+		println("sentinel handleAlarm ")
+	}
+ 	Transition t0 
+		whenEvent alarm -> handleAlarm
+ }
+
+
+
+
+
