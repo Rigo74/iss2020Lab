@@ -1,5 +1,6 @@
 package it.unibo.kactor
 import alice.tuprolog.*
+import it.unibo.`is`.interfaces.protocols.IConnInteraction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -30,6 +31,10 @@ object sysUtil{
 	var mqttBrokerIP : String? = ""
 	var mqttBrokerPort : String? = ""
 
+	var trace : Boolean = false
+	val connActive : MutableSet<IConnInteraction> = mutableSetOf<IConnInteraction>()    //Oct2019
+
+
 	fun getPrologEngine() : Prolog = pengine
 	fun curThread() : String = "thread=${Thread.currentThread().name}"
 
@@ -48,33 +53,35 @@ object sysUtil{
 	}
 	fun getActorContext ( actorName : String): QakContext?{
 		val ctxName = solve( "qactor($actorName,CTX,_)", "CTX" )
-		//println("       sysUtil | getActorContext ctxName=${ctxName} - ${ctxsMap.get( ctxName )}")
+		//println("               %%% sysUtil |  getActorContext ctxName=${ctxName} - ${ctxsMap.get( ctxName )}")
 		return ctxsMap.get( ctxName )
 	}
 	fun createContexts(  hostName : String,
 					desrFilePath:String, rulesFilePath:String){
 		loadTheory( desrFilePath )
 		loadTheory( rulesFilePath )
-
+		if( solve("tracing", "" ).equals("success") ) trace=true
 		try {
 			mqttBrokerIP   = solve("mqttBroker(IP,_)", "IP")
 			mqttBrokerPort = solve("mqttBroker(_,PORT)", "PORT")
 		}catch(e: Exception){
-			println("sysUtil | NO MQTT borker FOUND")
+			println("               %%% sysUtil | NO MQTT borker FOUND")
 		}
         //Create the messages
         try {
-            val dispatcNames = solve("getDispatchIds(D)", "D")
+            val dispatcNames      = solve("getDispatchIds(D)", "D")
             val dispatchNamesList = strRepToList(dispatcNames!!)
             dispatchNamesList.forEach { d -> createDispatch(d) }
-        }catch( e : Exception){ println("NO DISPATCH FOUND")}
+        }catch( e : Exception){ //println("               %%% sysUtil | NO DISPATCH FOUND")
+		}
         //Create the contexts
-			val ctxs: String? = solve("getCtxNames(X)", "X")
+		//println("               %%% sysUtil | getCtxNames( X )" )
+		val ctxs: String? = solve("getCtxNames( X )", "X")
 			//context( CTX, HOST, PROTOCOL, PORT )
 			val ctxsList = strRepToList(ctxs!!)
 			//waits for all the other context before activating the actors
 			ctxsList.forEach { ctx -> createTheContext(ctx, hostName = hostName) }//foreach ctx
-			addProxyToOtherCtxs(ctxsList)  //here could wait in polling ...
+			addProxyToOtherCtxs(ctxsList, hostName = hostName)  //here could wait in polling ...
 	}//createContexts
 
     fun createDispatch(  d : String )  {
@@ -84,23 +91,29 @@ object sysUtil{
          dispatchMap.put( d, dt as Struct )
      }
 	fun createTheContext(  ctx : String, hostName : String  ) : QakContext?{
-		//println("sysUtil | $ctx host=$hostName  ")
 		val ctxHost : String?  = solve("getCtxHost($ctx,H)","H")
-		//println("sysUtil | createTheContext $ctx ctxHost=$ctxHost  ")
+		//println("               %%% sysUtil | createTheContext $ctx ctxHost=$ctxHost  ")
 		val ctxProtocol : String? = solve("getCtxProtocol($ctx,P)","P")
 		val ctxPort     : String? = solve("getCtxPort($ctx,P)","P")
-		//println("sysUtil | $ctx host=$ctxHost port = $ctxPort protocol=$ctxProtocol")
+		//println("               %%% sysUtil | $ctx host=$ctxHost port = $ctxPort protocol=$ctxProtocol")
 		val portNum = Integer.parseInt(ctxPort)
 
 		val useMqtt = ctxProtocol!!.toLowerCase() == "mqtt"
 		var mqttAddr = ""
 		if( useMqtt ){
-			println("sysUtil | context $ctx WORKS WITH MQTT")
+			println("               %%% sysUtil | context $ctx WORKS WITH MQTT")
 			if( mqttBrokerIP != null ) mqttAddr = "tcp://$mqttBrokerIP:$mqttBrokerPort"
 			else{ throw Exception("no MQTT broker declared")  }
 		}
 		//CREATE AND MEMO THE CONTEXT
-		val newctx = QakContext( ctx, "$ctxHost", portNum, "") //isa ActorBasic
+		var newctx : QakContext? = null
+		if( ! ctxHost.equals(hostName) ){
+			  newctx = QakContext( ctx, "$ctxHost", portNum, "", true) //isa ActorBasic
+		}else{
+			 //println("               %%% sysUtil | createTheContext $ctx host=$hostName  ")
+			  newctx = QakContext( ctx, "$ctxHost", portNum, "") //isa ActorBasic
+		}
+		//val newctx = QakContext( ctx, "$ctxHost", portNum, "") //isa ActorBasic
 		newctx.mqttAddr = mqttAddr //!!!!!! INJECTION !!!!!!
 		ctxsMap.put(ctx, newctx)
 		if( ! ctxHost.equals(hostName) ){
@@ -110,10 +123,10 @@ object sysUtil{
 		return newctx
  	}//createTheContext
 
-	fun addProxyToOtherCtxs( ctxsList : List<String>){
+	fun addProxyToOtherCtxs( ctxsList : List<String>, hostName : String){
 		ctxsList.forEach { ctx ->
 			val curCtx = ctxsMap.get("$ctx")
-			if( curCtx is QakContext ) {
+			if( curCtx is QakContext && curCtx.hostAddr != hostName ) {
 				val others = solve("getOtherContextNames(OTHERS,$ctx)","OTHERS")
 				val ctxs = strRepToList(others!!)
  					//others!!.replace("[", "").replace("]", "").split(",")
@@ -121,11 +134,11 @@ object sysUtil{
  					if( it.length==0  ) return
 					val ctxOther = ctxsMap.get("$it")
 					if (ctxOther is QakContext) {
-						//println("FOR ACTIVATED CONTEXT ${ctxOther!!.name}: ADDING A PROXY to ${curCtx!!.name} ")
+						//println("               %%% sysUtil | FOR ACTIVATED CONTEXT ${ctxOther!!.name}: ADDING A PROXY to ${curCtx!!.name} ")
 						ctxOther.addCtxProxy(curCtx)
 					}else{
 						if( ctxOther!!.mqttAddr.length > 1 )  return //NO PROXY for MQTT ctx
-						println("sysUtil | WARNING: CONTEXT ${it} NOT ACTIVATED: " +
+						println("               %%% sysUtil | WARNING: CONTEXT ${it} NOT ACTIVATED: " +
 					 			"WE SHOULD WAIT FOR IT, TO SET THE PROXY in ${curCtx.name}")
 						val ctxHost : String?     = solve("getCtxHost($it,H)","H")
  						val ctxProtocol : String? = solve("getCtxProtocol($it,P)","P")
@@ -167,11 +180,13 @@ object sysUtil{
 
 	fun createActor( ctx: QakContext, actorName: String,
 					 className : String, scope : CoroutineScope = GlobalScope  ) : ActorBasic?{
+		/*
 		if( className=="external"){
-			println("sysUtil |   actor=$actorName in context:${ctx.name}  is EXTERNAL"   )
+			println("               %%% sysUtil |   actor=$actorName in context:${ctx.name}  is EXTERNAL"   )
 			return null
 		}
-		println("sysUtil | CREATE actor=$actorName in context:${ctx.name}  class=$className"   )
+  	 */
+		traceprintln("               %%% sysUtil | CREATE actor=$actorName in context:${ctx.name}  class=$className"   )
 		val clazz = Class.forName(className)	//Class<?>
         var actor  : ActorBasic
         try {
@@ -204,14 +219,14 @@ object sysUtil{
 		try {
 			//user.dir is typically the directory in which the Java virtual machine was invoked.
 			//val executionPath = System.getProperty("user.dir")
-			//println("sysUtil | loadheory executionPath: ${executionPath}" )
+			//println("               %%% sysUtil | loadheory executionPath: ${executionPath}" )
 			//val resource = classLoader.getResource("/") //URL
 			//val cl =  javaClass<ActorBasic> //javaClass does not work
-			//println("sysUtil | loadheory classloader: ${cl}" )
+			//println("               %%% sysUtil | loadheory classloader: ${cl}" )
 			val worldTh = Theory( FileInputStream(path) )
 			pengine.addTheory(worldTh)
 		} catch (e: Exception) {
-			println("sysUtil | loadheory WARNING: ${e}" )
+			println("               %%% sysUtil | loadheory WARNING: ${e}" )
 			throw e
 		}
 	}
@@ -222,4 +237,10 @@ object sysUtil{
 		else return s
 
 	}
+
+
+	fun traceprintln( msg : String ){
+		if( sysUtil.trace ) println( msg  )
+	}
+
 }//sysUtil

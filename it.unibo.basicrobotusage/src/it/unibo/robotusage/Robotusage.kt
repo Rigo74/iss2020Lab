@@ -15,27 +15,34 @@ class Robotusage ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		var NumOfStep = 0
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						println("robotusage start")
 					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+					 transition( edgeName="goto",targetState="boundary", cond=doswitch() )
+				}	 
+				state("boundary") { //this:State
+					action { //it:State
+						forward("cmd", "cmd(w)" ,"basicrobot" ) 
+					}
+					 transition(edgeName="t00",targetState="rotate",cond=whenEvent("obstacle"))
+				}	 
+				state("rotate") { //this:State
+					action { //it:State
+						NumOfStep = NumOfStep + 1
+						forward("cmd", "cmd(a)" ,"basicrobot" ) 
+						delay(1000) 
+						forward("cmd", "cmd(h)" ,"basicrobot" ) 
+					}
+					 transition( edgeName="goto",targetState="boundary", cond=doswitchGuarded({(NumOfStep < 4)}) )
+					transition( edgeName="goto",targetState="work", cond=doswitchGuarded({! (NumOfStep < 4)}) )
 				}	 
 				state("work") { //this:State
 					action { //it:State
-						delay(1000) 
-						forward("cmd", "cmd(a)" ,"basicrobot" ) 
-						delay(1000) 
-						forward("cmd", "cmd(d)" ,"smartrobot" ) 
-						delay(1000) 
-						println("robotusage send w to smartrobot")
-						forward("cmd", "cmd(w)" ,"smartrobot" ) 
-						delay(1000) 
-						forward("cmd", "cmd(h)" ,"smartrobot" ) 
-						delay(1000) 
 					}
-					 transition(edgeName="t00",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t01",targetState="handleObstacle",cond=whenEvent("obstacle"))
 				}	 
 				state("handleObstacle") { //this:State
 					action { //it:State

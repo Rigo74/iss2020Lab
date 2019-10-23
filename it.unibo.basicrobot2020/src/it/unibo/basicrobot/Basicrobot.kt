@@ -41,9 +41,21 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("handleObstacle") { //this:State
 					action { //it:State
 						forward("cmd", "cmd(h)" ,"robotadapter" ) 
-						println("basicrobot | stops (for safety) since  obstacle ")
+						println("basicrobot | stops (for safety) since  obstacle  ")
 					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+					 transition( edgeName="goto",targetState="farFromObstacle", cond=doswitch() )
+				}	 
+				state("farFromObstacle") { //this:State
+					action { //it:State
+						println("basicrobot |  going back (to avoid event-generation) ")
+						forward("cmd", "cmd(s)" ,"robotadapter" ) 
+						delay(250) 
+						forward("cmd", "cmd(h)" ,"robotadapter" ) 
+						stateTimer = TimerActor("timer_farFromObstacle", 
+							scope, context!!, "local_tout_basicrobot_farFromObstacle", 350.toLong() )
+					}
+					 transition(edgeName="t02",targetState="work",cond=whenTimeout("local_tout_basicrobot_farFromObstacle"))   
+					transition(edgeName="t03",targetState="farFromObstacle",cond=whenEvent("obstacle"))
 				}	 
 			}
 		}

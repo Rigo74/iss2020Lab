@@ -1,5 +1,5 @@
 package it.unibo.kactor
-//version in C:\Didattica2018Work\iss2020Lab\it.unibo.qakactor
+
 import alice.tuprolog.*
 import kotlinx.coroutines.*
 import java.util.NoSuchElementException
@@ -93,9 +93,9 @@ abstract class ActorBasicFsm(  qafsmname:  String,
     protected var myself : ActorBasicFsm
     protected lateinit var currentState: State
     protected var currentMsg       = NoMsg
-    protected var msgToReply = NoMsg
+    protected var msgToReply       = NoMsg
     lateinit protected var mybody: ActorBasicFsm.() -> Unit
-    var stateTimer : TimerActor? = null
+    var stateTimer : TimerActor?   = null
 
     private val stateList = mutableListOf<State>()
     private val msgQueueStore = mutableListOf<ApplMessage>()
@@ -149,7 +149,7 @@ abstract class ActorBasicFsm(  qafsmname:  String,
     }
 
     suspend fun fsmwork(msg: ApplMessage) {
-        //println("ActorBasicFsm $name | fsmwork in ${currentState.stateName} $msg")
+        //sysUtil.traceprintln("$tt ActorBasicFsm $name | fsmwork in ${currentState.stateName} $msg")
         var nextState = checkTransition(msg)
         var b         = hanldeCurrentMessage(msg, nextState)
         while (b) { //handle previous messages
@@ -161,9 +161,10 @@ abstract class ActorBasicFsm(  qafsmname:  String,
     }
 
     fun hanldeCurrentMessage(msg: ApplMessage, nextState: State?, memo: Boolean = true): Boolean {
-        //println("ActorBasicFsm $name | hanldeCurrentMessage in ${currentState.stateName} msg=${msg.msgId()}")
+        //sysUtil.traceprintln("$tt ActorBasicFsm $name | hanldeCurrentMessage in ${currentState.stateName} msg=${msg.msgId()}")
         if (nextState is State) {
             currentMsg   = msg
+            if( currentMsg.isRequest() ){ requestMap.put(currentMsg.msgId(), currentMsg) }  //Request
             var msgBody = currentMsg.msgContent()
             val endTheTimer = currentMsg.msgId() != "local_noMsg" &&
                             ( ! msgBody.startsWith("local_tout_")
@@ -174,8 +175,8 @@ abstract class ActorBasicFsm(  qafsmname:  String,
                             )
             currentState = nextState
 
-            //println("ActorBasicFsm $name | hanldeCurrentMessage currentState= ${currentState.stateName}  ")
-            //println("\"ActorBasicFsm $name | hanldeCurrentMessage currentMsg= $currentMsg  ")
+            //sysUtil.traceprintln("               %%% ActorBasicFsm $name | hanldeCurrentMessage currentState= ${currentState.stateName}  ")
+            //sysUtil.traceprintln("               %%% ActorBasicFsm $name | hanldeCurrentMessage currentMsg= $currentMsg  ")
             /*
             if( currentMsg.msgId() != "local_noMsg" &&
                 ! currentMsg.msgContent().startsWith("local_tout_")  &&
@@ -193,7 +194,8 @@ abstract class ActorBasicFsm(  qafsmname:  String,
             if (!(msg.isEvent())) {
                 msgQueueStore.add(msg)
                 println("ActorBasicFsm $name |  added $msg in msgQueueStore")
-            } //else println("ActorBasicFsm $name | DISCARDING THE EVENT: $msg")
+            }
+            //else sysUtil.traceprintln("$tt ActorBasicFsm $name | DISCARDING THE EVENT: ${msg.msgId()}")
             return false
         }
     }
@@ -209,12 +211,12 @@ abstract class ActorBasicFsm(  qafsmname:  String,
     }
 
     private fun lookAtMsgQueueStore(): State? {
-        //println("ActorBasicFsm $name | lookAtMsgQueueStore :${msgQueueStore.size}")
+        //sysUtil.traceprintln("$tt ActorBasicFsm $name | lookAtMsgQueueStore :${msgQueueStore.size}")
         msgQueueStore.forEach {
             val state = checkTransition(it)
             if (state is State) {
                 currentMsg = msgQueueStore.get( msgQueueStore.indexOf(it) )
-                //println("ActorBasicFsm $name | lookAtMsgQueueStore FOUND $currentMsg")
+                //sysUtil.traceprintln("               %%% ActorBasicFsm $name | lookAtMsgQueueStore FOUND $currentMsg")
                 msgQueueStore.remove(it)
                 return state
             }
@@ -224,11 +226,11 @@ abstract class ActorBasicFsm(  qafsmname:  String,
 
     private fun checkTransition(msg: ApplMessage): State? {
         val trans = currentState.getTransitionForMessage(msg)
-        //println("ActorBasicFsm $name | checkTransition ENTRY $msg , currentState=${currentState.stateName} ")
+        //sysUtil.traceprintln("$tt ActorBasicFsm $name | checkTransition ENTRY $msg , currentState=${currentState.stateName} ")
         return if (trans != null) {
            trans.enterTransition { getStateByName(it) }
         } else {
-            //println("ActorBasicFsm $name | checkTransition in ${currentState.stateName} NO next State for $msg !!!")
+            //println("sysUtil.traceprintln("               %%% ActorBasicFsm $name | checkTransition in ${currentState.stateName} NO next State for $msg !!!")
             null
         }
     }
@@ -272,10 +274,39 @@ abstract class ActorBasicFsm(  qafsmname:  String,
         return {
             edgeEventHandler = {
                 //println("whenDispatchGuarded $it - $evName");
-                it == msgName && guard() } //it.isEvent() && it.msgId() == evName }
+                it == msgName && guard() } //it.isDispatch() && it.msgId() == msgName }
         }
     }
 
+    fun whenRequest(msgName: String): Transition.() -> Unit {
+        //sysUtil.traceprintln("$tt ActorBasicFsm $name | whenRequest $currentMsg" )
+        return {
+            edgeEventHandler = {
+                //sysUtil.traceprintln("$tt ActorBasicFsm $name | ${currentState.stateName} whenRequest $it  $msgName")
+                it == msgName   }  //it.isRequest() && it.msgId() == msgName }
+        }
+    }
+    fun whenRequestGuarded(msgName: String, guard:()->Boolean): Transition.() -> Unit {
+        return {
+            edgeEventHandler = {
+                //sysUtil.traceprintln("$tt ActorBasicFsm $name | ${currentState.stateName} whenRequestGuarded $it, $msgName")
+                it == msgName   && guard() }  //it.isRequest() && it.msgId() == msgName }
+        }
+    }
+    fun whenReply(msgName: String): Transition.() -> Unit {
+        return {
+            edgeEventHandler = {
+                //sysUtil.traceprintln("$tt ActorBasicFsm $name | ${currentState.stateName} whenReply $it  $msgName")
+                it == msgName   }  //it.isReply() && it.msgId() == msgName }
+        }
+    }
+    fun whenReplyGuarded(msgName: String, guard:()->Boolean): Transition.() -> Unit {
+        return {
+            edgeEventHandler = {
+                //sysUtil.traceprintln("$tt ActorBasicFsm $name | ${currentState.stateName} whenReplyGuarded $it  $msgName")
+                it == msgName  && guard() }  //it.isReply() && it.msgId() == msgName }
+        }
+    }
 
     fun whenTimeout( timerEventName : String ): Transition.() -> Unit {
                 return {
@@ -296,9 +327,10 @@ abstract class ActorBasicFsm(  qafsmname:  String,
         msgToReply = currentMsg
         //println(getName() + " 			msgToReply:" +msgToReply );
     }
- 
+
+
     suspend fun replyToCaller(msgId: String, msg: String) {
-        //println( " replyToCaller msgToReply=" + msgToReply);
+        //sysUtil.traceprintln("$tt ActorBasicFsm $name | replyToCaller msgToReply=" + msgToReply);
         val caller = msgToReply.msgSender()
         //println( " replyToCaller  $msgId : $msg  to $caller" );
         forward(msgId, msg, caller)
@@ -318,8 +350,8 @@ abstract class ActorBasicFsm(  qafsmname:  String,
         }
     }
 */
-    /*
-UTILITIES TO HANDLE MES CONTENT
+/*
+UTILITIES TO HANDLE MSG CONTENT
  */
     private var msgArgList = mutableListOf<String>()
 

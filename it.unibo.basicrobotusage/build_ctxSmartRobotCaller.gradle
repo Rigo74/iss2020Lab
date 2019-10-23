@@ -1,16 +1,16 @@
 /*
 ================================================================================
-build_ctxSmartRobot.gradle
+build_ctxSmartRobotCaller.gradle
 GENERATED ONLY ONCE
 USAGE:	 
 	gradle build eclipse		//to set the dependency on the library
-	gradle   -b build_ctxSmartRobot.gradle distZip //for executable jar and distribution
+	gradle   -b build_ctxSmartRobotCaller.gradle distZip //for executable jar and distribution
 	
-	gradle   -b build_ctxSmartRobot.gradle qawrapper
-	gradlew  -b build_ctxSmartRobot.gradle eclipse		//to set the dependency on the library
-	gradlew  -b build_ctxSmartRobot.gradle build
-	gradlew  -b build_ctxSmartRobot.gradle -q tasks --all
-	gradlew  -b build_ctxSmartRobot.gradle cleanDistDir	//to clean the src directory
+	gradle   -b build_ctxSmartRobotCaller.gradle qawrapper
+	gradlew  -b build_ctxSmartRobotCaller.gradle eclipse		//to set the dependency on the library
+	gradlew  -b build_ctxSmartRobotCaller.gradle build
+	gradlew  -b build_ctxSmartRobotCaller.gradle -q tasks --all
+	gradlew  -b build_ctxSmartRobotCaller.gradle cleanDistDir	//to clean the src directory
 ================================================================================
 */
 plugins {
@@ -58,7 +58,7 @@ dependencies {
 //CUSTOM
     compile name: 'uniboInterfaces'
     compile name: '2p301'
-    compile name: 'it.unibo.qakactor-1.1'
+    compile name: 'it.unibo.qakactor-1.2'
  
     //For p2p two-way connections (TCP, UDP, BTH, Serial ...)
     compile name: 'unibonoawtsupports'

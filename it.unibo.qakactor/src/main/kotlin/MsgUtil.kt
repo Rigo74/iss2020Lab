@@ -21,6 +21,21 @@ var count = 1;
         return ApplMessage(msgId, ApplMessageType.dispatch.toString(),
             actor, dest, "$content", "${count++}")
     }
+    fun buildRequest( actor: String, msgId : String ,
+                       content : String, dest: String ) : ApplMessage {
+        return ApplMessage(msgId, ApplMessageType.request.toString(),
+            actor, dest, "$content", "${count++}")
+    }
+    fun buildReply( actor: String, msgId : String ,
+                      content : String, dest: String ) : ApplMessage {
+        return ApplMessage(msgId, ApplMessageType.reply.toString(),
+            actor, dest, "$content", "${count++}")
+    }
+    fun buildReplyReq( actor: String, msgId : String ,
+                    content : String, dest: String ) : ApplMessage {
+        return ApplMessage(msgId, ApplMessageType.request.toString(),
+            actor, dest, "$content", "${count++}")
+    }
     fun buildEvent( actor: String, msgId : String , content : String  ) : ApplMessage {
         return ApplMessage(msgId, ApplMessageType.event.toString(),
             actor, "none", "$content", "${count++}")

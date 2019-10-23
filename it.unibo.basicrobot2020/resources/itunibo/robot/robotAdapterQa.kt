@@ -23,7 +23,7 @@ class robotAdapterQa( name : String ) : ActorBasic( name ){
 	 		if( sol2.isSuccess() ){
 				val host =  sol2.getVarValue("R").toString()
 				val port =  sol2.getVarValue("PORT").toString()
-				println("		--- robotAdapterQa | USING $host : $ port")
+				println("		--- robotAdapterQa | USING $host : $port")
 				itunibo.robot.robotSupport.create( this,host,port )
 			}
 		}		  		      
@@ -31,6 +31,7 @@ class robotAdapterQa( name : String ) : ActorBasic( name ){
 
     override suspend fun actorBody(msg : ApplMessage){
         //println("		--- robotAdapterQa | received  msg= $msg "  ) //msg.msgContent()=cmd(X)
+		if( msg.isEvent() ) return	//robotAdapterQa receives the events raised by the actors in its context		
 		val move = (Term.createTerm(msg.msgContent()) as Struct).getArg(0).toString()
 		itunibo.robot.robotSupport.move( move  )
     }

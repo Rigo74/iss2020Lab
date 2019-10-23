@@ -2,9 +2,10 @@ package it.unibo.kactor
 
 import alice.tuprolog.Struct
 import alice.tuprolog.Term
+import it.unibo.`is`.interfaces.protocols.IConnInteraction
 
 enum class ApplMessageType{
-    event, dispatch, request, invitation
+    event, dispatch, request, reply, invitation
 }
 
 open class ApplMessage  {
@@ -16,6 +17,8 @@ open class ApplMessage  {
     protected var msgContent: String = ""
     protected var msgNum: Int = 0
 
+    var conn : IConnInteraction? = null   //Oct2019
+
     val term: Term
         get() = if (msgType == null)
             Term.createTerm("msg(none,none,none,none,none,0)")
@@ -23,14 +26,16 @@ open class ApplMessage  {
             Term.createTerm(msgContent)
 
     //@Throws(Exception::class)
-    constructor(
-        MSGID: String, MSGTYPE: String, SENDER: String, RECEIVER: String, CONTENT: String, SEQNUM: String) {
+    constructor( MSGID: String, MSGTYPE: String, SENDER: String, RECEIVER: String,
+                 CONTENT: String, SEQNUM: String, connection : IConnInteraction? = null ) {
         msgId = MSGID
         msgType = MSGTYPE
         msgSender = SENDER
         msgReceiver = RECEIVER
         msgContent = envelope(CONTENT)
         msgNum = Integer.parseInt(SEQNUM)
+
+        conn   = connection //Oct2019 It is NOT NULL for a request
         //		System.out.println("ApplMessage " + MSGID + " " + getDefaultRep() );
     }
 
@@ -82,6 +87,12 @@ open class ApplMessage  {
     }
     fun isDispatch(): Boolean{
         return msgType == ApplMessageType.dispatch.toString()
+    }
+    fun isRequest(): Boolean{
+        return msgType == ApplMessageType.request.toString()
+    }
+    fun isReply(): Boolean{
+        return msgType == ApplMessageType.reply.toString()
     }
 
     fun getDefaultRep(): String {

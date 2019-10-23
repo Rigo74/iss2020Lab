@@ -20,15 +20,14 @@ class Callerfriend ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 					action { //it:State
 						println("callerfriend start")
 					}
-					 transition(edgeName="t01",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t02",targetState="handleObstacle",cond=whenEvent("obstacle"))
 				}	 
 				state("handleObstacle") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("callerfriend handleObstacle ")
-						emit("alarm", "alarm(obstacle)" ) 
 					}
-					 transition(edgeName="t02",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="t03",targetState="handleObstacle",cond=whenEvent("obstacle"))
 				}	 
 			}
 		}
