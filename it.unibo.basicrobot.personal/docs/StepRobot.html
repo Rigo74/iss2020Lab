@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<link rel="stylesheet" type="text/css" href="style.css">
+    
+<head>
+   
+<title>Step Robot</title>
+</head>
+    
+<body>
+<div id="top">
+<h1>Step Robot</h1>
+</div>  
+
+<div class="body"> 
+
+<h2>Requirements</h2>
+<div class="req">
+    Design and build a software system (<em>steprobot</em>) that is able to receive via Internet commands (represented 
+    in textual form), so that: 
+    <ul>
+        <li>the command <k>step</k>  moves the <em>robot</em> forward for a prefixed time (e.g. <tt>2</tt> secs) (<ks>req-step</ks>).</li>
+    </ul>
+    Moreover, the <em>robot</em> must be always able to react 'immediately' to the <k>stop</k> command, by stopping 
+    any ongoing movement (<ks>req-stop</ks>).
+</div>
+
+<h3>Premise</h3>
+
+We note that:
+<ul>
+    <li>
+        the system logically includes an external component (let us name it <em>basicrobot</em>) that we will use as an interface to send 
+        commands via Internet;
+    </li>
+    <li>
+        the system does not interact directly with the <em>robot</em> but it use the <em>basicrobot</em> to perform this interaction, the basic <em>basicrobot</em> 
+        has established some interaction rules, provided as API, that allow to send it the commands <k>w | s | h | a | d</k> which meaning respectively 
+        <k>forward | backward | stop | left | right</k>.
+    </li>
+</ul>
+Since we are going to write software for a <b>distributed, heterogeneous</b> system, the <i>conceptual space</i> of 'classical' object-oriented
+programming is not the best staring point to talk about the system. Rather, we could use an agent-based or an actor-based
+<i>conceptual space</i>, in which the interaction among components occurs only by means of messages represented as Strings. 
+<br/><br/>
+In the following, we will use the custom 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+qak metamodel</a> as our (starting) language to denote models of the system at the variuos stages of our development process.
+
+<h2>Requirement analysis</h2>
+
+<table>
+    <tr>
+        <td style="width: 50%;">
+            <m>A model representing how the system was thought, and how it will satisfy the requirements:</m>
+            <pre>
+
+                QActor robot context ctxStepRobot {
+                    [" var StepTime = 0L; "]
+                    State s0 initial {
+                    }
+                    Goto work
+                    
+                    State work {
+                    }
+                    
+                    Transition t0
+                        <k>whenMsg</k> step -> doStep //<ks>req-step</ks>
+                        <k>whenMsg</k> stop -> doStop //<ks>req-stop</ks>
+
+                    State doStep {
+                        onMsg(  step :  step( T ) ){
+                            <ks>["StepTime = payloadArg(0).toLong()"]</ks>
+                            forward <em>basicrobot</em> -m cmd : cmd( w )
+                        }
+                    }
+                    
+                    Transition t0
+                        <k>whenTimeVar</k> StepTime -> endStep //<ks>req-step</ks>
+                        <k>whenMsg</k> 	   stop     -> endStep //<ks>req-step</ks>
+
+                    State endStep {
+                        forward <em>basicrobot</em> -m cmd : cmd( h )
+                    }
+                    Goto work
+
+                    State doStop {
+                        forward <em>basicrobot</em> -m cmd : cmd( h )
+                    }
+                    Goto work
+                }	
+            </pre>
+        </td>
+        <td>
+                The key-point here is to understand well and to fix the logical way in which the robot accepts the commands.
+                <br/><br/>
+                
+                Since, at these stage,  we aim at capturing <k>what</k> the system has to do,
+                we must be - in absence of specific requirements -  totally <b>technology-independent</b> 
+                (i.e. we cannot make reference to any concrete technological support for communications on the Internet).
+                <br/>
+                Thus, we consider appropriate to 'think' about the system by adopting the <ks>conceptual space</ks> of the
+                <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+                qak metamodel</a>, in which the components of a software system are 'actors' able to exchange information as messages of three different (main) types:
+                
+                <ul>
+                    <li>dispatch</li>
+                    <li>request</li>
+                    <li>event</li>
+                </ul>
+                
+                <kc>After a discussion with the customer</kc>, we can define the logical architecture of the system as shown to the left.
+        </td>
+    </tr>
+</table>
+
+<h3>Notes</h3>
+In this model:
+<ul>
+<li>the <em>steprobot</em> works as a sort of <a href="https://en.wikipedia.org/wiki/Microservices" target ="web">Microservice</a>
+on the TCP-port <tt>8016</tt>, exploiting the <tt>qak-infrastructure</tt>.
+This is useful for fast prototyping; however, the final infrastructural support has to be defined later, by the project designer;
+</li>
+<li>each state is associated with a specific, named requirement. This is very useful for <kc>requirement traceability</kc>;</li>
+</ul>
+
+<h2>Problem analysis</h2>
+
+<h3>The requirement  <ks>req-step</ks></h3>
+The <ks>req-step</ks> entails the 'problematic' to define a <kc>proactive</kc> behavior (for a given time), without loosing the 
+capability to be <kc>reactive</kc> to the <k>stop</k> command according to the <ks>req-stop</ks>.
+<br/><br/>
+The 'problematic' to define a <kc>proactive</kc> behavior for a given time implies the need to 'react' to an event sent by
+a timer. The 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html#whenTime" target="web">
+whenTime</a> primitive gives us the required expressive power:
+
+<table>
+    <tr>
+        <td style="width:50%">
+            <m>A model 'wired' on  <tt>2-second</tt>  specification:</m>
+            <pre>
+
+                State doStep{
+                    forward <em>basicrobot</em> -m cmd : cmd( w )
+                }
+                Transition t0 
+                    <k>whenTime</k>   2000 -> endStep		//<ks>req-step</ks>
+                    whenMsg stop    -> endStep		//<ks>req-stop</ks>
+                    
+                State endStep{ 
+                    forward <em>basicrobot</em> -m cmd : cmd( h )
+                }
+                Goto work		
+            </pre>
+
+        </td>
+
+        <td>
+            <m>A model in which the step time is set by the caller:</m>
+            <pre>
+
+            QActor robot context ctxRobot {
+            <ks>[" 
+            var StepTime = 0L;  
+            "]</ks>    
+            ... 
+                State doStep {
+                    onMsg(  step :  step( T ) ){
+                        <ks></ks>["StepTime = payloadArg(0).toLong()"]</ks>
+                        forward <em>basicrobot</em> -m cmd : cmd( w )
+                    }
+                }
+                
+                Transition t0
+                    <k>whenTimeVar</k> StepTime -> endStep //<ks>req-step</ks>
+                    whenMsg 	stop     -> endStep //<ks>req-stop</ks>
+                
+                State endStep {
+                    forward <em>basicrobot</em> -m cmd : cmd( h )
+                }
+                Goto work
+            }
+            </pre>
+        </td>
+    </tr>
+</table>
+
+<h3>The requirement  <ks>req-stop</ks></h3>
+    The <ks>req-stop</ks> implicitely bring the <em>steprobot</em> to assume a <kc>reactive</kc> behaviour. The <ks>req-stop</ks> 
+    implies that the system must be responsive to the <k>stop</k> command. The stop command received is the same that could be received during a step, 
+    in fact, as required, when a stop command is received the <em>robot</em> has to stop regardless of the state in which it is. To perform this action 
+    the system will send a message to the <em>basicrobot</em>.
+    <br/><br/>
+    <table>
+        <tr>
+            <td style="width: 50%">
+                <m>A model representing how commands are handled:</m>
+                <pre>
+
+                        QActor robot context ctxRobot {
+                            ...
+                            Transition t0
+                                <k>whenMsg</k> stop -> doStop //<ks>req-stop</ks>
+                            
+                            State doStop {
+                                forward <em>basicrobot</em> -m cmd : cmd( h )
+                            }
+                            Goto work
+                        }	
+                </pre>
+            </td>
+            <td>
+                When stop is received the system will send a properly command to the <em>basicrobot</em> in order to stop any ongoing movement of the <em>robot</em>.
+            </td>
+        </tr>
+    </table>
+
+
+<h2>Test plans</h2> 
+
+<h2>Project</h2> 
+
+<h2>Testing</h2> 
+
+<h2>Deployment</h2>
+
+<h2>Maintenance</h2> 	
+
+</div>
+
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">
+    <img src="me.jpg" width="64px" height="64px" />
+    By Stefano Righini email: stefano.righini6@studio.unibo.it
+</div>
+</body>
+</html>

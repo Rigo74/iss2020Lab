@@ -1,0 +1,55 @@
+/*
+ * This is a textual representation of a model expressed using the language (meta-model) QAK
+ * that describes the structure, the interaction and the behaviour of the software system 
+ * according to the requirements. This is the result of the project phase.
+ */
+
+System basicrobot
+
+Dispatch cmd  : cmd(X)
+Dispatch step : step(DURATION)
+Dispatch stop : stop
+
+Context ctxBasicRobot ip [ host= "localhost"   port= 8018 ]
+Context ctxStepRobot ip [ host= "localhost"   port= 8016 ]
+
+ExternalQActor basicrobot context ctxBasicRobot
+
+QActor robot context ctxStepRobot {
+	[" var StepTime = 0L; "]
+	State s0 initial {
+	}
+	Goto work
+	
+	State work {
+	}
+	
+	Transition t0
+		whenMsg step -> doStep
+		whenMsg stop -> doStop
+
+  	State doStep {
+		onMsg(  step :  step( T ) ){
+			 ["StepTime = payloadArg(0).toLong()"]
+			 forward basicrobot -m cmd : cmd( w )
+		}
+	}
+	
+	Transition t0
+		whenTimeVar StepTime -> endStep
+		whenMsg 	stop     -> endStop
+
+	State endStep {
+		forward basicrobot -m cmd : cmd( h )
+	}
+	Goto work
+
+	State doStop {
+		forward basicrobot -m cmd : cmd( h )
+	}
+	Goto work
+}
+
+
+
+
