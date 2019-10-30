@@ -1,4 +1,4 @@
-package it.unibo.eclipse.qak.robotMinds19
+package testSrc
 
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail

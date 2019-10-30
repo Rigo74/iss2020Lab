@@ -1,0 +1,639 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+<style type="text/css">
+<!--
+
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+	width: 750px;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+pre{
+	font-family: "Helvetica";
+	font-size: 80%;
+	background-color: #fcf8c7;
+	border: 1px solid blue;
+	width: 700px;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}    
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}    
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+  -->
+</style>
+    
+<head>
+   
+<title>LAB3ISS</title></head>
+    
+<body>
+
+<div class="body"> 
+
+<h1>72939 - LAB3 | A ButtonLedSystem framework</h1> 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/LectureBologna1819.html" target="isslm">LabISS-lectures site</a></font> 
+
+<h2>REQUIREMENTS</h2>
+<div class="req">
+Refactoring the <tt>BLS</tt> system introduced in <a href="Lab1.html" target="info">Lab1.html</a> so to provide a reusable software 
+<a href="https://en.wikipedia.org/wiki/Software_framework">framework</a> for <tt>BLS</tt> applications.
+</div>	    
+ 	
+	
+<h2>TOWARD SYSTEM MODELLING</h2>
+<p>
+The architecture of the <tt>BLS</tt> system introduced in <a href="Lab1.html" target="info">Lab1.html</a>  and later extended in
+<a href="Lab2.html" target="info">Lab2.html</a>, includes components
+that represent, concrete devices, for example a
+<a href="../src/it/unibo/bls/devices/mock/LedMock.java" target="code">LedMock</a> or a
+ <a href="../src/it/unibo/bls/devices/gui/ButtonAsGui.java" target="code">ButtonAsGui</a>.
+<br/>
+ To enhance flexibility and reusability, a <a href="../src/it/unibo/bls/devices/DeviceFactory.java" target="code">DeviceFactory</a>
+ is introduced, that works with reference to a set of <em>device types</em> (
+ <a href="../src/it/unibo/bls/devices/LedType.java" target="code">LedType</a> and
+	<a href="../src/it/unibo/bls/devices/ButtonType.java" target="code">ButtonType</a>).
+</p><p>
+Let us now replace any specific device with a <em>device model</em> (for a quick introduction on the role of models in software, you can see 
+<a href="https://en.wikipedia.org/wiki/Conceptual_model_(computer_science)" target="web">Conceptual model</a> and
+<a href="https://en.wikipedia.org/wiki/Systems_modeling" target="web">Systems modeling</a>) with the aim of capturing 
+the <em>relevant properties</em> (fron our perspective of software designers) 
+ of the device (without any reference to its technological aspects).
+</p><p>
+
+<h3>Digital twins</h3>
+In the context of the  <a href="https://en.wikipedia.org/wiki/Internet_of_things">Internet of things</a>, we can read  that a
+<a href="https://en.wikipedia.org/wiki/Digital_twin">digital twin</a> is:
+
+<ul>
+<li>a dynamic virtual representation of a physical object or system across its lifecycle, 
+using real-time data to enable understanding, learning and reasoning;</li>
+<li>a real time digital replica of a physical device;</li>
+<li>a digital replica of a living or non-living physical entity. By bridging the physical and the virtual world, 
+data is transmitted seamlessly allowing the virtual entity to exist simultaneously with the physical entity</li>
+<li>...</li>
+</ul>
+
+The introduction of the concept of <em>digital twin</em> is going to 'disruptt' the entire <em>Product Lifecycle Management</em> (<tt>PLM</tt>), 
+from manufacturing to service and operations.
+Digital twins offer a great amount of business potential by predicting the future instead of analyzing the past of the manufacturing process.
+
+<h2>MODELLING THE DEVICES</h2>
+Our definition of a model for the <tt>Led</tt> and for the <tt>Button</tt> is at the moment quite simple, since it is limited to capture
+the idea of a components with a <bc>state</bc>, represented as a <tt>boolean</tt> variable.
+</p><p>
+<center><img src="./blsLogicModels.png" alt="blsLogicModels" width="70%" height="70%"></center>
+</p><p>
+Our models for the <tt>Led</tt> and for the <tt>Button</tt> are defined so to be <em>observable</em>; moreover, the model of the <tt>Button</tt>
+is also defined as an <em>observer</em>.
+</p><p>
+<center><table style="width:90%">
+  <tr>
+    <th>Interfaces</th>
+    <th>Models</th> 
+	<th>Application logic</th>
+    </tr>
+<tr>
+<td>
+<ul>
+<li><a href="../src/it/unibo/blsFramework/interfaces/IButtonModel.java" target="code">IButtonModel</a></li>
+<li><a href="../src/it/unibo/blsFramework/interfaces/ILedModel.java" target="code">ILedModel</a></li>
+<li><a href="../src/it/unibo/blsFramework/interfaces/IAppLogic.java" target="code">IAppLogic</a></li>
+<li><a href="../src/it/unibo/blsFramework/interfaces/IApplListener.java" target="code">IApplListener</a></li>
+<li><a href="../src/it/unibo/blsFramework/interfaces/IBlsFramework.java" target="code">IBlsFramework</a></li>
+</ul>	
+</td>
+<td>
+<ul>
+<li><a href="../src/it/unibo/blsFramework/models/ButtonModel.java" target="code">ButtonModel</a> (<tt>boolean buttonState</tt>)</li>
+<li><a href="../src/it/unibo/blsFramework/models/LedModel.java" target="code">LedModel</a> (<tt>boolean ledState</tt>)</li>
+</ul>	
+</td> 
+<td><a href="../src/it/unibo/blsFramework/applLogic/BlsApplicationLogic.java" target="code">BlsApplicationLogic.java</a><br/>
+<a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/applLogic/BlsApplicationLogic.kt" target="code">BlsApplicationLogic.kt</a>
+</td>
+</tr>
+ </table></center>
+ </p><p>
+ Our ideas can be summarized as follows:
+
+<ul>
+<li>The  model  of any <bc>input/sensor</bc> device (like a <tt>Button</tt>) should evolve according to information that arises from some
+concrete device, i.e. it should be an <em>Observer</em>. Moreover, it should be also an <em>Observable</em> in order to propagate
+information about changes, by avoiding the need of polling on it.</li>
+<li>The model of any <bc>output/actuator</bc>  device (like a <tt>Led</tt>) should be an <em>Observable</em>,
+since it should send information (when it changes)
+ to some concrete device without being obliged to know such a device in static way.</li>
+ <li>A <b>system</b> based on proper set of models can be designed, build and tested <em>once and for all</em>. Concrete devices can be
+ added (also in a dynamic way) as <i>observers</i> (if output devices) or as <i>observable</i> (if input devices). In other
+ words, we can design and build a reusable software <a href="https://en.wikipedia.org/wiki/Software_framework">framework</a>.</li>
+ <li>An <b>application built upon the framework</b> can be logically conceived as a software system composed of two main parts: 
+ a <em>logical, high-level</em> part (the framework) that does not change and a <em>technology-dependent, lower-level</em>  part 
+ that provides concrete components  to be 'injected' into the logical part.</li>
+</ul> 
+
+<center><img src="./blsLogicModelsAndConcrete.png" alt="blsLogicModelsAndConcrete" width="80%" height="80%"></center> 
+
+</p> 
+
+ 
+ <h2>A BLS FRAMEWORK</h2>
+ 
+Our  <tt>BLS</tt> framework is implemented by the class 
+<a href="../src/it/unibo/blsFramework/appl/BlsFramework.java" target="code">BlsFramework</a> and is deployed with
+the <tt>jar</tt> file named <a href="../build/libs/it.unibo.bls19Local-1.0.jar" target="code">it.unibo.bls19Local-1.0.jar</a>.
+
+Its internal organization  is based on the 
+<em>basic steps</em> required to set-up any software system:
+
+<ul>
+<li><bc>createLogicalComponents</bc> : creates the objects that represents the components of the framework.</li>
+<li><bc>configureSystemArchitecture</bc> : 'injects' references to the components in order to create a local network
+of interrelated objects.</li>
+</li>
+</ul>
+<p>
+There are also (as required by the <a href="../src/it/unibo/blsFramework/interfaces/IBlsFramework.java" target="code">IBlsFramework</a>
+interface) methods (<bc>setConcreteLed</bc> and <bc>setConcreteButton</bc>, <bc>addConcreteLed</bc>) to set/add device-objects to the system and
+selector methods (e.g. <bc>getLedModel</bc>, <bc>getButtonConcrete</bc>) to acquire a reference to the last specific component added to the system.
+<br/>
+The framework has no explicit <tt>startTheSystem</tt> method, since in this case the computation will start as consequance
+of a state change in a  <tt>concrete Button</tt>.
+</p><p>
+ 
+ We can reuse several components already introduced in
+ <a href="Lab1.html" target="info">Lab1.html</a> and <a href="Lab2.html" target="info">Lab2.html</a>, in particular: 
+ <ul>
+ <li>we can reuse the <a href="../src/it/unibo/bls/listener/ButtonObserver.java" target="code">ButtonObserver</a>
+ and all the <tt>Button</tt> devices, since they are already <em>Observable</em>;</li>
+ <li>we can reuse our concrete <tt>Led</tt> devices. The only thing to do is to introduce a 
+ <a href="../src/it/unibo/blsFramework/concreteDevices/LedObserver.java" target="code">LedObserver</a>
+ as an <a href="https://en.wikipedia.org/wiki/Adapter_pattern">adapter</a> between the 
+<a href="../src/it/unibo/blsFramework/models/LedModel.java" target="code">LedModel</a> a concrete <tt>Led</tt>;</li>
+ <li>we can also reuse the application logic 
+<a href="../src/it/unibo/blsFramework/applLogic/BlsApplicationLogic.java" target="code">BlsApplicationLogic</a> 
+with little change, since it must make reference to a 
+<a href="../src/it/unibo/blsFramework/interfaces/ILedModel.java" target="code">ILedModel</a> rather than  to a 
+<a href="../src/it/unibo/bls/interfaces/ILed.java" target="code">ILed</a>.</li>
+ 
+ </ul>
+
+ <h4>An example</h4>
+ An example of its usage is given in  
+ <a href="../src/it/unibo/blsFramework/appl/MainBlsFramework.java" target="code">MainBlsFramework.java</a>
+ or in its equivalent Kotlin version, that we take as our reference in the following.
+
+ <br/><br/>
+<table style="width:100%">
+<tr>
+<td width="60%">
+<img src="./kotlin-Actor3.png" alt="kotlin-Actor3" width="500" height="400"> 
+</td>
+
+<td width="40%">
+<a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/fsm/MainBlsFsmFramework.kt" target="code">MainBlsFsmFramework.kt</a>
+<br/<br/>
+<ol>
+<li><em>START</em> Create a <tt>BLS</tt> with  
+<a href="../src/it/unibo/bls/devices/gui/LedAsGui.java" target="code">LedAsGui</a> and
+a <a href="../src/it/unibo/bls/devices/gui/ButtonAsGui.java" target="code">ButtonAsGui</a>.</li>
+<li><em>ADD</em>: add another <a href="../src/it/unibo/bls/devices/gui/LedAsGui.java" target="code">LedAsGui</a>.
+</li>
+<li><em>CHANGE</em>: after some time, set
+<a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/applLogic/AnotherApplLogic.kt" target="code">AnotherApplLogic.kt</a></li>
+</ol></td>
+
+</tr>
+</table>
+
+
+
+ <h2>The Application Logic (in Kotlin)</h2> 
+ 
+ In this work, rather than simply reusing our previous <tt>Java</tt> version of the component that implements the application logic,
+ we will introduce a version based on <tt>Kotlin</tt>
+ (<a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/applLogic/BlsApplicationLogic.kt" target="code">BlsApplicationLogic.kt</a>), 
+ by starting from the given requirement that it must work as a <em>proactive/reactive</em> entity:
+
+<ul>
+<li><em>reactive</em>: the application logic is always able to run the operation <bc>execute</bc>, since this operation is 
+the method of a conventional object (the method code runs in the context of a caller<tt>Thread</tt>); </li>
+<li><em>proactive</em>: the application logic is able to perform the 'blinking task' in autonomous way, until
+the <tt>Button</tt> is pressed again.
+
+</li>
+</ul>
+
+As done in <a href="../src/it/unibo/blsFramework/applLogic/BlsApplicationLogic.java" target="code">BlsApplicationLogic.java</a>,
+the <a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/applLogic/BlsApplicationLogic.kt" target="code">BlsApplicationLogic.kt</a>
+is a conventional <tt>Java</tt> class that exposes the method  <bc>execute</bc>.
+
+<h4>The proactive part</h4>
+The difference consists in implementing the 'proactive' part as a <em>Kotlin Actor</em> defined as follows:
+ <br/><br/>
+<table style="width:100%">
+<tr>
+<td width="70%">
+<img src="./kotlin-Actor1.png" alt="kotlin-Actor1" width="600" height="400"> 
+ </td>
+ <td width="30%">
+ The actor  is defined within the extendible class 
+ <a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/applLogic/BlsApplicationLogic.kt" target="code">BlsApplicationLogic.kt</a>
+  <br/>  <br/>
+ 
+ If no message is present on the actor input channel, the actor waits without consuming
+<tt>CPU</tt> time (more precisely, it <em>suspends</em>, since it is a coroutine) .
+<br/><br/>
+ If there is a message, the actor blinks the <a href="../src/it/unibo/blsFramework/models/LedModel.java" target="code">LedModel</a>
+  while the boolean variable <bc>doBlink</bc> is true. 
+ <br/>
+ Otherwise it checks for a new message from its
+input channel.
+</td>
+</tr>
+ </table>
+ 
+<h4>The reactive part</h4>
+The variable <bc>doBlink</bc> is changed by the method <bc>applLogic</bc> (called by the method <bc>execute</bc>)
+that sends also a message to the actor, in order to resume its activity.
+
+ <br/><br/>
+<table style="width:100%">
+<tr>
+<td width="60%">
+<img src="./kotlin-Actor2.png" alt="kotlin-Actor2" width="400" height="300"> 
+</td>
+
+<td width="40%">
+The variable <bc>doBlink</bc> is changed by the method <bc>applLogic</bc> (called by the method <bc>execute</bc>)
+that sends also a message to the actor, in order to resume its activity.
+</td>
+
+</tr>
+</table>
+
+ 
+
+ 
+ 
+ <h2>THE NEW FEATURES OF THE SYSTEM</h2>
+The main results of our model-based re-factoring of the <tt>BLS</tt> system can be summarized as follows:
+
+<ul>
+<li>We can deploy the framework as a 'stand-alone', tested system (e.g. by providing a library as a <tt>JAR</tt> file). </li>
+<li>We can build a <tt>BLS</tt> application by simply injecting in the framework some (new) specific, concrete device.</li>
+<li>We can modify the application logic by overriding the <bc>appLogic</bc> method. </li>
+<li>We can dynamically extend the system by adding more concrete buttons and led.</li>
+</ul>
+
+<h3>DYNAMIC EXTENSIONS</h3>
+Of course, the consequence of dynamic extensions must be carefully analyzed before allowing them, but in some
+applications can be appropriate and useful. 
+<br/> 
+For example, we could:
+<ol>
+<li><em>START</em>: start a system by introducing a 
+<a href="../src/it/unibo/bls/devices/gui/LedAsGui.java" target="code">LedAsGui</a> and
+a <a href="../src/it/unibo/bls/devices/gui/ButtonAsGui.java" target="code">ButtonAsGui</a>.</li>
+<li><em>ADD</em>: after some time add a <a href="../src/it/unibo/bls/devices/arduino/LedProxyArduino.java" target="code">LedProxyArduino</a>,
+and a <a href="../src/it/unibo/bls/devices/arduino/ButtonProxyArduino.java" target="code">ButtonProxyArduino</a> as defined
+in our previous <a href="Lab2.html" target="info">Lab2.html</a>.
+</li>
+<li><em>CHANGE</em>: set up <a href="../src/main/kotlin/it/unibo/blsFramework/kotlin/applLogic/AnotherApplLogic.kt" target="code">AnotherApplLogic.kt</a></li>
+</ol>
+ 
+ 
+	
+<h3>Testing / JaCoCo</h3>
+A possible integration test is reported in
+	<a href="../src/test/java/it/unibo/bls/integration/TestBlsFramework.java" target="code">TestBlsFramework.java</a>
+<br/>
+Execute <bc>gradle test</bc> and look at 
+	<a href="../build/reports/tests/test/index.html" target="code">build/report/tests/test/index.html</a>	
+
+	<ol>
+<li>In <a href="../build.gradle" target="code">build.gradle</a> add the 
+<a href="https://docs.gradle.org/current/userguide/jacoco_plugin.html" target="webb">JaCoCo plugin</a> 
+(see <a href="https://www.youtube.com/watch?v=ieYs0hkogVY">Video on JaCoCo</a>)</li>
+<li>The command <bc>gradle build</bc> does execute the tests and <tt>JaCoCo</tt> creates the binary file <bc>text.exec</bc> in <tt>build/jacoco</tt></li>
+
+<li>Execute <bc>gradle build jacocoTestReport</bc> to convert the binary file a readable test report; then look at
+<a href="../build/reports/jacoco/test/html/index.html" target="code">build/reports/jacoco/test/html/index.html</a>.
+
+</li>
+</ol>
+
+
+ <h3>DEPLOYMENT</h3>
+Executing <bc>gradle jar</bc> and look at <tt>build/libs</tt> for
+<a href="../build/libs/it.unibo.bls19Local-1.0.jar" target="code">it.unibo.bls19Local-1.0.jar</a>.
+
+<h4>EXERCISE</h4>
+
+<ul>
+<li>Using the library <a href="../build/libs/it.unibo.bls19Local-1.0.jar" target="code">it.unibo.bls19Local-1.0.jar</a>, build a software
+system with a single <tt>GUI Button</tt> that blinks a <tt>Segment Led</tt> on the PC and a <tt>Led</tt> on Arduino.</li>
+</ul>
+
+
+<h2>(KOTLIN) ACTORS</h2> 
+In Kotlin, an <a href="https://en.wikipedia.org/wiki/Actor_model" target="code">actor</a> is an entity made up of a combination of a <em>coroutine</em>, 
+the state that is confined and encapsulated into this coroutine,
+and a <em>channel</em> to communicate with other coroutines. A simple actor can be written as a function, but an actor with a complex
+state is better suited for a class. 
+<br/><br/>
+In Kotlin 1.3, coroutines are stable (but the <tt>@kotlinx.coroutines.ObsoleteCoroutinesApi</tt> is still required in IntelliJ) and
+also actors should be. However, changes will be still possible.  For an introduction, we could read:
+<ul>
+<li><a href="https://kotlinexpertise.com/kotlin-coroutines-guide/#qa" target="web">Kotlin coroutines guide</a></li>
+<li><a href="https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md" target="web">Kotlin Coroutines</a> (<tt>GIT</tt>)</li>
+<li><a href="https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/shared-mutable-state-and-concurrency.md#actors" target="web">
+Kotlin coroutines: Shared mutable state and concurrency</a></li>
+</ul>
+
+<em>Coroutines</em> (see <a href="https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md" target="web">Kotlin Coroutines</a>) 
+are for asynchronous tasks that wait for something most of the time 
+(<a href="https://en.wikipedia.org/wiki/I/O_bound" target="web">IO-bound tasks</a>) while <em>Threads</em> are for 
+<a href="https://en.wikipedia.org/wiki/CPU-bound" target="web">CPU-bound tasks</a>.
+Moreover:<br/>
+ 
+ 
+
+<div class="req">
+	An entire mutable state can be confined into a specific actor coroutine, which solves the problem of shared mutable state 
+and follows the principle of <em>share by communication</em>.
+<br/><br/>
+<a href="https://github.com/Kotlin/kotlinx.coroutines/blob/master/docs/shared-mutable-state-and-concurrency.md#actors" target="web">Kotlin actor</a>
+is a coroutine builder  <i>'that conveniently combines actor's mailbox channel into its scope to receive messages from and 
+combines the send channel into the resulting job object'</i>.
+</div>
+
+From now on, we will represent such a new, fundamental computational entity with the
+following picture:
+
+ <center><img src="./actor.png" alt="actor" width="130" height="100"></center>
+
+ <h3>Useful resources</h3>
+ To facilitate the design and the development of our next applications, we introduce a set of resources:
+ <br/><br/>
+ 
+ <table style="width:100%">
+<tr>
+<td width="20%">
+<center><img src="./ActorBasic.png" alt="ActorBasic" width="130" height="100"></center> 
+</td>
+<td width="40%">
+<center><img src="./ActorBasicCode.png" alt="ActorBasicCode" width="450" height="400"></center> 
+ 
+</td>
+<td width="40%">
+<a href="../src/main/kotlin/it/unibo/kactor/ActorBasic.kt" target="code">ActorBasic.kt</a><br/><br/>
+An abstract class  that provides an actor. <br/> <br/>
+The application designer must write the <tt>actorBody</tt>
+method to  handle:
+<li>
+with the help of <a href="../src/main/kotlin/it/unibo/kactor/MsgUtil.kt" target="code">MsgUtil.kt</a></li>
+<li>the received message of type 
+<a href="../src/main/kotlin/it/unibo/kactor/ApplMessage.kt" target="code">ApplMessage.kt</a> (requires
+<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a> )</li>
+
+</td>
+</tr>
+<tr>
+<td width="20%"></td>
+<td width="40%"></td>
+<td width="40%"><a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegment.kt" target="code">LedSegment.kt</a></td>
+</tr>
+
+<tr>
+<td width="20%">
+<center><img src="./segmHoriz.png" alt="segmHoriz" width="130" height="100"></center> 
+ 
+</td>
+<td width="40%"></td>
+<td width="40%"><a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegmHorizontal.kt" target="code">LedSegmHorizontal.kt</a></td>
+</tr>
+
+<tr>
+<td width="20%">
+<center><img src="./segmVertLeft.png" alt="segmVertLeft" width="130" height="100"></center> 
+
+</td>
+<td width="40%"></td>
+<td width="40%"><a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegmVerticalRight.kt" target="code">LedSegmVerticalRight.kt</a></td>
+</tr>
+
+<tr>
+<td width="20%">
+<center><img src="./segmVertRight.png" alt="segmVertRight" width="130" height="100"></center> 
+
+</td>
+<td width="40%"></td>
+<td width="40%"><a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegmVerticalLeft.kt" target="code">LedSegmVerticalLeft.kt</a></td>
+</tr>
+</table>
+ 
+
+<h4><a id="worktodo"/>WORK TO DO</h4>
+
+<ol>
+<li>Using the library <a href="../build/libs/it.unibo.bls19Local-1.0.jar" target="code">it.unibo.bls19Local-1.0.jar</a>, build a software
+system with a single <tt>GUI Button</tt> that blinks a <tt>GUI Led</tt> shaped as a  
+<a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegment.kt" target="code">LedSegment.kt</a> (a 
+<a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegmHorizontal.kt" target="code">LedSegmHorizontal.kt</a>, or 
+<a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegmVerticalRight.kt" target="code">LedSegmVerticalRight.kt</a> or
+<a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegmVerticalLeft.kt" target="code">LedSegmVerticalLeft.kt</a>).
+</li>
+
+<li>
+<b>Design and build</b> a new system, with the following requirements:
+<div class="req">
+The system must control a <em>chain of Led</em> made of <tt>n>2</tt>:
+<a href="../src/main/kotlin/it/unibo/chain/segment7/LedSegment.kt" target="code">LedSegment.kt</a>, so that:
+<ol>
+<li> <em>R0 (START)</em>: the chain is activated (at time <tt>t0</tt>) when a command <tt>START</tt> is sent to it</li>
+<li> <em>R1 (BLINK)</em>: the  <b>Led-i</b>  (<tt>i=1..n</tt>) is turned-on for a prefixed time <bc>TIMEON</bc>, at time <bc>t0 + TIMEON*i</bc></li>
+<li> <em>R2 (REPEAT)</em>: the chain blinking repeats</li>
+<li> <em>R3 (STOP)</em>: the chain blinking is stopped when the chain receives the command <tt>STOP</tt> </li>
+</ol>
+</div>	
+
+Our attention will be focused on the  following aspects:
+<ul>
+<li>a model for the chain?</li>
+<li>the control: centralized or distributed ?</li>
+<li>proactive/reactive: actors massage-based rather than Threads</li>
+<li>body of actor as a finite state machine</li>
+</ul> 
+</li>
+</ol>
+
+<h4>Possible architectures</h4>
+
+<ol>
+<li><em>Monolitic</em>. A central control creates the <tt>n</tt> LedSegment and inserts each of them in the same GUI context (<tt>JFrame</tt>).
+The control can be modeled as an actor that waits for <tt>'START'</tt> and <tt>'STOP'</tt> message. The blinking activity
+turns on/off each LedSegment in sequence; to repeat it, the control sends to itself the  <tt>'START'</tt> message.
+(See <a href="../src/main/kotlin/it/unibo/chain/appl/LedSegmChainSystemMonolitic.kt" target="code">LedSegmChainSystemMonolitic.kt</a> )
+</li>
+<li><em>Distributed-one view</em>. Each LedSegment <tt>k (1<=k<=n)</tt> is controlled by an actor (<tt>LedInChainCtrlActor</tt>) that 
+owns a reference to  the next actor <tt>k+1</tt> (when <tt>k=n</tt>, the next actor is <tt>1</tt>). Each LedSegment is inserted
+in a unique GUI context (<tt>JFrame</tt>). The system is started/stopped by sending the message <tt>'START'</tt>/<tt>'STOP'</tt> to
+the first <tt>LedInChainCtrlActor</tt> 
+(see <a href="../src/main/kotlin/it/unibo/chain/appl/LedInChainCtrlActor.kt" target="code">LedInChainCtrlActor.kt</a>) 
+that propagates the command to the next actor.
+(See <a href="../src/main/kotlin/it/unibo/chain/appl/LedSegmChainSystemDistrOneView.kt" target="code">LedSegmChainSystemDistrOneView.kt</a> )
+</li>
+<li><em>Distributed-n views</em>. Like the previous one, with the difference that each LedSegment is inserted
+in its own GUI context (<tt>JFrame</tt>).
+(See <a href="../src/main/kotlin/it/unibo/chain/appl/LedSegmChainSystemDistr.kt" target="code">LedSegmChainSystemDistr.kt</a> )
+</li>
+<li><em>Model-based</em>. A central control actor handles a model of the chain, implemented as a  <tt>MutableList</tt> of <tt>ILedModel</tt>. 
+In the system configuration phase, a LedSegment is injected into a <tt>LedInChainObs</tt> 
+(see <a href="../src/main/kotlin/it/unibo/chain/model/LedInChainObs.kt" target="code">LedInChainObs.kt</a>)
+that works as an <i>Observer</i> of the corresponding
+item of the model list.  Each LedSegment is inserted in a unique GUI context (<tt>JFrame</tt>).
+(See <a href="../src/main/kotlin/it/unibo/chain/model/ChainModel.kt" target="code">ChainModel.kt</a> 
+and <a href="../src/main/kotlin/it/unibo/chain/model/ModelChainSystemMonolitic.kt" target="code">ModelChainSystemMonolitic.kt</a> )
+<br/> 
+The  business logic of the control actor (the <tt>actorBody</tt>) is structured as 
+<a href="https://en.wikipedia.org/wiki/Finite-state_machine" target="web">Finite State Machine</a> (<bc>FSM</bc>)
+as shown in the following picture:
+
+<center><img src="./chainModelBased.png" alt="chainModelBased" width="70%" height="7%"></center>
+</li>
+ 
+</ol>
+
+<h2>Towards Distributed Systems </h2>
+
+Every software systems can be described/designed along three main coordinates/dimensions:
+
+<ol>
+<li><em>STRUCTURE</em>: related to the set of (static/dynamic) elements that compose the system.</li>
+<li><em>INETRACTION</em>: related on how the components exchange information (and control).</li>
+<li><em>BEHAVIOUR</em>: related on how each component works and how the system as a whole works.</li>
+</ol>
+
+Until now, our reference paradigm was 'conventional' 
+<a href="https://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented programming</a> (<bc>OOP</bc>), in which the components are objects
+- also called <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object">Plain Old Java Objects</a> (<bc>POJO</bc>) 
+that interact by using <bc>procedure-calls</bc>.
+<br/><br/>
+From now on, we will consider (as it was at the very beginning of the history of <tt>OOP</tt>) the idea that each software component
+is an active entity able to interact with other components by exchanging messages.
+In other words, we will  start from a <a href="https://en.wikipedia.org/wiki/Metamodeling">meta-model</a> in which a software systems is composed of a set of <em>actors</em> that can share
+the same computational node or that can work on a set of different nodes.
+<br/> 
+Before entering in this new design space, it is important to explore in more detail the <em>behavior</em> dimension,
+with particular reference to the <a href="https://en.wikipedia.org/wiki/Functional_programming">functional style<a> of programming, 
+in contrast to 'traditional' imperative programming.
+Once again, Kotlin can help us in this job.
+
+
+ 
+
+<br/><br/>
+
+
+</div>  
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">
+By AN Unibo-DISI    
+</div> 
+</body>
+</html>

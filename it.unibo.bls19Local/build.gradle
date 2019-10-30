@@ -1,0 +1,86 @@
+/*
+================================================================================
+ USAGE:	 
+	gradle build eclipse	  //to set the dependency on the library
+	gradle build distZip     //for executable jar and distribution
+ ================================================================================
+*/
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+    id 'application'
+    //id 'jacoco'         //ADDED After BLSFramework
+}
+
+apply plugin: 'jacoco'      //ADDED After BLSFramework
+
+group 'issUnibo19'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    flatDir { //grazie Mattia Piretti
+       dirs '/C:/Didattica2018Work/iss2019Lab/it.unibo.bls19Local/uniboLibs'	//full path
+   }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+//COROUTINE
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core-common', version: '1.1.0'
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.1.0'
+//ANDROID
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-android
+    //compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-android', version: '1.1.1'
+//ARDUINO
+    // https://mvnrepository.com/artifact/org.scream3r/jssc
+    compile group: 'org.scream3r', name: 'jssc', version: '2.8.0'
+//CUSTOM
+    compile name: '2p301'
+    compile name: 'uniboInterfaces'
+    compile name: 'it.unibo.bls19Local-1.0'
+    //For p2p two-way connections (TCP, UDP, BTH, Serial ...)
+    compile name: 'unibonoawtsupports'
+    
+
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+} 
+
+sourceSets {
+    main.java.srcDirs += 'src'
+     test {
+        java {
+            srcDirs += ["src/it/unibo/bls/components"]   
+            srcDirs += ["src/it/unibo/bls/integration"] 
+        }
+    }
+}
+/*  Run gradle build jacocoTestReport  */ 
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("$buildDir\\reports")
+}
+
+
+/*
+//If the Java plugin is also applied to your project, 
+//a new task named jacocoTestReport is created that depends on the test task.
+*/
+
+
+
+// Define the main class for the application.
+mainClassName = 'it.unibo.bls.appl.MainBlsMockBase'
+//mainClassName = 'it.unibo.blsFramework.kotlin.fsm.xxx'

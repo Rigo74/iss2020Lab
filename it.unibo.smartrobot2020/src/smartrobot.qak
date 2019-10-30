@@ -7,13 +7,13 @@
  * ================================================================
  */
 System smartrobot  
-
+ 
 Dispatch cmd  : cmd(X)
  
 Request  step      :  step(DURATION)
 Reply    stepdone  :  stepdone(V)  
 Reply    stepfail  :  stepfail(DURATION, CAUSE)
-Dispatch stop      :  stop(V)  
+Dispatch stop      :  stop(V)   
  
 Event  obstacle    : obstacle( DISTANCE )  
 Event  alarm       : alarm(V)

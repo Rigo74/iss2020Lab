@@ -90,6 +90,24 @@ bc{
     color: #990000;
 	background-color: #fcf8c7;
 }
+k{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #990000;
+	 
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	 
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	 
+}
 pre{
 	font-family: "Helvetica";
 	font-size: 70%;
@@ -193,7 +211,56 @@ and <tt>CPS</tt>. </li>
 loosing in performance.</li>
 </ol>
 
-<h3><a id="data"/>Data, Types and Variables</h3>
+<h2><a id="examples"/>EXAMPLES</h2>
+
+For the examples hereunder, put the code after <tt>----</tt> in  a main and use the following import:
+<pre>
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.actor
+
+fun main() = runBlocking{
+	println(...)
+}
+</pre>
+
+Let us introduce also some utility function:
+<h3>Utilities</h3>
+
+<pre>
+fun <k>curThread()</k> : String { 
+	return "thread=${Thread.currentThread().name}" 
+}
+
+
+inline fun <k>measureTimeMillis</k>(block: () -> Unit): Long {
+    val start = System.currentTimeMillis()
+    block()
+    return System.currentTimeMillis() - start
+}
+
+suspend fun <k>CoroutineScope.massiveRun</k>( action: suspend () -> Unit) {
+    val n=100  //number of coroutines to launch
+    val k=1000 //times an action is repeated by each coroutine
+    val time = measureTimeMillis {
+        val jobs = List(n) {
+            launch {
+                repeat(k) { action() }
+            }
+        }
+        jobs.forEach { it.join() }
+    }
+    println("Completed ${n * k} actions in $time ms")    
+}
+
+
+</pre>
+<h2><a id="data"/>Data, Types and Variables</h2>
 
 <center><table style="width:95%">
 
@@ -211,6 +278,7 @@ loosing in performance.</li>
 <tr>
 <td><pre>val name = "Bob"
 val str = "Hello $name"
+<kc>------</kc>
 println( str )	//Hello Bob
 </pre> </td>
 <td><m><em>String template</em></m> </td>
@@ -220,6 +288,7 @@ println( str )	//Hello Bob
 <tr>
 <td><pre>val name : String? = null
 val v = name?.length ?: 0
+<kc>------</kc>
 println("v=$v")	//0
 </pre> </td>
 <td><m><em>Nullable type</em> with safe null access</m> </td>
@@ -227,6 +296,7 @@ println("v=$v")	//0
 <tr>
 <td><pre>
 val v : Any = 23
+<kc>------</kc>
 println( "v is String=${v is String}") //false
 println( "v is Int=${v is Int}")	//true
 </pre> </td>
@@ -237,7 +307,9 @@ println( "v is Int=${v is Int}")	//true
 
 
 <tr>
-<td><pre>var v : Any = "Bob"
+<td><pre>
+var v : Any = "Bob"
+<kc>------</kc>
 println( "v is String=${v is String}") //true
 println( "v is Int=${v is Int}")	//false
 </pre> </td>
@@ -249,11 +321,13 @@ println( "v is Int=${v is Int}")	//false
 <td><pre>val v : Any = "Bob"
 //val n = v.length //ERROR
 val n = (v as String).length
+<kc>------</kc>
 println( "$n") //3
 //println( "${v as Int}") //java.lang.ClassCastException
 println( "${v as? Int}")  //null
 
 val t : Int = v as? Int ?: 100
+<kc>------</kc>
 println( "$t") //100  //100
 </pre> </td>
 <td><m><em>Explicit casting</em>. The <bc>as</bc> operator performs type casting. 
@@ -266,16 +340,20 @@ The <bc>?:</bc> is the <em>Elvis operator</em> that provides default values inst
 <td ><pre>
 val s1 = "a"
 var s2 = "a"
+<kc>------</kc>
 println( "s1 === s2 : ${s1 === s2} ") //true
 println( "s1 == s2  : ${s1 == s2} ") //true
 
 s2 = "b"
+<kc>------</kc>
 println( "s1 === s2 : ${s1 === s2} ") //false
 s2 = "a"
+<kc>------</kc>
 println( "s1 === s2 : ${s1 === s2} ") //true
 
 val a = java.io.File("a")
 val b = java.io.File("a")
+<kc>------</kc>
 println( "a === b : ${a === b}") //false
 println( "a == b  : ${a == b}") //true
 
@@ -288,6 +366,7 @@ println( "a == b  : ${a == b}") //true
 <td><pre> 
 val aToz = "a".."z"
 val q = "q"
+<kc>------</kc>
 println( "q in aToz=${q in aToz}") //true
 println( "1 in aToz=${"""1""" in aToz}") //false
 </pre> </td>
@@ -296,7 +375,9 @@ The <bc>in</bc> infix operator performs a belong test. Triple quotes <bc>"""</bc
 </tr>
 
 <tr>
-<td><pre>var a = arrayOf(1,2,3)
+<td><pre>
+var a = arrayOf(1,2,3)
+<kc>------</kc>
 println( "array of size=${a.size}")
 println( "firstEl=${a[0]}  lastEl=${a[a.size-1]}")
 </pre> </td>
@@ -308,14 +389,16 @@ println( "firstEl=${a[0]}  lastEl=${a[a.size-1]}")
 </table></center>
  	
 
-<h3><a id="funs"/>Functions</h3>
+<h2><a id="funs"/>Functions</h2>
 
 <center><table style="width:95%">
 <tbody>	
 <tr>
-<td style="width:45%"><pre>fun sum(a:Int, b:Int) : Int {
+<td style="width:45%"><pre>
+fun sum(a:Int, b:Int) : Int {
   return a+b
 }
+<kc>------</kc>
 println( " ${sum(3,6)} " ) //9
 </pre> </td>
 <td><m>A <em>Top-level function</em> that returns a value</m>
@@ -326,7 +409,7 @@ println( " ${sum(3,6)} " ) //9
 <td><pre>var counter = 0
 fun incCounter() : Unit{ counter++ }
 fun decCounter() { counter-- }
-
+<kc>------</kc>
 println( "pre=$counter  " ) //pre=0
 incCounter()
 println( "post=$counter " ) //post=1
@@ -338,18 +421,17 @@ decCounter()
 <tr>
 
 <tr>
-<td><pre>fun square(v: Int) = v * v
+<td><pre>
+fun square(v: Int) = v * v
+<kc>------</kc>
 println( " ${square(3)} " ) //9
 </pre> </td>
 <td><m><em>One line function</em>. Braces can be omitted. Return type can be omitted (it is inferred)</m> </td>
 </tr>
-
-
-
-
-
-
-<td><pre>
+ 
+<td>
+<h3>Reused declarations</h3>
+<pre>
 val action : () -> Unit 	   
 	//function type (no args, returns nothing useful (Unit)
 
@@ -376,19 +458,21 @@ A  way to provide a value function is to use a <em>function literal</em>:
 <tr>
 <td><pre>
 action	= { println("hello") }  //lambda expression
+<kc>------</kc>
 action() //hello
 
 sum = { x:Int, y:Int -> x+y }  //lambda expression
 val a = sum(1,2)
+<kc>------</kc>
 println("a=$a")	      //a=3
 
 greet = { m: String -> { println(m)}  }
+<kc>------</kc>
 greet( "Hello World" )() //Hello World
-
----------------------------------------------------
 { println( "Welcome" ) }()  //Welcome
 
 val fl = { print( "Last exp val=" ); 100 }
+<kc>------</kc>
 println( "${fl()}" )  //Last exp val=100
 </td>
 <td><m><em>Lambda Expression literal</em>: it can be assigned to a variable, just like any other literal. 
@@ -398,19 +482,23 @@ Returns (the value of the) <bc>last</bc> expression </m> </td>
 <tr>
 <td><pre>
 val action: ()->Unit = fun() { println("Hello") }
+<kc>------</kc>
 action() //hello
 
 val sum: (Int)->Int  = fun(x) = x * x
+<kc>------</kc>
 println("sum=${sum(1,2)}")	      //sum=3
 
 val greet: (String)->()->Unit = 
 		fun(m:String) = fun() { println("Printing $m") }
+<kc>------</kc>
 greet( "Hello World" )() //Printing Hello World
 
 ------------------------------------------
 fun exec23( op: ( Int, Int) -> Int ) {  op(2,3)  }
 
 val v4 =  exec23( fun(x:Int,y:Int):Int{return x+y} )
+<kc>------</kc>
 println("$v4")          //5
 </pre> </td>
 <td><m><em>Anonymous function</em>; another way to write a block of code instead of a Lambda expression. Needs <bc>return</bc>
@@ -438,15 +526,19 @@ println("${ exec23(mul) }")	      //6
 fun exec23( op:(Int,Int) -> Int ) : Int { return op(2,3) }
 
 val v1 = exec23( { x:Int, y:Int -> x-y } ) //no shortcut
+<kc>------</kc>
 println("v1=$v1")	      //v1=-1
 
 val v2 = exec23() { x:Int, y:Int -> x-y } //lamda is last arg
+<kc>------</kc>
 println("v2=$v2")	      //v2=-1
 
 val v3 = exec23{ x:Int, y:Int -> x-y } //() can be removed
+<kc>------</kc>
 println("v3=$v3")	      //v3=-1
 
 val v4 = exec23{ x,y -> x-y } //arg types inferred
+<kc>------</kc>
 println("v4=$v4")	      //v4=-1
 
 	
@@ -463,7 +555,8 @@ fun p2( op: ( Int ) -> Int ) : Int { return op(2) }
     val v3 =  p2 { x:Int-> x*x }
     val v4 =  p2 { x -> x*x }
     val v5 =  p2 { it -> it*it }
-    println("v5=$v5")	      //v45=4
+<kc>------</kc>
+println("v5=$v5")	      //v45=4
 </pre> </td>
 <td><m><em>Simplification</em> in lambda call: </m>
 
@@ -477,9 +570,10 @@ p2 { it*it }
 
 
 <td><pre>
-fun modulo(k:Int): (Int) -> Int    //SIGNATURE
-            = { it % k  }               //BODY
+fun modulo(k:Int): (Int) -> Int   <kc> //SIGNATURE</kc>
+            = { it % k  }               <kc>//BODY</kc>
 var v = modulo(3)(5)	
+<kc>------</kc>
 println("$v") //2
 </pre> </td>
 <td><m><em>Function as return value</em>.  </m> </td>
@@ -503,7 +597,7 @@ fun sToN( s: String, base: Int=10 ) : Int{
     }
     return v
 }
-
+<kc>------</kc>
 println( " ${ sToN( s: "123") } " ) //123
 </pre> </td>
 <td><m><em>Default parameters</em> and <em>Named parameters</em> at call </m> </td>
@@ -513,13 +607,16 @@ println( " ${ sToN( s: "123") } " ) //123
 
 
 <tr>
-<td><pre>fun mirror(v: Int) : Pair&ltInt,Int> {
+<td><pre>
+fun mirror(v: Int) : Pair&ltInt,Int> {
 	return Pair(v, -v)
 }
 val v = mirror(2)
+<kc>------</kc>
 println("${v.first}, ${v.second} ")  //2,-2
 
 val(pos,neg) = mirror(3)
+<kc>------</kc>
 println( " pos=$pos neg=$neg " ) //pos=3 neg=-3  
 </pre> </td>
 <td><m><em>Multiple return values</em>. To extract the values into separate values, we can exploit
@@ -535,11 +632,12 @@ val(pos,neg) = mirror(3)
 <td><pre>fun sum(a:Int, b:Int) : Int {
   return a+b
 }
-println("${::sum}") //fun sum(kotlin.Int,kotlin.Int):kotlin.Int 
+<kc>------</kc>
+println("${::sum}") <kc>//fun sum(kotlin.Int,kotlin.Int):kotlin.Int</kc> 
 </pre> 
 <m>To obtain the output, include the dependency on:</m>
 <pre>
-implementation "org.jetbrains.kotlin:kotlin-reflect"
+<k>implementation</k> "org.jetbrains.kotlin:kotlin-reflect"
 </pre>
 </td>
 <td><m><em>Function reference</em>. The <bc>::</bc> operator creates a member reference or a (statically known) class reference.
@@ -548,19 +646,7 @@ A Kotlin class reference is not the same as a Java class reference. To obtain a 
 use the <bc>.java</bc> property on a <tt>KClass</tt> instance.</m>
  </td>
  
- 
-
-
-<tr>
-<td><pre>
-fun curThread() : String { 
-	return "thread=${Thread.currentThread().name}" 
-}
-</pre> </td>
-<td><m><em>An utility function</em>: we will use it in the following</m> </td>
-</tr>	
- 
- 
+  
  <tr>
 <td><pre>
 fun main(args: Array<String>) {
@@ -570,13 +656,7 @@ fun main(args: Array<String>) {
     println(str)
     println("ENDS")
 }
-
-//OUTPUT
-BEGINS
-Hello World!!
-Hello World 
-ENDS
-</pre> </td>
+ </pre> </td>
 <td><m>
 <h5>Standard library function</h5> 
 
@@ -586,6 +666,13 @@ It is a <bc>scoping function</bc>, wherein the variables declared inside the exp
 useful higher order functions implementing idiomatic patterns.
 -->
 </m>
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS
+Hello World!!
+Hello World 
+ENDS
+</pre>
 </td>
 </tr>
 
@@ -616,15 +703,6 @@ fun main(args: Array<String>) {
     testRunFunction()
     println("ENDS")
 }
-
-//OUTPUT
-BEGINS thread=main
-Second start: Global-logo thread=main
-First start : Global-logo thread=main
-First ended : First-run
-Second ended: Second-run 
-logo=Global-logo v1=StandaloneCoroutine{.. v2=Second-run
-ENDS thread=main
 </pre> </td>
 <td><m>
 <h5>Standard library function</h5> 
@@ -637,6 +715,16 @@ ENDS thread=main
 useful higher order functions implementing idiomatic patterns.
 -->
 </m>
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS thread=main
+Second start: Global-logo thread=main
+First start : Global-logo thread=main
+First ended : First-run
+Second ended: Second-run 
+logo=Global-logo v1=StandaloneCoroutine{.. v2=Second-run
+ENDS thread=main
+</pre>
 </td>
 </tr>
 
@@ -644,7 +732,7 @@ useful higher order functions implementing idiomatic patterns.
 </table></center>
  
 
-<h3><a id="clos"/>Closures and Callbacks</h3>
+<h2><a id="clos"/>Closures and Callbacks</h2>
 
 <center><table style="width:95%">
 <tbody>	
@@ -663,10 +751,12 @@ fun counterCreate()  : ( cmd : String ) -> Int {
 }
 
 val c1 = counterCreate()
+<kc>------</kc>
 for( i in 1..3 ) c1("inc")
 println("c1=${c1("val")}")	      //c1=3
 
 val c2 = counterCreate()	//another instance
+<kc>------</kc>
 for( i in 1..3 ) c2("dec")
 println("c2=${c2("val")}")	     //c2=-3
 </pre> </td>
@@ -702,11 +792,11 @@ fun main() {
 </pre> </td>
 <td>
 <m>
-<h5>EXPERIMENT ON CPS</h5>
+<h5>EXPERIMENT ON CPS (Continuation Passing Style)</h5>
 With reference to the set of functions on the left, let us execute a <em>Normal call sequence</em>:
 The output is:</m>
 <pre>
-//OUPUT
+<kc>//OUPUT</kc>
 BEGINS
 Input  ...
 Submit ...
@@ -751,13 +841,6 @@ fun main() = runBlocking{
     doJobCps( 10  )
     println("ENDS ${curThread()}")
 }
-
-//OUPUT
-BEGINS thread=main
-Input  ... thread=main 
-Submit ... thread=main
-Handle myinputcps-10  thread=main 
-ENDS thread=main
 </pre> </td>
 <td><m><em>Callbacks</em> are quite common in <bc>event-loop</bc> architectures such as <b>JavaScript</b>.
 The idea is to pass one function as a parameter to another function, and have this one invoked once the process has completed.
@@ -772,7 +855,14 @@ In order to avoid the <bc>anti-pattern</bc> known as
  quite diffused to handle 
  <a href="https://en.wikipedia.org/wiki/Asynchronous_I/O" target="web">Asynchronous I/O</a>
 </m> 
-
+<pre>
+<kc>//OUPUT</kc>
+BEGINS thread=main
+Input  ... thread=main 
+Submit ... thread=main
+Handle myinputcps-10  thread=main 
+ENDS thread=main
+</pre>
  
 </td>
 </tr>
@@ -795,15 +885,6 @@ fun doJobCps( n: Int  ){
      )}//submitCps
   )//getInputAsynchCps	
 }
-
-//OUPUT
-BEGINS thread=main
-ENDS thread=main
-Input  ... thread=Thread-0 
-Input received thread=Thread-0 
-Submit ... thread=Thread-0
-Handle myinputasynchcps-10  thread=Thread-0 
-		
 </pre> </td>
 <td><m>
 <h5>ASYNCHRONOUS PROGRAMMING WITH CPS</h5>
@@ -815,13 +896,23 @@ Now, the <tt>main</tt> program ends immediately; the computation is executed in 
 <br/><br/>
 Note the <a href="https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions">Single Abstract Method conversion</a> 
 (<bc>SAM</bc>) in <tt>kotlin.concurrent.thread</tt>: when an object implements a <tt>SAM</tt> interface, we can pass a lambda instead.
-</m> </td>
+</m> 
+<pre>
+<kc>//OUPUT</kc>
+BEGINS thread=main
+ENDS thread=main
+Input  ... thread=Thread-0 
+Input received thread=Thread-0 
+Submit ... thread=Thread-0
+Handle myinputasynchcps-10  thread=Thread-0 
+</pre>
+</td>
 </tr>
 
 </tbody>	
 </table></center>
 
-<h3><a id="suspend"/>Suspending functions and coroutines</h3>
+<h2><a id="suspend"/>Suspending functions and coroutines</h2>
 
 <center><table style="width:95%">
 <tbody>	
@@ -839,13 +930,8 @@ fun main() = runBlocking{
     println("ENDS")
 }
 
-//OUTPUT
-BEGINS thread=main
-delayedFun STARTS thread=main
-delayedFun ENDS 
-ENDS thread=main
 </pre> </td>
-<td><m><em> </em>
+<td><m>
 <bc>delay</bc> is a special <i>suspending function</i> that does not block a thread, but suspends the work.
 <br/><br/>
 <bc>runBlocking</bc> is a  <tt>Coroutine Builder</tt> wrapper that runs new coroutine and blocks current thread interruptibly until its completion. 
@@ -855,7 +941,17 @@ to be used in main functions and in tests.
 A function that can <bc>suspend</bc> its work cannot be called from a normal function,
 but only from another suspend function or from a <em>Coroutine</em>.
 
-</m> </td>
+</m> 
+
+<pre>
+<kc>//OUPUT</kc>
+BEGINS thread=main
+delayedFun STARTS thread=main
+delayedFun ENDS 
+ENDS thread=main
+</pre>
+
+</td>
 </tr>
 
 
@@ -876,11 +972,6 @@ fun main() = runBlocking{
     println("ENDS")
 }
 
-//OUTPUT:
-BEGINS thread=main
-IO operation thread=main
-Done, time=509
-ENDS
 </pre> </td>
 <td><m>
 Essentially a <em>Coroutine</em> is a light-weight thread that can be activated with a 
@@ -897,7 +988,16 @@ Among the <em>Coroutine Builder</em> there are:
 However, we could launch coroutines in the specific scope of the operation we are performing.
 
 
-</m> </td>
+</m> 
+
+<pre>
+<kc>//OUPUT</kc>
+BEGINS thread=main
+IO operation thread=main
+Done, time=509
+ENDS
+</pre>
+</td>
 </tr>
   
  <tr>
@@ -910,10 +1010,11 @@ fun main() = runBlocking{
     println("ENDS")
 }
 
-//OUTPUT:
+<kc>//OUPUT</kc>
 BEGINS thread=main
 ENDS thread=main
 IO operation thread=DefaultDispatcher-worker-1
+
 </pre> </td>
 <td><m>
 A <em>Dispatcher</em> determines the thread in which a coroutine will be executed. It can be provided by the<tt> Coroutine Scope</tt>
@@ -930,9 +1031,10 @@ we do not await for coroutine completion, the programs ends before that the coro
 <li><bc>By the coroutine scope</bc></li>
 </ul>
 
-
-
-</m> </td>
+</m> 
+<pre>
+</pre>
+</td>
 </tr>
  
 <tr>
@@ -946,7 +1048,7 @@ fun main() = runBlocking{
     println("ENDS ${curThread()}")
 }
 
-//OUTPUT:
+<kc>//OUPUT</kc>
 BEGINS thread=main
 IO operation thread=DefaultDispatcher-worker-2
 Done, time=514
@@ -967,7 +1069,7 @@ fun main() = runBlocking{
     println("ENDS ${curThread()}")
 }
 
-//OUTPUT
+<kc>//OUPUT</kc>
 BEGINS thread=main
 ENDS thread=main
 IO operation thread=main
@@ -1009,8 +1111,17 @@ fun main() = runBlocking{
     activate()
     println("ENDS")
 }
+</pre> </td>
+<td><m>The <bc>async</bc> builder returns a <em>promise</em> (also known as <tt>future</tt>), 
+(which is of type <bc>Deferred</bc> in Kotlin): it promises to compute a value which we can wait for or 
+request at any time.
+<br/><br/>
+ The method <bc>await</bc> on the promise allows us to get the value.
 
-//OUTPUT
+
+</m> 
+<pre>
+<kc>//OUPUT</kc>
 BEGINS thread=main
 ENDS thread=main
 Waiting for completion
@@ -1020,15 +1131,8 @@ Done, time=525
 Done, time=525
 All jobs done
 ENDS
-</pre> </td>
-<td><m>The <bc>async</bc> builder returns a <em>promise</em> (also known as <tt>future</tt>), 
-(which is of type <bc>Deferred</bc> in Kotlin): it promises to compute a value which we can wait for or 
-request at any time.
-<br/><br/>
- The method <bc>await</bc> on the promise allows us to get the value.
-
-
-</m> </td>
+</pre>
+</td>
 </tr>
 
 <tr>
@@ -1050,14 +1154,6 @@ fun main() = runBlocking<Unit> {
  }
  println("ENDS ${curThread()}")
 }
-
-//OUTPUT
-BEGINS thread=main
-2) thread=main
-3) thread=DefaultDispatcher-worker-1
-ENDS thread=main
-4) thread=MyThr
-1) thread=main
 </pre> </td>
 <td><m>
 All the <tt>coroutine builder</tt> functions like <bc>launch</bc> and <bc>async</bc> accept as parameter one of the
@@ -1080,7 +1176,17 @@ The size of this thread pool is 64</li>
 https://play.kotlinlang.org
 /koans/overview
 -->
-</m> </td>
+</m> 
+<pre>
+<kc>//OUPUT</kc>
+BEGINS thread=main
+2) thread=main
+3) thread=DefaultDispatcher-worker-1
+ENDS thread=main
+4) thread=MyThr
+1) thread=main
+</pre>
+</td>
 </tr>
 
 
@@ -1089,7 +1195,7 @@ https://play.kotlinlang.org
 
 
  
-<h3><a id="dispatch"/>Dispatchers</h3>
+<h2><a id="dispatch"/>Dispatchers</h2>
 <center><table style="width:95%">
 <tr>
 <td style="width:45%"> <pre></pre> </td>
@@ -1119,7 +1225,9 @@ or let it run unconfined.</li>
 <li>Coroutines can be executed concurrently using a multi-threaded dispatcher.</li>
 <li>Coroutines can suspend on one thread and resume on another thread.</li>
 </ul>
-
+<pre>
+<kc>//OUPUT</kc>
+</pre>
 </m> </td>
 </tr>
 
@@ -1132,8 +1240,10 @@ suspend fun launchAction(i:Int,scope:CoroutineScope){
 suspend fun launchDefault(i:Int,scope:CoroutineScope){
     scope.launch( Dispatchers.Default ){ action(i) }
 }
-
-//OUTPUT
+</pre> </td>
+<td><m><em>Dispatch.Default</em>: the actions are executed by as many Threads as the CPU cores
+<pre>
+<kc>//OUTPUT</kc>
 AT START | CPU=4 threads=2 curThread=main
 BEGINS
 1) thread=DefaultDispatcher-worker-1
@@ -1149,9 +1259,8 @@ Action 6 done
 Action 5 done
 Action 4 done
 Action 2 done
-</pre> </td>
-<td><m><em>Dispatch.Default</em>: the actions are executed by as many Threads as the CPU cores
- 
+
+</pre> 
 </m> </td>
 </tr>
 
@@ -1163,8 +1272,10 @@ suspend fun launchAction(i:Int,scope:CoroutineScope){
 suspend fun launchIO(i:Int,scope:CoroutineScope){
     scope.launch( Dispatchers.IO ){ action(i) }
 }
-
-//OUTPUT
+</pre> </td>
+<td><m><em>Dispatch.IO</em>: the actions are executed by a pool of (<tt>64??</tt>) Threads 
+<pre>
+<kc>//OUTPUT</kc>
 AT START | CPU=4 threads=2 curThread=main
 BEGINS
 1) thread=DefaultDispatcher-worker-1
@@ -1180,9 +1291,7 @@ Action 5 done
 Action 3 done
 Action 4 done
 Action 1 done
-</pre> </td>
-<td><m><em>Dispatch.IO</em>: the actions are executed by a pool of (<tt>64??</tt>) Threads 
- 
+</pre> 
 </m> </td>
 </tr>
 
@@ -1196,8 +1305,12 @@ suspend fun launchAction(i:Int,scope:CoroutineScope){
 suspend fun launchSingle(i:Int,scope:CoroutineScope){
     scope.launch( th ){ action(i) }
 }
-
-//OUTPUT
+ 
+</pre> </td>
+<td><m><em>Thread confinement </em>: : the actions are executed one a e time (in <tt>mutual exclusion</tt>)
+by a <bc>single thread</bc>
+<pre>
+<kc>//OUTPUT</kc>
 AT START | CPU=4 threads=2 curThread=main
 BEGINS
 1) thread=My Thread
@@ -1213,10 +1326,7 @@ Action 3 done
 Action 4 done
 Action 5 done
 Action 6 done
-</pre> </td>
-<td><m><em>Thread confinement </em>: : the actions are executed one a e time (in <tt>mutual exclusion</tt>)
-by a <bc>single thread</bc>
- 
+</pre> 
 </m> </td>
 </tr>
 
@@ -1225,7 +1335,7 @@ by a <bc>single thread</bc>
 </tbody>	
 </table></center>
 
-<h3><a id="concur"/>Concurrency</h3>
+<h2><a id="concur"/>Concurrency</h2>
 
 <center><table style="width:95%">
 <tr>
@@ -1275,16 +1385,18 @@ fun main() = runBlocking<Unit>{
     }
     println("ENDS with Counter = $counter")
 }
-
-//OTPUT
-BEGINS with 4  cores
-Completed 100000 actions in 55 ms
-ENDS with Counter = 83987
 </pre> </td>
 <td><m><em>No synchronization</em>. We use the multi-threaded <bc>Dispatcher.Defaults</bc> within a computer with <tt>4</tt> cores.
 Since the increment operation <tt>counter++</tt> is <bc>not atomic</bc> some increment is lost
 and the final value is less then <tt>10000</tt> .
-</m></td>
+</m>
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS with 4  cores
+Completed 100000 actions in 55 ms
+ENDS with Counter = 83987
+</pre>
+</td>
 </tr>
 
 <tr>
@@ -1299,17 +1411,19 @@ fun main() = runBlocking<Unit>{
     }
     println("ENDS with Counter = ${counter.get()}")
 }
-
-//OUTPUT
-BEGINS with 4  cores
-Completed 100000 actions in 55 ms
-ENDS with Counter = 100000
-
 </pre> </td>
 <td><m><em>Thread-safe data</em>. Thread-safe (synchronized, linearizable, atomic) data structure  are a general solution 
 that works both for threads and for coroutines. However, it does not easily scale to complex state or to complex operations.
 
-</m> </td>
+</m> 
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS with 4  cores
+Completed 100000 actions in 55 ms
+ENDS with Counter = 100000
+
+</pre>
+</td>
 </tr>
 
 
@@ -1332,19 +1446,18 @@ fun main() = runBlocking<Unit>{
  }
  println("ENDS with Counter = $counter")
 }
-
-//OUTPUT
-BEGINS with 4  cores
-Completed 100000 actions in 902 ms
-ENDS with Counter = 100000
-
 </pre> </td>
 <td><m><em>Thread confinement fine-grained</em>. Each coroutine is launched with DefaultDispathcer, but each increment is confined
 to a single-threaded context. 
 <br/>
 Each individual increment switches from multi-threaded <bc>Dispatchers.Default</bc> context to the 
 <bc>newSingleThreadContext</bc> using <bc>withContext</bc> block. Thus, the code works more slowly.
-
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS with 4  cores
+Completed 100000 actions in 902 ms
+ENDS with Counter = 100000
+</pre>
 </m> </td>
 </tr>
 
@@ -1361,19 +1474,18 @@ fun main() = runBlocking<Unit>{
     }
     println("ENDS with Counter = $counter")
 }
-
-//OUTPUT
-BEGINS with 4  cores
-Completed 100000 actions in 480 ms
-ENDS with Counter = 100000
-
 </pre> </td>
 <td><m>A <em>Critical section</em> protects all modifications of a shared state so that is never executed concurrently 
 (but it is accessed in <bc>mutual exclusion</bc>). The Coroutine's alternative to  <tt>synchronized</tt> operations is <bc>Mutex</bc>.
 <br/>
 The locking here is fine-grained and the execution is quite slow. However, it can be  it is a good solution
  when there is no natural thread in which we can confine a shared state to be modified.
-
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS with 4  cores
+Completed 100000 actions in 480 ms
+ENDS with Counter = 100000
+</pre>
 
 </m> </td>
 </tr>
@@ -1381,8 +1493,9 @@ The locking here is fine-grained and the execution is quite slow. However, it ca
 <tr id="producer">
 <td><pre>
 val simpleProducer = GlobalScope.produce {
-        send(1)
+     send(1)
 }
+<kc>------</kc>
 println(simpleProducer.receive()) //1
 ------------------------------------------------------------
 val context = newSingleThreadContext("myThread")
@@ -1392,12 +1505,11 @@ val typedProducer: ReceiveChannel&lt;Any> =
 	send("a")
 	send(100)
 }
+<kc>------</kc>
 println(typedProducer.receive()) //1
 typedProducer.consumeEach {
    println(it)
 }
-
-
 </pre> </td>
 <td><m>A <em>Producer</em> works as follows:
 <ul>
@@ -1420,7 +1532,7 @@ For other examples see <a href="../../it.unibo.bls19d/userDocs/Lab7.html#kprod" 
 </tbody>	
 </table></center>
 
-<h3><a id="channels"/>Channels</h3>
+<h2><a id="channels"/>Channels</h2>
 
 <center><table style="width:95%">
 <tbody>	
@@ -1449,8 +1561,8 @@ suspend fun channelTest(){
  }
     println("Done. time=$timeElapsed")
 }
-
-//OUTPUT
+<m>
+<kc>//OUTPUT</kc>
 BEGINS
 SENDER | sent 0
 SENDER | sent 1
@@ -1464,6 +1576,7 @@ RECEIVER | receives 4
 SENDER | sent 4
 Done. time=3556
 ENDS
+</m>
 </pre> </td>
 <td><m>Channels provide a way to transfer a <tt>stream of values</tt>. <bc>send</bc> and <bc> receive</bc>  are
 <em>suspending functions</em> used for providing and consuming objects from the channel, implemented with a <tt>FIFO</tt>
@@ -1500,7 +1613,7 @@ Kotlin defines several types of channels:
 </table></center>
 
  
-<h3><a id="actors"/>Actors</h3>
+<h2><a id="actors"/>Actors</h2>
 
 <m>An actor is an entity made up of a combination of a coroutine, the state that is confined and encapsulated into this coroutine, 
 and a channel to communicate with other coroutines. 
@@ -1519,9 +1632,6 @@ class CounterMsg(
   val cmd:String,
   val response:CompletableDeferred&ltInt>?=null){
 }
-
-//fun CoroutineScope.counterActor():
-//				SendChannel&ltCounterMsg>=
 fun CoroutineScope.counterActor() = actor<CounterMsg> {
             actor<CounterMsg> {
     var localCounter = 0 // actor state
@@ -1550,13 +1660,14 @@ fun main() = runBlocking<Unit>{
     counter.close() // shutdown the actor
     println("ENDS ")
 }
-
-//OUTPUT
+<m>
+<kc>//OUTPUT</kc>
 BEGINS with 4  cores
 Counter INITIAL VALUE=0
 Completed 100000 actions in 734 ms
 Counter FINAL VALUE= = 100000
 ENDS 
+</m>
 </pre> </td>
 <td><m>
 Our <bc>CounterIncCoroutines</bc> problem, can be solved by 'embedding' the counter-data into an <em>Actor</em> that:
@@ -1611,7 +1722,7 @@ since a producer is associated with the channel that it <i>sends</i> elements to
 </table></center>
 
 
-<h3><a id="classes"/>CLASSES</h3>
+<h2><a id="classes"/>CLASSES</h2>
 
 <center><table style="width:95%">
 <tbody>	
@@ -2137,7 +2248,7 @@ must be nested in the superclass </m>
 </tbody>	
 </table></center>
 
-<h3 id="sequence">SEQUENCES and SUSPENDABLE SEQUENCES</h3>
+<h2 id="sequence">SEQUENCES and SUSPENDABLE SEQUENCES</h2>
 
 <center><table style="width:95%">
 <tbody>	
@@ -2230,7 +2341,7 @@ For other examples of suspendable sequence, see <a href="../../it.unibo.bls19d/u
 </tbody>	
 </table></center>
 
-<h3>OTHER</h3>
+<h2>OTHER</h2>
 
 <center><table style="width:95%">
 <tbody>	

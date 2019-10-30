@@ -1,0 +1,580 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+<style type="text/css">
+<!--
+
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+	width: 750px;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+pre{
+	//font-family: "Helvetica";
+	font-size: 70%;
+	background-color: #fcf8c7; 
+}
+ 
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}    
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}    
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+  -->
+</style>
+<head>
+
+<title>Lab8ISS</title></head>
+    
+<div class="body">    
+ 
+
+<h1>LABRaspberryPi |  Using the RaspberryPi</h1>
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/LectureBologna1819.html" target="isslm">LabISS-lectures site</a></font> 
+      
+ 
+<div style="background-color:white; width:100%;float:left;"> 
+<h2>INTRODUCTION</h2>
+<ul>
+    <li><em>Vision</em>: <bc>Technology</bc> is fundamental, but it is something to be <em>properly used</em>, not something we have to be subjected to. </li>
+    <li><em>Goal</em>: Show how a low-cost computational device like 
+	<a href="../../Raspberry/raspberryEntry.html" target="code">RaspberryPi</a>   
+	can be included in our heterogeneous distributed systems applications, according on to a <bc>message passing</bc> programming style. </li>
+	.<!--
+	<li><em>Work</em>: 
+	<ol>
+	<li>A very simple introduction to the usage of <tt>RaspberryPi GPIO</tt> by means of bash commands,
+	<tt>GPIO</tt> library and <tt>Python</tt> see <a href="../Raspberry/raspberryProjects.html" target="code">Raspberry Low level Projects</a>.
+	</li>
+	<li>Design ad development of a  distributed, heterogeneous system with one producer and many consumers.</li>
+	<li>Using physical devices  including a   <a href="LedEntry.html" target="code">physical Led</a>,
+  a <a href="buttonEntry.html" target="code">physical Button</a> and motors. </li>
+	</ol>
+	-->
+
+</li>
+</ul>
+    
+ 
+
+ 
+ <h2>STARTING</h2>
+
+ <ol>
+<li>Download and install <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html"  target="web">PuTTY</a></li>
+<li>Raspberry <bc>BEFORE PiB+</bc>: Download the unibo <tt>SD</tt> image: 
+     <a href="http://137.204.107.10/iss2018/it.unibo.issMaterial/issdocs/Material/2016-02-26-raspbian-jessie-iss.img.zip" 
+target="web">2016-02-26-raspbian-jessie-iss.img.zip</a> (<tt>WARNING: 1GB</tt>)</li>
+<li>Raspberry <bc>PiB+</bc>: Download the unibo <tt>SD</tt> image: 
+     <a href="http://137.204.107.10/iss2018/it.unibo.issMaterial/issdocs/Material/pierfederici.zip" 
+target="web">pi3b+.zip</a> (<tt>WARNING: 2GB</tt>)</li>
+
+<li>Generate your own <a href="https://en.wikipedia.org/wiki/Secure_Digital#Micro" target="web">Secure Digital</a> card </li>
+<li>Consult <a href="../CARD/rpi_sd.pdf" target="code">rpi_sd.pdf</a> , <a href="../CARD/guida_rpi.pdf"  target="code">guida_rpi.pdf</a> 
+and <a href="https://www.raspberrypi.org/documentation/installation/installing-images/linux.md">Installing operating system images on Linux</a></li>
+<li>Insert the <tt>SD</tt> card in the  proper <tt>PC slot</tt>  and look (in the unit <bc>boot</bc>) at the file <bc>mywifi.conf</bc>:
+<pre>
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+ap_scan=1
+eapol_version=1
+fast_reauth=1
+
+network={
+        ssid="natspot"
+        scan_ssid=1
+        key_mgmt=WPA-PSK
+        psk="123456789"
+}    
+    </pre>
+ Add any other network you plan to use.  For example:
+<pre>
+network={
+        ssid="almawifi"
+        scan_ssid=1
+        key_mgmt=WPA-PSK
+        psk="..."
+}    
+</pre>
+    </li>
+    <li>Insert the <tt>SD</tt> card into the RaspberryPi and <em>extend the file system</em> by running:
+    <pre>
+    sudo raspi-config
+    </pre>
+</li>
+
+<li>Connect the RaspberryPi to the PC via a <a href="http://www.howtogeek.com/210326/not-all-ethernet-cables-are-equal-you-can-get-faster-lan-speeds-by-upgrading/">Ethernet cable </a></li>      
+<li>Open PuTTY and connect to <tt>192.168.137.2</tt> port <tt>22</tt> </li>
+<li>Login with: <tt>pi</tt> pswd= <tt>raspberry</tt></li>
+<li>Look at the output:    
+<pre>
+IP                      192.168.137.2
+Wifi settings           /boot/mywifi.conf
+Web terminal            https://192.168.137.2:4200
+VNC Remote Desktop      192.168.137.2:1 Password:123456
+SMB Network Share       \\192.168.137.2\home_pi\   
+</pre>
+</li>
+
+<li>Access to the RaspberryPi via Windows :
+<pre>\\192.168.137.2\home_pi\  (connnetti unita di rete)
+\\192.168.43.xxx   (on Explorer path box)
+</pre>
+</li>
+
+<li>
+<h4>Connect the RaspberryPi to a PC  with Wifi.</h4>    
+<ol>
+<li>
+For Pi before <bc>Pi3</bc>, insert a <tt>WIFI</tt> adapter (e.g. <tt>EDUP</tt> - Adattatore Wifi Mini <tt>USB</tt>,150MBps) in a <tt>USB</tt> slot.</li>    
+<li>Activate an hot spot (e.g by using a smart device) with name <b>natspot</b> and password <b>123456789</b></li>
+<li>Turn on the RaspberryPi. It will acquire an address (<tt>192.168.43.xxx</tt>) as shown by the command <b>ifconfig</b> </li>  
+<li>Open <bc>PuTTY</bc> and connect to <tt>192.168.43.xxx</tt> on port <tt>22</tt></li>
+<li>Useful reading: <a href="https://www.digikey.com/en/maker/blogs/raspberry-pi-3---how-to-connect-wi-fi-and-bluetooth" target="web">
+PiB Wi-Fi/Bluetooth</a></li>
+<li>
+Useful commands:
+<pre>
+cat /boot/mywifi.conf
+sudo iw dev wlan0 scan | grep SSID	(list of networks visible to the Pi)
+cat /etc/network/interfaces		()
+sudo iwlist wlan0 scan
+sudo cat /etc/wpa_supplicant/wpa_supplicant.conf
+ 
+
+Deprecated command		Replacement command(s)
+arp					ip n (ip neighbor)		//finding IP
+ifconfig			ip a (ip addr), ip link, ip -s (ip -stats)
+iptunnel			ip tunnel
+iwconfig			iw
+nameif				ip link, ifrename
+netstat				ss, 
+	netstat -r		ip route  
+	netstat -i		ip -s link  
+	netstat- g		ip maddr  
+
+
+</pre>
+
+</li>
+</ol>    
+</li>
+
+ 
+</ol>
+
+<h3>Useful for network.</h3> 
+Since the release of Raspbian Jessie a few things have changed regarding configuration of the network stack from the <tt>CLI</tt>. 
+Previous to Raspbian Jessie, network parameters could be adjusted by editing <tt>/etc/network/interfaces</tt>. 
+This functionality has now been moved to <bc>/etc/dhcpcd.conf</bc>; for example:
+<pre>
+nohook lookup-hostname
+interface eth0
+static ip_address=192.168.0.1/24
+static routers=192.168.0.254
+static domain_name_servers=8.8.8.8
+</pre>
+
+Otherwise:
+<pre>
+route				ip r (ip route)		//Displays the host’s routing tables.
+sudo route add default gw 192.168.1.1 wlan0		//Add a specific default routing
+sudo route add default gw 10.200.255.254 wlan0	//ALMAWIFI
+</pre>
+
+<h3>Updating Raspberry</h3> 
+<pre>
+sudo apt-get update			///etc/apt/sources.list
+sudo apt-get dist-upgrade
+</pre>
+    
+Si veda anche: <a href="https://www.raspberryitaly.com/raspberrypi-tutti-i-comandi-utili-a-colpo-docchio/" target="web">
+RaspberryPi: Tutti i comandi utili a colpo d’occhio</a>
+<h2>The hardware</h2>
+<!--
+<center><table style="width:98%">
+<tbody>	
+<tr>
+<td >     <center>
+    <img src="RaspCommented0.jpg" alt="RaspCommented0" width="300" height="221"/>
+    </center>
+
+</td>
+<td>
+<m>
+ 
+The <bc>GPIO.BOARD</bc> option specifies that you are referring to the pins by the number of the pin the the plug 
+- i.e the numbers printed on the board (e.g. P1) and in the middle of the diagrams below.
+<br/> 
+The <bc>GPIO.BCM</bc> option means that you are referring to the pins by the "<bc>Broadcom SOC channel</bc>" number, 
+these are the numbers after "GPIO" in the green rectangles around the outside of the below diagrams.
+<br/><br/>
+Unfortunately the BCM numbers changed between versions of the Model B; so it may be safer to use the BOARD numbers if you are going to use more than one pi in a project.
+ 
+
+</m>
+</td>
+</tr>
+</tbody>	
+</table></center>
+-->
+<center>
+    <img src="raspberry-pi-rev2-gpio-pinout.jpg" alt="RaspRev2" width="80%" height="80%"/>
+ </center>
+<h3 id="h3">Model B+ </h3>
+    The Model B+ uses the same numbering as the Model B2.0, and adds some new pins.
+<center>
+    <img src="Raspberry-Pi-GPIO-Layout-Model-B-Plus.png" alt="RaspRev2" width="90%" height="90%" />
+</center>
+
+<h3>Bash example</h3>   
+<pre>
+echo 15 > /sys/class/gpio/unexport  
+echo 15 > /sys/class/gpio/export  
+echo 18 > /sys/class/gpio/unexport  
+echo 18 > /sys/class/gpio/export  
+cd /sys/class/gpio/gpio15  
+echo out > direction 
+echo 0 > value 
+cd /sys/class/gpio/gpio18  
+echo out > direction 
+echo 0 > value 
+</pre> 
+
+<h3>WiringPi example</h3>   
+<pre>
+gpio readall
+
+ +-----+-----+---------+------+---+-Model B2-+---+------+---------+-----+-----+
+ | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ |     |     |    3.3v |      |   |  1 || 2  |   |      | 5v      |     |     |
+ |   2 |   8 |   SDA.1 | ALT0 | 1 |  3 || 4  |   |      | 5V      |     |     |
+ |   3 |   9 |   SCL.1 | ALT0 | 1 |  5 || 6  |   |      | 0v      |     |     |
+ |   4 |   7 | GPIO. 7 |   IN | 1 |  7 || 8  | 1 | ALT0 | TxD     | 15  | 14  |
+ |     |     |      0v |      |   |  9 || 10 | 0 | OUT  | RxD     | 16  | 15  |
+ |  17 |   0 | GPIO. 0 |   IN | 0 | 11 || 12 | 0 | OUT  | GPIO. 1 | 1   | 18  |
+ |  27 |   2 | GPIO. 2 |   IN | 0 | 13 || 14 |   |      | 0v      |     |     |
+ |  22 |   3 | GPIO. 3 |   IN | 0 | 15 || 16 | 0 | IN   | GPIO. 4 | 4   | 23  |
+ |     |     |    3.3v |      |   | 17 || 18 | 0 | IN   | GPIO. 5 | 5   | 24  |
+ |  10 |  12 |    MOSI | ALT0 | 0 | 19 || 20 |   |      | 0v      |     |     |
+ |   9 |  13 |    MISO | ALT0 | 0 | 21 || 22 | 0 | IN   | GPIO. 6 | 6   | 25  |
+ |  11 |  14 |    SCLK | ALT0 | 0 | 23 || 24 | 1 | ALT0 | CE0     | 10  | 8   |
+ |     |     |      0v |      |   | 25 || 26 | 1 | ALT0 | CE1     | 11  | 7   |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ |  28 |  17 | GPIO.17 |   IN | 0 | 51 || 52 | 0 | IN   | GPIO.18 | 18  | 29  |
+ |  30 |  19 | GPIO.19 |   IN | 0 | 53 || 54 | 0 | IN   | GPIO.20 | 20  | 31  |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
+ +-----+-----+---------+------+---+-Model B2-+---+------+---------+-----+-----+
+</pre>
+
+   
+<pre>
+gpio unexportall
+gpio export 25 out
+gpio export 1 out
+gpio write 25 0
+gpio write 1 0
+</pre>	
+<h3>Resistors</h3>
+
+The Raspberry Pi has internal <em>pull-up</em> and <em>pull-down</em> resistors that can be specified when the pin declarations are made.
+ <br/>
+ If we need some resistor:
+     
+<a href="http://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-resistor-color-code-4-band">resistor color code</a>
+
+<h3>Links (introduction to GPIO control)</h3>         
+<ul>        
+<li><a href="https://www.youtube.com/watch?v=D-cTUEKbJJA" target="web">VIDEO: Raspberry Pi GPIO with Java</a></li>
+<li>About pins: <a href="http://elinux.org/RPi_Low-level_peripherals" target="web">RPi_Low-level_peripherals</a></li>
+<li>About Raspberry Pi GPIOs control: <a href="http://elinux.org/RPi_GPIO_Code_Samples" target="web">RPi GPIO Code Samples</a></li>
+<li><a href="http://wiringpi.com/the-gpio-utility/" target="web">Command-line utility gpio  (used by Wiringpi)</a></li>
+    <li><a href="http://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/" target="web">gpio-pins-and-python</a></li>
+<li><a href="http://wiringpi.com//" target="web">Wiringpi</a></li>
+<li><a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/RaspberryPi_Setup/RaspberryPi_Setup.html" target="web">Oracle java/RaspberryPi_Setup</a>  </li>         
+<li><a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/RaspberryPi_GPIO/RaspberryPi_GPIO.html" target="web">Oracle java/RaspberryPi_GPIO</a>  </li>   
+<li>Java <a href="https://bitbucket.org/sbub/raspberry-pi-gpio-web-control/overview" target="web">gpio-web-control</a></li>    
+</ul>                
+	
+
+
+           
+<h2>Connect the hardware</h2>
+
+<table style="width:98%">
+<tbody>	
+<tr><td><em>ButtonLed</em></td><td><em>Motors</em></td></tr>
+<tr>
+<td><img src="butLedRasp.jpg" alt="butLedRasp" width="301" height="302"/></td>
+<td><img src="robotConnections.png" alt="robotConnections" height="30%"/></td>
+</tr>
+</tbody>
+</table>
+
+
+ 
+ 
+<h3 >Basic Experiments (interactive) </h3> 
+           
+<table style="width:98%">
+<tbody>	
+ 
+  <tr>
+    <th>Bash</th>
+    <th>Gpio</th>
+    <th>Python</th>
+    </tr>
+  <tr class="alt">
+    <td>
+<a href="../src/bls/bash/led25OnOff.sh" target="code">led25OnOff.sh</a>
+      <pre>
+echo Unexporting.
+echo 25 > /sys/class/gpio/unexport #
+echo 25 > /sys/class/gpio/export #
+cd /sys/class/gpio/gpio25 #
+
+echo Setting direction to out.
+echo out > direction #
+echo Setting pin high.
+echo 1 > value #
+sleep 1 #
+echo Setting pin low
+echo 0 > value #
+sleep 1 #
+echo Setting pin high.
+echo 1 > value #
+sleep 1 #
+echo Setting pin low
+echo 0 > value #      
+      </pre>
+      
+</td>
+<td><a href="../src/bls/bash/gpio/led25Gpio.sh" target="code">led25Gpio.sh</a>
+      <pre>
+gpio readall #
+echo Setting direction to out
+gpio mode 6 out #
+echo Write 1
+gpio write 6 1 #
+sleep 1 #
+echo Write 0
+gpio write 6 0 #    
+      </pre>
+      
+      </td> 
+    <td>    <a href="../src/bls/python/ledPython25.py" target="code">ledPython25.py</a>
+<br/><br/>  
+        The newest version of Raspbian has the <br/>
+        <tt>RPi.GPIO</tt> library pre-installed. 
+        <pre>
+sudo python
+>>> import RPi.GPIO as GPIO
+>>> GPIO.VERSION
+>>> GPIO.setmode(GPIO.BCM) 
+>>> GPIO.setup(25,GPIO.OUT)
+>>> while True:
+>>>     GPIO.output(25,GPIO.HIGH)
+>>>     time.sleep(1)
+>>>     GPIO.output(25,GPIO.LOW)
+>>>     time.sleep(1)
+>>> quit()
+</pre> </td>
+   </tr>
+ </table> 
+            
+<h3>ButtonLed Code</h3>           
+<table style="width:98%">
+<tbody>	
+<tr>
+ 
+    <th>Bash</th>
+    <th>Gpio</th>
+    <th>Python</th>
+    </tr>
+  <tr class="alt">
+    <td>
+<a href="../src/bls/bash/led25OnOff.sh" target="code">led25OnOff.sh</a><br/>
+<a href="../src/bls/bash/buttonOn24Click.sh" target="code">buttonOn24Click.sh</a>  <br/>
+<a href="../src/bls/bash/buttonLed.sh" target="code">buttonLed.sh</a>          
+</td> 
+<td>    <a href="../src/bls/bash/gpio/led25Gpio.sh" target="code">led25Gpio.sh</a><br/>
+<a href="../src/bls/bash/gpio/button24Gpio.sh " target="code">button24Gpio.sh</a>  
+</td> 
+<td>    <a href="../src/bls/python/ledPython25.py" target="code">ledPython25.py</a><br/>
+        <a href="../src/bls/python/buttonPython24.py" target="code">buttonPython24.py</a>
+<br/>
+        <a href="../src/bls/gpio/python/buttonLedPython.py" target="code">buttonLedPython.py</a>
+ </td>
+</tr>
+ </table>          
+
+ 
+ <h3>Using Pi4J : useful links</h3> 
+    <a href="http://www.austinjug.org/presentations/RaspberryPi-AustinJUG.pdf" target="code">Java8+Pi4j (pdf)</a> <br/>        
+    <a href="http://pi4j.com/"  target="code">Pi4j site</a>    
+
+	
+<h2>Sensors</h2>  
+<bc>HC-SR04</bc>  <tt>UltraSonic Distance Measure Module Range Sensor</tt>.<br/>
+<a href="../src/sensors/SonarAlone.c" target="code">SonarAlone.c</a><br/>
+
+<h2>Motors</h2>  
+
+<img src="robotSkeleton.png" alt="robotSkeleton" width="70%"/>
+<br/><br/>	
+<a href="../src/motors/nanoMotorDriveA.sh" target="code">nanoMotorDriveA.sh</a><br/>
+<a href="../src/motors/nanoMotorDriveB.sh" target="code">nanoMotorDriveB.sh</a><br/>
+
+
+ 
+<h2 id="usefulnotes">Useful notes</h2>
+<a href="./devsDdr.html" target="code">Devices for a ddr robot</a><br/><br/>
+	
+Remember:
+
+<pre>
+sudo apt-get update
+sudo apt-get upgrade
+</pre>
+
+<h3>WiringPi Gpio and Pi4J</h3>
+WiringPi is developed and tested on a Raspberry Pi ONLY. The command
+<pre>
+gpio -v
+</pre>
+give the output:
+
+<pre>
+gpio version: 2.46
+Copyright (c) 2012-2018 Gordon Henderson
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type: gpio -warranty
+
+Raspberry Pi Details:
+  Type: Model B+, Revision: 02, Memory: 512MB, Maker: Sony
+  * Device tree is enabled.
+  *--> Raspberry Pi Model B Plus Rev 1.2
+  * This Raspberry Pi supports user-level GPIO access.
+</pre>
+
+ 
+<pre>
+sudo apt-get update
+sudo apt-get upgrade
+</pre>	 
+
+  
+For the <bc>Rasperry B+  (V1.2)</bc> the <bc>Pi4J</bc> library to use can be found in 
+<pre><k>it.unibo.libs2018/libs/pi4j/pi4j-core.jar</k></pre> 
+This library has been built from the <em>2-12 SNAPSHOT</em> and is not available in <tt>MavenCentral</tt>.
+
+ 
+      <br/> <br/>
+</div>    
+    
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">
+By AN Unibo-DISI    
+</div>    
+
+</body></html>

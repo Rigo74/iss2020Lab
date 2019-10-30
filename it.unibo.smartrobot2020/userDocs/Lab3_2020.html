@@ -200,8 +200,8 @@ Therefore, we add also the following requirements:
 -->
 <li>  requirement <ks>req-step-time</ks>: when the command <k>step</k> ends with a <kc>failure</kc>, the <em>smartrobot</em> provides
 information about the <kc>elapsed-time</kc>;</li>
-<li>  requirement <ks>req-step-info</ks>: the <em>smartrobot</em> makes the <em>basicrobot</em> able to known
-the result of the command <k>step</k> and, in the case of <kc>failure</kc> the value of the <kc>elapsed-time</kc>. </li>
+<li>  requirement <ks>req-step-info</ks>: if the command <k>step</k>  is sent to the <em>smartrobot</em> by a caller <ks>C</ks>, 
+<ks>C</ks> must be able to known the result of its command and, in the case of <kc>failure</kc> the value of the <kc>elapsed-time</kc>. </li>
 </li>
 </ul>
 </m> 
@@ -375,12 +375,12 @@ Our problem analysis starts from the <kc>TODO</kc> sentences in the model of the
 
 <h3>The requirement <ks>req-step-info</ks></h3>
 The requirement <ks>req-step-info</ks> could be fulfilled by emitting and event in the states <k>stepStop</k> ad <k>stepFail</k>. 
-In fact, an event emitted by a QActor (<em>smartrobot</em> in our case) that interacts with an <tt>ExternalActor</tt> (<em>basicrobot</em>),
-can be perceived by the <tt>ExternalActor</tt>  (see
+In fact, an event emitted by a QActor (<em>smartrobot</em> in our case) that is called as an <tt>ExternalActor</tt> by another actor,
+can perceive  by the caller (see
 <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakEvents2020.html" target="lab">
 LabQakEvents2020 | Qak-event propagation</a>).
 <br/><br/>
-However, the requirement states that information about the result of the command <k>step</k> should be made available to the <em>basicrobot</em> only.
+However, the requirement seems to state that information about the result of the command <k>step</k> should be made available to the caller <ks>C</ks> only.
 If such an interpretation is confirmed by the customer, the emission of an event is not the correct approach.
 <br/><br/>
 We observe that this problem (and other 'open problems') can be overcome by supposing that the <k>step</k> command  is 
@@ -521,7 +521,7 @@ The full code can be found in
 <h1>Working with QActors</h1>  
 At this point of our development, a QActor can be viewed as a <k>reusable</k> resource that can be used by sending messages to it, in three main forms: 
 <i>fire-and-forget</i> (dispatch), <i>request-response</i> (request) and <i>information-emission</i> (event).
-Since a  QActor events can also be emitted from the QActor, it can be considered also an <k>observable</k> resource.
+Since the QActor can emit events in its turn, it can be considered also an <k>observable</k> resource.
 <br/><br/>
 The architecture of a QActor-based system must include at least one QActor that can be used by other QActors 
 or by non-QActor code (called here 'alien' code). 

@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+<style type="text/css">
+<!--
+
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+	width: 750px;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+pre{
+	font-family: "Helvetica";
+	font-size: 80%;
+	background-color: #fcf8c7;
+	border: 1px solid blue;
+	width: 700px;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}    
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}    
+  -->
+</style>
+    
+<head>
+   
+<title>LAB2ISS</title></head>
+    
+<body>
+
+<div class="body"> 
+
+<h1>72939 - LAB2 | ButtonLedSystem with Physical devices</h1> 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/LectureBologna1819.html" target="isslm">LabISS-lectures site</a></font> 
+
+<h2>REQUIREMENTS</h2>
+<div class="req">
+Extend the <tt>BLS</tt> system <a href="Lab1.html" target="info">Lab1.html</a> (built with reference to <tt>Mock</tt> and <tt>GUI</tt> devices),
+ by introducing a <tt>Physical Led</tt> and a <tt>Physical Button</tt> controlled by the  <a href="https://en.wikipedia.org/wiki/Arduino">Arduino</a>
+microcontroller.
+</div>	    
+ 	
+	
+<h2>STARTING POINT</h2>
+
+ 
+A local solution for the <tt>BLS</tt> system running on <a href="https://en.wikipedia.org/wiki/Arduino">Arduino</a> can be easily found  on the network. 
+There are technical,
+technology-dependent problems to face (e.g. interact with a very fast micro-controller, avoid signal bouncing, etc.) but
+a possible solution can be: <a href="../src/arduino/bls2019LocalOnArduino/bls2019LocalOnArduino.ino" target="code">bls2019LocalOnArduino.ino</a>.
+
+<h4>Beyond Arduino</h4>
+ 
+However, our goal here is not to create an ad-hoc solution for <tt>Arduino</tt>, but to build a <tt>BLS</tt> system where some specific
+physical device component (in our case either the <tt>Led</tt> or the <tt>Button</tt> or both) can be handled by <tt>Arduino</tt>, while the business
+logic remains on a conventional <tt>PC</tt>.
+
+	<div class="req">
+	A fundamental question: is it possible to face the  <tt>BLS</tt> system problem (in general <b>any</b> problem) in a
+	technology-independent way?.
+	</div>
+
+	
+At the moment, since we have to start from the system introduced in <a href="Lab1.html" target="info">Lab1.html</a>, 
+it is useful to build a <em>model</em>
+of that system, to recall its properties from three different points of view:  <i>structure, interaction and behavior</i>.
+
+<h2>MODELS in SOFTWARE</h2>
+In <a href="https://www.sebokwiki.org/wiki/System_Modeling_Concepts"></a> we read that
+"perhaps the most fundamental concept in systems modeling is <em>abstraction</em>, 
+which concerns hiding unimportant details in order to <b>focus on essential characteristics</b>". 
+<p>
+It is useful to have a common way to talk about the concepts underlying the many different types of models 
+(e.g., many modeling techniques enable the understanding of <em>system behavior</em>, while others enable the understanding of 
+<em>system structure</em>). In our approach a relevant aspect is related to <em>interaction</em>, since
+we are moving from the traditional interaction based on procedure-calls among system components towards interaction based on 
+<a href="https://en.wikipedia.org/wiki/Message_passing">message-passing</a>.
+</p>
+
+<h3>A logic architecture for the BLS</h3>
+As already, proposed in <a href="Lab1.html" target="info">Lab1.html</a>, the following <tt>UML</tt> interaction diagram 
+can give us a summary of our model of the current software system:
+<center><img src="./bls0.png" alt="bls0" width="60%" height="60%"></center>
+
+This model can be adopted as a representation of the <b>logic architecture</b> of our <tt>BLS</tt> system. 
+It is technology-aware (since it is based on objects) but it is also quite technology-independent since there is no
+reference to the implementation details of the components.
+<p>
+In particular, the devices (<tt>Button</tt> and <tt>Led</tt>) are software components that can represent either
+virtual or real devices. The architecture defines the <em>relationships</em> with the other components, in particular with the   
+<tt>BusinessLogic</tt>. 
+
+<h4>MVC?</h4>
+We could consider if proposed architecture is related to the architectural pattern known as <em>MVC</em>
+(<a href="A https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">Model–View–Controller</a>).
+The answer is left to the reader, but - first of all - we have to define in a precise way the meaning of the 
+term <em>Model</em>.
+
+</p><p>
+At the moment, with a more detailed description of the available software, we can say that:
+</p>
+
+<h3>Structure</h3>
+Our  system is composed of three main software components:
+<ul>
+<li>A <tt>Button</tt> device that implements the interface 
+<a href="../src/it/unibo/bls/interfaces/IButtonObservable.java" target="code">IButtonObservable</a>.</li>
+<li>A <tt>Led</tt> device that implements the interface  
+<a href="../src/it/unibo/bls/interfaces/ILed.java" target="code">Iled</a>.</li>
+<li>A  <tt>Controller</tt> that embeds the business logic and implements the interface  
+<a href="../src/it/unibo/bls/interfaces/IControlLed.java" target="code">IControlLed</a>.</li>
+</ul>
+<p>
+A software device component can be created by means of a 
+<a href="../src/it/unibo/bls/devices/DeviceFactory.java" target="code">DeviceFactory</a>
+tha works according to a set of device types defined in <a href="../src/it/unibo/bls/devices/LedType.java" target="code">LedType</a> and
+	<a href="../src/it/unibo/bls/devices/ButtonType.java" target="code">ButtonType</a>. Moreover:
+	
+<ul>
+<li>At creation time, each software device does not know any other device. However, a reference to the <tt>Led</tt>  is 'injected'
+at system configuration time into the <tt>BusinessLogic</tt>.
+(see <bc>connectTheComponents</bc> in <a href="../src/it/unibo/bls/appl/MainBlsMockBase.java" target="code">MainBlsMockBase</a>).</li>
+<li>Since the <tt>Button</tt> is defined as an <i>observable</i> entity, the system does introduce an <i>observer</i> of the <tt>Button</tt>
+of class <a href="../src/it/unibo/bls/listener/ButtonObserver.java" target="code">ButtonObserver</a>. This component acts as a 'glue'
+between the <tt>Button</tt> and the <tt>BusinessLogic</tt>.
+</li>
+<li>The <tt>Controller</tt> (i.e. the
+<a href="../src/it/unibo/bls/applLogic/BlsApplicationLogic.java" target="code">BlsApplicationLogic</a>)
+is 'injected' at system configuration time into the <tt>ButtonObserver</tt>
+(see <bc>connectTheComponents</bc> in <a href="../src/it/unibo/bls/appl/MainBlsMockBase.java" target="code">MainBlsMockBase</a>).
+</li>
+</ul>	
+
+</p>	
+
+<h3>Interaction</h3>
+Since the system is based on 'classical' object programming, the interaction among the components takes place via <em>procedure-calls</em>.
+
+<h3>Behavior</h3>
+The <a href="../src/it/unibo/bls/applLogic/BlsApplicationLogic.java" target="code">BlsApplicationLogic</a>
+ component activates (when created) an internal <tt>Thread</tt> that blinks the <tt>Led</tt> 
+while an internal variable (<bc>doBlink</bc>) is true. When <bc>doBlink</bc> is false, this <tt>Thread</tt> waits.
+<p>
+
+A new flow of control begins each time the <tt>Button</tt> is 'clicked'. This control-flow activates the <bc>execute</bc> operation
+of the <a href="../src/it/unibo/bls/applLogic/BlsApplicationLogic.java" target="code">BlsApplicationLogic</a>.
+that modifies the state of the variable <bc>doBlink</bc>. This state-change is 'notified' (by using a 
+synchronized statement related to a 
+<a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/locksync.html" target="web">monitor object</a>) to wake 
+the blinking <tt>Thread</tt>.
+</p><p>
+The <tt>BusinessLogic</tt> is also implemented in <tt>Kotlin</tt>-based version 
+(<a href="../src/main/kotlin/it/unibo/bls/kotlin/applLogic/BlsApplicationLogic.kt" target="code">BlsApplicationLogic.kt</a>)
+that avoids <tt>Thread</tt> contention on shared memory.
+</p>
+
+
+<h3>System creation/configuration</h3>
+The internal organization of the main program 
+<a href="../src/it/unibo/bls/appl/MainBlsMockBase.java" target="code">MainBlsMockBase</a>  is based on a set of
+operations that logically capture the <em>basic steps required to set-up a software system</em>:
+
+<ul>
+<li><bc>createTheComponents</bc> : this operation creates the objects that represents the components of the system.</li>
+<li><bc>connectTheComponents</bc> : this operation 'injects' references to the components in order to create a local network
+of interrelated objects.</li>
+<li><bc>startTheSystem</bc> : this operation puts in execution the system. In this case, it is sufficient to
+add the <a href="../src/it/unibo/bls/listener/ButtonObserver.java" target="code">ButtonObserver</a>  to the <tt>Button</tt>,
+since the Button is logically a component with its own Thread of control.
+
+</li>
+</ul>
+
+These operations are highly reusable, as shown by the given:
+<a href="../src/it/unibo/bls/appl/MainBlsGuiBase.java" target="code">MainBlsGuiBase.java</a>
+
+<h2>WHAT WE CAN DO</h2>
+<p>
+Our main goal here could be tat of reusing the given code as much as possible. Let us propose a work-plan:
+</p>
+<ol>
+<li><em>Serial line:</em>:
+	A conventional <tt>PC</tt> can exchange information with <tt>Arduino</tt> by means of a Serial line connected to an <tt>USB</tt> port.
+	Let us introduce an utility to facilitate this task: 
+	<a href="../src/it/unibo/bls/devices/arduino/JSSCSerialComm.java" target="code">JSSCSerialComm.java</a>. <br/>
+	Note that the <bc>jssc</bc> linrary allows us to handle <tt>Arduino</tt> as an <i>observable device</i> that calls the operation 
+	<bc>serialEvent</bc> when it writes on the Serial line.
+<li><em>Proxy objects:</em>:
+	Since the <tt>Led</tt> or/and the <tt>Button</tt> are now physical devices handled by <tt>Arduino</tt>, we can make reference to the
+	<a href="https://en.wikipedia.org/wiki/Proxy_pattern" target="web">Proxy</a>  pattern in order to:
+	<ul>
+	<li><em>Led:</em>: send a proper command to <tt>Arduino</tt> each time the <tt>Led</tt> must change its state:
+	<a href="../src/it/unibo/bls/devices/arduino/LedProxyArduino.java" target="code">LedProxyArduino.java</a> </li>
+	<li><em>Button:</em>: receive information from <tt>Arduino</tt> each time the physical <tt>Button</tt> changes its state ('clicks'):
+	<a href="../src/it/unibo/bls/devices/arduino/ButtonProxyArduino.java" target="code">ButtonProxyArduino.java</a>.
+	Note that the receiver is introduced as a Thread created by the <tt>ButtonProxyArduino</tt> constructor.
+	</ul>
+</li>
+<li><em>Arduino code:</em>: The code running on <tt>Arduino</tt> must able to execute two main operations:	
+	<ul>
+	<li><bc>readAndExecCmd:</bc>:  read a command sent by the <tt>PC</tt> and execute such a command. </li>
+	<li><bc>sendButtonState:</bc>: send to the <tt>PC</tt> information about the state of the <tt>Button</tt </li>
+	</ul>
+	A possible implementation is: <a href="../src/arduino/bls2019/bls2019.ino" target="code">bls2019.ino</a>. Note that: 
+	<ul>
+	<li>the <em>command language</em> from <tt>PC</tt> to <tt>Arduino</tt> is defined by a simple char: <pre>0 | 1</pre>  </li>
+	<li>the <em>messages</em> sent by <tt>Arduino</tt> on the serial line to the <tt>PC</tt>,  are Strings of the form:
+	<pre>msg(info,event,arduino,none,LEDSTATE,NUM)  LEDSTATE=true|false, NUM=naturalnum </pre>
+	</li>
+	</ul>
+	<div class="req">
+	We will discuss and understand these choices later, in our forthcoming labs.
+	</div>
+  
+</li>
+<li><em>DeviceFactory:</em>: We should extend the <a href="../src/it/unibo/bls/devices/DeviceFactory.java" target="code">DeviceFactory</a> 
+to handle new types of devices, related to <tt>Arduino</tt>. </li>
+<li><em>System creation:</em>: We should specialize the original main program
+ <a href="../src/it/unibo/bls/appl/MainBlsMockBase.java" target="code">MainBlsMockBase.java</a>:
+ <ul>
+ <li>Led on <tt>Arduino</tt>: 
+ <a href="../src/it/unibo/bls/appl/MainBlsLedOnArduinoBase.java" target="code">MainBlsLedOnArduinoBase.java</a></li>
+ <li>Button on <tt>Arduino</tt> :
+ <a href="../src/it/unibo/bls/appl/MainBlsButtonOnArduinoBase.java" target="code">MainBlsButtonOnArduinoBase.java</a></li>
+ </ul>
+ 
+ </li>
+</ol>
+
+<h2>Final considerations</h2>
+
+<ul>
+<li>The classes <a href="../src/it/unibo/bls/devices/mock/LedMock.java" target="code">LedMock</a> 
+and <a href="../src/it/unibo/bls/devices/mock/ButtonMock.java" target="code">ButtonMock</a> 
+can be re-used - by means of the <tt>Java</tt> <em>inheritance</em> - in order to introduce different types of devices.
+</li>
+<li>The class <a href="../src/it/unibo/bls/appl/MainBlsMockBase.java" target="code">MainBlsMockBase.java</a> can
+be reused - by means of the <tt>Java</tt> <em>inheritance</em> - to build the <tt>BLS</tt> system. The only thing to do
+is to override the method <bc>setDeviceTypes</bc>.
+</li>
+<br/><br/>
+Now, we could consider the possibility to re-factor the system, so to define a <em>reusable framework</em> for <tt>BLS</tt> applications
+that can be specialized without recurring to  inheritance.
+</ul>
+<br/><br/>
+ 
+	
+</div>  
+
+</body>
+</html>

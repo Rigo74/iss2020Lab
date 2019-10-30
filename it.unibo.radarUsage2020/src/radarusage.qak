@@ -1,0 +1,5 @@
+System radarusage
+
+Event polar : polar(D,A)
+
+Context ctxRadarUsage ip [ host= "localhost"   port= 8044 ]
