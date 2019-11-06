@@ -172,6 +172,7 @@ You can consult also:
 <li><a href="#dispatch">Dispatchers</a></li>
 <li><a href="#concur">Concurrency</a></li>
 <li><a href="#channels">Channels</a></li>
+<li><a href="#kotlinprodcons">Producers-consumers</a></li>
 <li><a href="#actors">Actors</a></li>
 <li><a href="#classes">Classes</a></li>
 <li><a href="#sequence">Sequences (suspendable)</a></li>
@@ -923,7 +924,8 @@ Handle myinputasynchcps-10  thread=Thread-0
 </table></center>
 
 <h2><a id="suspend"/>Suspending functions and coroutines</h2>
-<m><ul>
+<m>
+<ul>
 <li>Essentially, a <em>Coroutine</em> is a light-weight thread that can be activated with a 
 <em>Coroutine builder</em> into a <em>CoroutineScope</em>.<br/><br/></li>
 
@@ -931,10 +933,29 @@ Handle myinputasynchcps-10  thread=Thread-0
 They are based on the concept of <em>Continuation-passing style</em> (CPS) programming.<br/><br/></li>
 
 <li>By default, coroutines are run on a shared pool of threads. 
-Threads still exist in a program based on coroutines, but one thread can run many coroutines, so there's no need for too many threads..<br/><br/></li>
+Threads still exist in a program based on coroutines, but one thread can run many coroutines, so there's no need for too many threads.
+<br/><br/></li>
 
+<li>The execution of a coroutine always happens inside a <em>Coroutine Context</em> that defines <b>how</b> the coroutine will be executed
+(see <a href="https://proandroiddev.com/demystifying-coroutinecontext-1ce5b68407ad" target="web">Demystifying CoroutineContext</a>).
+It includes a coroutine <em>Dispatcher</em>. 
+<br/><br/></li>
+ 
+<li>Every coroutine builder, including <tt>runBlocking</tt> is an extension on <em>CoroutineScope</em> interface 
+and inherits its abstract read-only property
+<tt>coroutineContext: CoroutineContext</tt> to  automatically propagate both context elements and cancellation.
+See <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html" target="web">
+Coroutine Scope</a>
+	<ul>
+		<li><bc>Global scope</bc>: the coroutine affects the whole Application</li>
+		<li><bc>CoroutineScope</bc>: defines a scope for new coroutines</li>
+	</ul>
+<br/></li>
+<li>A Context can be composed  by several element types to create <em>composed behaviors</em>.
+</li>
 </ul>
 </m>
+
 
 <center><table style="width:95%">
 <tbody>	
@@ -1716,7 +1737,7 @@ ENDS
 </tbody>	
 </table></center>
 
-<h2><a id="kotlinprod"/>Producers-consumers in Kotlin</h2>
+<h2><a id="kotlinprodcons"/>Producers-consumers in Kotlin</h2>
 <m>
 The pattern where a coroutine is producing a sequence of elements is quite common. 
 This is a part of <em>producer-consumer pattern</em> that is often found in concurrent code. 
@@ -2814,7 +2835,7 @@ A Context can be composed  by several element types to create <em>composed behav
 </tr>
 
 <tr>
-<td><pre>
+<td style="width:45%"><pre>
 suspend fun actionWithContext( n: Int){
  withContext(Dispatchers.Default) {
    println("$n) thread=${Thread.currentThread().name}")  
