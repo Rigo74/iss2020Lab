@@ -13,12 +13,8 @@ public class ResourceClientObserver {
 	private CoapObserveRelation relation = null;
 	private CoapClient client = null;
 	
-	public ResourceClientObserver(){
-		client = new CoapClient("coap://localhost:5683/robot");
-	}
-	
-	public void  observe( ) {
-		relation = client.observe(
+	public void  doObserve( CoapClient client ) {		
+		relation = client.observe(				
 				new CoapHandler() {
 					@Override public void onLoad(CoapResponse response) {
 						String content = response.getResponseText();
@@ -28,6 +24,15 @@ public class ResourceClientObserver {
 						System.err.println("OBSERVING FAILED (press enter to exit)");
 					}
 				});		
+	}
+	public void  observeRobot( ) {
+		client = new CoapClient("coap://localhost:5683/robot");
+		doObserve( client );
+	}
+
+	public void  observeSonar( ) {
+		client = new CoapClient("coap://localhost:5683/robot/sonar");
+		doObserve( client );
 	}
 	
 	public void waitUserEnd() {
@@ -40,7 +45,8 @@ public class ResourceClientObserver {
 	
 	public static void main(String[] args) {
   		ResourceClientObserver rco = new ResourceClientObserver();
-		rco.observe( );
+		rco.observeRobot( );
+		rco.observeSonar( );
 		rco.waitUserEnd();
 	}
 

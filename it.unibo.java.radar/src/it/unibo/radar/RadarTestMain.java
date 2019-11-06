@@ -15,7 +15,10 @@ public class RadarTestMain {
 			String distance = ""+ (90 - i*10);
 			radarPojo.radarSupport.update(distance,angle);
 			delay( 500 ); 
- 		}
+ 		}		
+//		radarPojo.radarSupport.update("60","90");
+//		delay( 3000 ); 
+//		radarPojo.radarSupport.update("60","0");
 	}
 	
 	

@@ -2,17 +2,17 @@ package kotlincode
 
 import it.unibo.kactor.*
 import kotlinx.coroutines.CoroutineScope
-import javacode.ResourceSonarSupport
+import javacode.CoapSupport
 
 class Sink(name:String, scope: CoroutineScope) : ActorBasic( name, scope ){
-var resourceSupport : ResourceSonarSupport	 
+var resourceSupport : CoapSupport	 
 	
 	init{
-		resourceSupport = ResourceSonarSupport("coap://192.168.1.8:5683", "sonardata")
+		resourceSupport = CoapSupport("coap://192.168.1.8:5683", "sonardata")
 	}
     override suspend fun actorBody(msg : ApplMessage){
         println("   $name |  receives msg= $msg ")
 		//PUT to a CoAP resource
-		resourceSupport.updateTheResource( msg.toString() )
+		resourceSupport.updateResource( msg.toString() )
     }
 }

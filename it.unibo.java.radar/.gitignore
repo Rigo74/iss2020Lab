@@ -3,8 +3,7 @@ bin/default
 .metadata
 build
 
- # Ignore Gradle project-specific cache directory
-.gradle
+
 
 
 /ReadMe.html

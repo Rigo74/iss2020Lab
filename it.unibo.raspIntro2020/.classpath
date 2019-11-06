@@ -69,7 +69,17 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Didattica2018Work/iss2019Lab/libs/radarPojo.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/com.googlecode.aima-java/aima-core/3.0.0/fd46a9bdd8ea9d9988adcd296c3af02af267df8a/aima-core-3.0.0.jar" sourcepath="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/com.googlecode.aima-java/aima-core/3.0.0/364606d9cf7caf3afd0ab345a4713e8c98a2441e/aima-core-3.0.0-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-log4j12/1.7.25/110cefe2df103412849d72ef7a67e4e91e4266b4/slf4j-log4j12-1.7.25.jar" sourcepath="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-log4j12/1.7.25/d6f907c4254a49f40fa46005b65bc97261ad9e46/slf4j-log4j12-1.7.25-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -135,6 +145,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/org.eclipse.swt.gtk.linux/x86/3.3.0-v3346/a9ce3fdc84060952a94f509442673698c3880f92/x86-3.3.0-v3346.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar" sourcepath="C:/Users/anatali/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/677abe279b68c5e7490d6d50c6951376238d7d3e/log4j-1.2.17-sources.jar">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

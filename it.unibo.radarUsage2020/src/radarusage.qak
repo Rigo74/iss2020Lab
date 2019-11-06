@@ -1,3 +1,6 @@
+/*
+ * Used just to configure Eclipse
+ */
 System radarusage
 
 Event polar : polar(D,A)

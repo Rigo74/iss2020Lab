@@ -4,13 +4,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor 
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import javacode.ResourceSonarSupport
+import javacode.CoapSupport
 import it.unibo.kactor.ApplMessage
 import it.unibo.kactor.MsgUtil
 
 
 class sonarOnPcSimulate( val name : String, val scope: CoroutineScope = GlobalScope )  {
-	var resourceSupport : ResourceSonarSupport	 
+	var coapSupport : CoapSupport	 
 
 	val actor = scope.actor<ApplMessage>{
  			    for (msg in channel) { // iterate over incoming messages
@@ -23,7 +23,7 @@ class sonarOnPcSimulate( val name : String, val scope: CoroutineScope = GlobalSc
 	
 
 	init{
-		resourceSupport = ResourceSonarSupport( "coap://localhost:5683" )
+		coapSupport = CoapSupport( "coap://localhost:5683" )
 	}
 
     suspend fun readInputData(){
@@ -31,9 +31,9 @@ class sonarOnPcSimulate( val name : String, val scope: CoroutineScope = GlobalSc
         while( true ){
  			 var data = readLine()
              println("data ${dataCounter++} = $data " )
-             val m = MsgUtil.buildEvent(name, "sonar", "sonar($dataCounter, $data)")
+             val m = MsgUtil.buildEvent(name, "sonar", "sonar($data)")
              println("EMIT to CoAP: $m"  )
-             resourceSupport.updateTheResource( m.toString() )
+			 if( ! coapSupport.updateResource( m.toString() ) ) println("EMIT failure"  )
         }
     }
 
