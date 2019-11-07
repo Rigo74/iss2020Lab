@@ -174,8 +174,9 @@ You can consult also:
 <li><a href="#channels">Channels</a></li>
 <li><a href="#kotlinprodcons">Producers-consumers</a></li>
 <li><a href="#actors">Actors</a></li>
-<li><a href="#classes">Classes</a></li>
 <li><a href="#sequence">Sequences (suspendable)</a></li>
+<li><a href="#classes">Classes</a></li>
+
  
   
 </ol>
@@ -230,7 +231,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.channels.Channel
- 
+
 
 <kc>Coroutines API are still experimental ... </kc>
 @kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -924,37 +925,47 @@ Handle myinputasynchcps-10  thread=Thread-0
 </table></center>
 
 <h2><a id="suspend"/>Suspending functions and coroutines</h2>
-<m>
+
 <ul>
+<m>
 <li>Essentially, a <em>Coroutine</em> is a light-weight thread that can be activated with a 
-<em>Coroutine builder</em> into a <em>CoroutineScope</em>.<br/><br/></li>
+<em>Coroutine builder</em> into a <em>CoroutineScope</em>.
+<br/><br/></li>
 
 <li>Coroutines are computations that can be <k>suspended</k> without blocking a thread.
-They are based on the concept of <em>Continuation-passing style</em> (CPS) programming.<br/><br/></li>
+They are based on the concept of <em>Continuation-passing style</em> (<k>CPS</k>) programming.
+<br/><br/></li>
 
 <li>By default, coroutines are run on a shared pool of threads. 
 Threads still exist in a program based on coroutines, but one thread can run many coroutines, so there's no need for too many threads.
-<br/><br/></li>
-
-<li>The execution of a coroutine always happens inside a <em>Coroutine Context</em> that defines <b>how</b> the coroutine will be executed
-(see <a href="https://proandroiddev.com/demystifying-coroutinecontext-1ce5b68407ad" target="web">Demystifying CoroutineContext</a>).
+<br/><br/></li> 
+ 
+<li>The execution of a coroutine always happens inside a <em>Coroutine Context</em> that defines <b>how</b> the coroutine will be executed.
 It includes a coroutine <em>Dispatcher</em>. 
+A <em>Coroutine Context</em> can be composed  by several element types to create <em>composed behaviors</em>.
 <br/><br/></li>
  
-<li>Every coroutine builder, including <tt>runBlocking</tt> is an extension on <em>CoroutineScope</em> interface 
-and inherits its abstract read-only property
+<li>Every coroutine builder, including <tt>runBlocking</tt> is an extension on <em>CoroutineScope</em> 
+interface  and inherits its abstract read-only property
 <tt>coroutineContext: CoroutineContext</tt> to  automatically propagate both context elements and cancellation.
-See <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html" target="web">
-Coroutine Scope</a>
 	<ul>
 		<li><bc>Global scope</bc>: the coroutine affects the whole Application</li>
 		<li><bc>CoroutineScope</bc>: defines a scope for new coroutines</li>
 	</ul>
 <br/></li>
-<li>A Context can be composed  by several element types to create <em>composed behaviors</em>.
+ 
+<li>
+Every <tt>coroutine builder</tt> functions (<bc>launch</bc>,<bc>async</bc>,...) accept as parameter one of the main <em>Dispatcher</em>
+(<tt>Default, IO, newSingleThreadContext , Unconfined, Main</tt>)
+<br/><br/></li>
+
+<li>Coroutines do not rely on features of the Operating System or the <tt>JVM</tt>. Instead, a <bc>Continuation</bc> is added to every suspending function as 
+an additional parameter according to the <bc>CPS</bc> style. The compiler produces a <em>state machine</em> to handle suspension.
 </li>
-</ul>
+
 </m>
+</ul>
+
 
 
 <center><table style="width:95%">
@@ -1018,7 +1029,7 @@ Without the <tt>Thread.sleep</tt> the programs ends immediately and no output is
 
 <tr>
 <td>
-<m><h3>Dispatchers</h3> 
+<m><h3>On Dispatchers</h3> 
 The example above  shows that the coroutine works with reference to the <bc>Dispather.Deafault</bc>. <br/>
 A <em>Dispatcher</em> determines the thread in which a coroutine will be executed. It can be provided by the<tt> Coroutine Scope</tt>
 or specified using a builder.
@@ -1030,9 +1041,13 @@ or specified using a builder.
 A dispatcher can be provided in two ways:
 
 <ul>
-<li>By the <bc>coroutine scope</bc></li>
-<li><bc>Explicitly</bc>: the coroutine builder receives a coroutine context as a first parameter</li>
+<li>By the <bc>coroutine scope</bc>.
+See  also <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html" target="web"> 
+Coroutine Scope</a> <br/><br/></li>
+<li><bc>Explicitly</bc>: the coroutine builder receives a coroutine context as a first parameter.
+See  <a href="#Dispatchers">Dispatchers</a> later on.</li>
 </ul>
+
 
 
 <br/>
@@ -1298,24 +1313,30 @@ ENDS
 
 <tr>
 <td>
-<h3>Dispatchers</h3> 
+
 <pre>
-fun main() = runBlocking<Unit> {
- println("BEGINS ${curThread()}")
- launch { <kc>//context of the parent runBlocking</kc>  
-   println("1) runBlocking | thread=${Thread.currentThread().name}")
+<h3 id="Dispatchers">Dispatchers</h3> 
+fun testDispatchers() {
+runBlocking {
+   <k>launch {</k> <kc>//context of the parent runBlocking </kc> 
+   println("1) runBlocking | ${curThread()}")
  }
- launch( <k>Dispatchers.Unconfined</k>) { <kc>//in main thread</kc>
-   println("2) Unconfined | thread=${Thread.currentThread().name}")
+ <k>launch( Dispatchers.Unconfined)</k> { <kc>//in main thread </kc> 
+   println("2) Unconfined | ${curThread()}")
  }
- launch( <k>Dispatchers.Default</k>) { <kc>//DefaultDispatcher</kc>
-   println("3) Default | thread=${Thread.currentThread().name}")
+ <k>launch( Dispatchers.Default)</k> { <kc>//DefaultDispatcher </kc> 
+   println("3) Default | ${curThread()}")
  }
- launch( <k>newSingleThreadContext</k>("MyThr")) { <kc>//new thread</kc>
-   println("4) newSingleThreadContext | 
-		thread=${Thread.currentThread().name}")
+ <k>launch( newSingleThreadContext("MyThr"))</k> { <kc>//new thread </kc> 
+   println("4) newSingleThreadContext | ${curThread()}")
  }
- println("ENDS ${curThread()}")
+}
+}
+fun main(){
+    val cpus = Runtime.getRuntime().availableProcessors();
+    println("BEGINS CPU=$cpus ${curThread()}")
+	testDispatchers()
+    println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>
@@ -1335,19 +1356,17 @@ The size of this thread pool is 64</li>
 
 
 <!--
--Dkotlinx.coroutines.debug JVM option
-https://play.kotlinlang.org
-/koans/overview
+-Dkotlinx.coroutines.debug JVM option https://play.kotlinlang.org/koans/overview
 -->
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS thread=main
-2) Unconfined | thread=main
-3) Default | thread=DefaultDispatcher-worker-1
-ENDS thread=main
-4) newSingleThreadContext |  thread=MyThr
-1) runBlocking | thread=main
+BEGINS CPU=4 thread=main / nthreads=1
+2) Unconfined | thread=main / nthreads=1
+3) Default | thread=DefaultDispatcher-worker-1 / nthreads=4
+1) runBlocking | thread=main / nthreads=5
+4) newSingleThreadContext | thread=MyThr / nthreads=5
+ENDS thread=main / nthreads=5
 </pre>
 </td>
 </tr>
@@ -1447,7 +1466,111 @@ child coroutines finish.
 -->
 
 
+<tr>
+<td style="width:45%">
 
+<pre>
+<h3>withContext</h3> 
+suspend fun actionWithContext( n: Int){
+ <k>withContext</k>(<ks>Dispatchers.Default</ks>) {
+   println("$n) thread=${Thread.currentThread().name}")  
+   delay(1000)
+   println("ActionWithContext $n done")
+ }
+}
+fun main() = runBlocking{
+   println("BEGIN")
+   for(i in 1..3) launch{ actionWithContext(i) } 
+   println("END")
+}
+</pre> </td>
+<td><m><em>withContext</em>: allows to 
+change the context that will be used to run a part of the code inside a coroutine.
+</m> 
+<pre>
+<kc>//OUPUT</kc>
+BEGINS
+ENDS
+2) thread=DefaultDispatcher-worker-2
+1) thread=DefaultDispatcher-worker-1
+3) thread=DefaultDispatcher-worker-3
+ActionWithContext 2 done
+ActionWithContext 1 done
+ActionWithContext 3 done
+</pre>
+See <a href="https://proandroiddev.com/demystifying-coroutinecontext-1ce5b68407ad" target="web">Demystifying CoroutineContext</a>.
+
+</td>
+</tr>
+
+<!-- WARNING: Continuation experimenatal droppend in kotlin 1.4 xxx
+ <tr>
+<td>
+<h3>Continuation</h3> 
+<pre>
+fun main(){
+    val cpus = Runtime.getRuntime().availableProcessors();
+    println("AT START | CPU=$cpus ")
+    println("BEGINS ${curThread()}")
+    println("MAIN | ${curThread()}")
+    var <ks>continuation</ks>: <k>Continuation<Unit>?</k> = null
+    GlobalScope.launch( <ks>Dispatchers.Unconfined</ks> ) {
+        println("COROUTINE |  started")
+        <k>suspendCoroutine&lt;Int></k> {
+            println("COROUTINE | suspended ${curThread()}")
+            <ks>continuation</ks> = it
+        }
+        println("COROUTINE|resumes&finish ${curThread()}")
+    }
+    println("MAIN | resumes continuation ${curThread()}")
+    <ks>continuation!!.resume(Int)</ks> ?: println("MAIN | no contin")
+    println("MAIN |  back after resume")
+    println("ENDS ${curThread()}")
+}
+</pre> </td>
+<td><m>
+A <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.coroutines.experimental/-continuation/index.html" target="web">Continuation</a> 
+is added to every suspending function as 
+an additional parameter according to the <bc>CPS</bc> style. In the example:
+<ol>
+<li><tt>main</tt> activates a coroutine with <bc>Unconfined dispatcher</bc> that doesn't do any dispatching: the coroutine
+code works within <tt>main</tt> thread</li>
+<li>The coroutine suspends its work by using  <bc>suspendCoroutine</bc>.</li>
+<li>The control returns to the <tt>main</tt> that uses a <bc>Continuation<Unit></bc>  set by the coroutine
+to resume it.</li>
+<li>The coroutine ends and the control is given back to the <tt>main</tt> that ends</li>
+
+</ol>
+<pre>
+<kc>//OUTPUT</kc>
+AT START |  CPU=4  
+BEGINS thread=main
+MAIN | thread=main
+COROUTINE |  started
+COROUTINE | suspended thread=main
+MAIN | resumes continuation thread=main
+COROUTINE|resumes&finish thread=main
+MAIN |  back after resume
+ENDS thread=main
+</pre>
+
+If we launch the coroutine with <bc>Dispatchers.Default</bc> (or some other confined form), the output will be:
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS thread=main
+MAIN | thread=main
+MAIN | resumes continuation thread=main
+MAIN | no contin
+MAIN |  back after resume
+ENDS thread=main
+
+</pre>
+</m>
+</td>
+</tr>
+-->
+
+ 
 
 </tbody>	
 </table></center>
@@ -1574,7 +1697,7 @@ ENDS with Counter = 100000
 <tr>
 <td>
 <m><h3>Thread-confinement (fine-grained)</h3>
-Each coroutine is launched with DefaultDispathcer, but each increment is confined
+Each coroutine is launched with <tt>DefaultDispathcer</tt>, but each increment is confined
 to a single-threaded context. 
 </m>
 <pre>
@@ -2186,6 +2309,102 @@ Action 6 done
 </tbody>	
 </table></center>
 
+<h2 id="sequence">SEQUENCES and SUSPENDABLE SEQUENCES</h2>
+
+<center><table style="width:95%">
+<tbody>	
+ <tr>
+<td style="width:45%">
+<pre>
+<h3>Sequences</h3>
+data class Person(val name: String, val age: Int)
+
+val <ks>persons</ks> = listOf(
+    Person("Peter", 16),
+    Person("Alice", 23),
+    Person("Anna",  25),
+    Person("Anna",  28),
+    Person("Sonya", 39)
+)
+
+val names = <ks>persons</ks><k>.asSequence()</k>
+    .filter { it.age > 18 }
+    .map { it.name }
+    .distinct()
+    .sorted()
+    .toList()
+
+fun main(){
+    println(names)
+}	
+</pre>
+</td>
+<td><m>
+<em>Sequences</em> are a key abstraction to functional programming in Kotlin, a concept quite similar to <tt>Java 8</tt> <em>Streams</em>.
+They represent <bc>lazily evaluated collections</bc>.  
+See <a href="https://winterbe.com/posts/2018/07/23/kotlin-sequence-tutorial/" target="web">Kotlin Sequence Tutorial</a>.
+<br/><br/>
+</m>
+<pre>
+<kc>//OUTPUT</kc>
+[Alice, Anna, Sonya]
+BYE
+</pre>
+<m>Sequences are <bc>stateless</bc> and they reset after being used.</m>
+</td>
+</tr>
+
+<tr id="yield">
+<td>
+<pre>
+<h3>Suspendable Sequences</h3>
+val fiboSeq = sequence{
+    var a = 0
+    var b = 1 
+    <k>yield(1)</k>   <kc>//first</kc>
+    while (true) {
+        <k>yield(a + b)</k>   <kc>//next</kc>
+        val tmp = a + b
+        a = b
+        b = tmp
+    }
+}
+
+ fun main() {
+    println("BEGINS")
+    val v = fibonacciSeq.elementAt(2)
+    println("v=$v")
+    val firstNums = fibonacciSeq.take(5)  //calculated later 
+    println("firstNums=${firstNums}")
+    println("firstNums=${firstNums.joinToString()}")
+    println("ENDS")
+}
+</pre> 
+</td>
+
+<td><m>We known that a <em>suspend function</em> can suspend its execution while waiting for the execution of one or more computations to happen.
+<br/><br/>
+Instead, a <em>suspendable sequence</em> is a coroutine builder that can suspend between invocation by using the <bc>yield()</bc> function.
+<br/>
+</m>
+<pre>
+<kc>//OUTPUT</kc>
+BEGINS
+v=2
+firstNums=kotlin.sequences.TakeSequence@726f3b58
+firstNums=1, 1, 2, 3, 5
+ENDS
+</pre>
+
+For other examples of suspendable sequence, see <a href="../../it.unibo.bls19d/userDocs/Lab7.html#yield" target="code">Lab7.html#yield</a>
+
+</m> 
+</td>
+</tr> 
+
+</tbody>	
+</table></center>
+
 <h2><a id="classes"/>CLASSES</h2>
 
 <center><table style="width:95%">
@@ -2193,6 +2412,7 @@ Action 6 done
 <tr>
 <td>
 <pre>
+<h3>Java static</h3>
 public class SingleCounter {
     private static int counter = 0;
     public static int value(){ return counter;}
@@ -2200,9 +2420,12 @@ public class SingleCounter {
     public static void dec(){ counter-- ;}
     public static void reset(){ counter = 0 ;}
 }
-</pre> </td>
-<td><m><em>Java to Kotlin </em>: let us report here the result of automatic conversion done by the <tt>IDE</tt></m>
+</pre> 
+<m><em>Java to Kotlin </em>: let us report the result of automatic conversion done by the <tt>IDE</tt></m>
+</td>
+<td>
 <pre>
+<h3>Kotlin object</h3>
 object SingleCounter {
     private var counter = 0
     fun value(): Int { return counter }
@@ -2712,306 +2935,9 @@ must be nested in the superclass </m>
 </tbody>	
 </table></center>
 
-<h2 id="sequence">SEQUENCES and SUSPENDABLE SEQUENCES</h2>
 
-<center><table style="width:95%">
-<tbody>	
- <tr>
-<td style="width:45%">
-<pre>
-data class Person(val name: String, val age: Int)
-
-val persons = listOf(
-    Person("Peter", 16),
-    Person("Alice", 23),
-    Person("Anna",  25),
-    Person("Anna",  28),
-    Person("Sonya", 39)
-)
-
-val names = persons
-    .asSequence()
-    .filter { it.age > 18 }
-    .map { it.name }
-    .distinct()
-    .sorted()
-    .toList()
-
-fun main(){
-    println(names)
-}	
-</pre>
-</td>
-<td><m>
-<em>Sequences</em> are a key abstraction to functional programming in Kotlin, a concept quite similar to <tt>Java 8</tt> <em>Streams</em>.
-They represent <bc>lazily evaluated collections</bc>.  
-See <a href="https://winterbe.com/posts/2018/07/23/kotlin-sequence-tutorial/" target="web">Kotlin Sequence Tutorial</a>.
-<br/><br/>
-The <tt>OUTPUT</tt> of the example is:</m>
-<pre>
-[Alice, Anna, Sonya]
-BYE
-</pre>
-<m>Sequences are <bc>stateless</bc> and they reset after being used.</m>
-</td>
-</tr>
-
-<tr id="yield">
-<td>
-<pre> 
-val fiboSeq = sequence{
-    var a = 0
-    var b = 1 
-    yield(1)           //first
-    while (true) {
-        yield(a + b)   //next
-        val tmp = a + b
-        a = b
-        b = tmp
-    }
-}
-
- fun main() {
-    println("BEGINS")
-    val v = fibonacciSeq.elementAt(2)
-    println("v=$v")
-    val firstNums = fibonacciSeq.take(5)  //calculated later 
-    println("firstNums=${firstNums}")
-    println("firstNums=${firstNums.joinToString()}")
-    println("ENDS")
-}
-</pre> 
-</td>
-
-<td><m>We known that a <em>suspend function</em> can suspend its execution while waiting for the execution of one or more computations to happen.
-<br/><br/>
-Instead, a <em>suspendable sequence</em> is a coroutine builder that can suspend between invocation by using the <bc>yield()</bc> function.
-<br/>
-The <tt>OUTPUT</tt> of the example is:</m>
-<pre>
-BEGINS
-v=2
-firstNums=kotlin.sequences.TakeSequence@726f3b58
-firstNums=1, 1, 2, 3, 5
-ENDS
-</pre>
-
-For other examples of suspendable sequence, see <a href="../../it.unibo.bls19d/userDocs/Lab7.html#yield" target="code">Lab7.html#yield</a>
-
-</m> 
-</td>
-</tr> 
-
-</tbody>	
-</table></center>
-
-<h2>OTHER</h2>
-
-<center><table style="width:95%">
-<tbody>	
-<tr>
-<td style="width:45%"><pre></pre> </td>
-<td><m> 
-<h5>Rules overview</h5>
-The execution of a coroutine always happens inside a <em>Coroutine Context</em> that defines <b>how</b> the coroutine will be executed
-(see <a href="https://proandroiddev.com/demystifying-coroutinecontext-1ce5b68407ad" target="web">Demystifying CoroutineContext</a>).
-It includes a coroutine <em>Dispatcher</em>.
-
-
-<br/><br/>
-Every coroutine builder, including <tt>runBlocking</tt> is an extension on <em>CoroutineScope</em> interface 
-and inherits its abstract read-only property
-<tt>coroutineContext: CoroutineContext</tt> to  automatically propagate both context elements and cancellation.
-See <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-coroutine-scope/index.html" target="web">
-Coroutine Scope</a>
-<ul>
-<li><bc>Global scope</bc>: the coroutine affects the whole Application</li>
-<li><bc>CoroutineScope</bc>: defines a scope for new coroutines</li>
-</ul>
- 
-
-A Context can be composed  by several element types to create <em>composed behaviors</em>.
-</m> </td>
-</tr>
-
-<tr>
-<td style="width:45%"><pre>
-suspend fun actionWithContext( n: Int){
- withContext(Dispatchers.Default) {
-   println("$n) thread=${Thread.currentThread().name}")  
-   delay(1000)
-   println("ActionWithContext $n done")
- }
-}
-fun main() = runBlocking{
-	println("BEGINS")
-    for(i in 1..3) launch{ actionWithContext(i) } 
-    println("ENDS")
-}
-
-//OUPUT
-BEGINS
-ENDS
-1) thread=DefaultDispatcher-worker-1
-2) thread=DefaultDispatcher-worker-2
-3) thread=DefaultDispatcher-worker-3
-ActionWithContext 3 done
-ActionWithContext 1 done
-ActionWithContext 2 done
-</pre> </td>
-<td><m><em>withContext</em>: allows to 
-change the context that will be used to run a part of the code inside a coroutine.
 
  
-</m> </td>
-</tr>
-
- <tr>
-<td><pre></pre> </td>
-<td><m></m> </td>
-</tr>
-
- <tr>
-<td><pre>
-fun main(){
-    val cpus = Runtime.getRuntime().availableProcessors();
-    println("AT START | CPU=$cpus ")
-    println("BEGINS ${curThread()}")
-    println("MAIN | ${curThread()}")
-    var continuation: Continuation<Unit>? = null
-    GlobalScope.launch(Dispatchers.Unconfined) {
-        println("COROUTINE |  started")
-        suspendCoroutine<Unit> {
-            println("COROUTINE | suspended ${curThread()}")
-            continuation = it
-        }
-        println("COROUTINE|resumes&finish ${curThread()}")
-    }
-    println("MAIN | resumes continuation ${curThread()}")
-    continuation?.resume(Unit) ?: println("MAIN | no contin")
-    println("MAIN |  back after resume")
-    println("ENDS ${curThread()}")
-}
-
-//OUTPUT
-AT START |  CPU=4  
-BEGINS thread=main
-MAIN | thread=main
-COROUTINE |  started
-COROUTINE | suspended thread=main
-MAIN | resumes continuation thread=main
-COROUTINE|resumes&finish thread=main
-MAIN |  back after resume
-ENDS thread=main
-</pre> </td>
-<td><m>
-Coroutines do not rely on features of the Operating System or the J<tt>VM</tt>. Instead, a <bc>Continuation</bc> is added to every suspending function as 
-an additional parameter according to the <bc>CPS</bc> style. The compiler produces a <em>state machine</em> to handle suspension.
-<br/><br/>
-
-<ol>
-<li><tt>main</tt> activates a coroutine with <bc>Unconfined dispatcher</bc> that doesn't do any dispatching: the coroutine
-code works within <tt>main</tt> thread</li>
-<li>The coroutine suspends its work by using  <bc>suspendCoroutine</bc>.</li>
-<li>The control returns to the <tt>main</tt> that uses a <bc>Continuation<Unit></bc>  set by the coroutine
-to resume it.</li>
-<li>The coroutine ends and the control is given back to the <tt>main</tt> that ends</li>
-
-</ol>
-
-If we launch the coroutine with <bc>Dispatchers.Default</bc> (or some other confined form), the output will be:</m>
-<pre>
-//OUTPUT
-BEGINS thread=main
-MAIN | thread=main
-MAIN | resumes continuation thread=main
-MAIN | no contin
-MAIN |  back after resume
-ENDS thread=main
-
-</pre>
-
-</td>
-</tr>
-
-
-<tr>
-<td><pre>
-fun testRunFunction() {
-    runBlocking {
-    val logo = "Global-logo"
-    val v1 = launch(Dispatchers.Default){ 
-        println("First start : $logo 
-			thread=${Thread.currentThread().name}")
-        Thread.sleep(200)
-        val logo = "First-run"
-        println("First ended : $logo")
-        logo
-    }
-    val v2 = run {
-        println("Second start: $logo 
-			thread=${Thread.currentThread().name}")
-        Thread.sleep(300)
-        val logo = "Second-run"
-        println("Second ended: $logo ")
-        logo
-    }
-    println("logo=$logo v1=$v1 v2=$v2" )
-    }
-}
-
-fun main(args: Array<String>) {
-    val cpus = Runtime.getRuntime().availableProcessors();
-    println("AT START | 
-		CPU=$cpus threads=${Thread.activeCount()}")
-    println("BEGINS")
-    testRunFunction()
-    println("ENDS")
-}
-
-//OUTPUT
-AT START | CPU=4 threads=2  
-BEGINS
-Second start: Global-logo  thread=main
-First start : Global-logo thread=DefaultDispatcher-worker-2
-First ended : First-run
-Second ended: Second-run 
-logo=Global-logo v1=StandaloneCoroutine{... v2=Second-run
-ENDS 
-</pre> </td>
-<td><m><em>Experiments</em> Let us launch the coroutine with the <bc>coroutineContext</bc> </m>
-<pre>val v1 = launch(kotlin.coroutines.coroutineContext)
-</pre>
-<m>Now, the <tt>OUTPUT</tt> is</m>
-<pre>
-BEGINS
-Second start: Global-logo  thread=main
-Second ended: Second-run 
-logo=Global-logo v1=StandaloneCoroutine{... v2=Second-run
-First start : Global-logo thread=main
-First ended : First-run
-ENDS
-</pre>
-<m>In fact, since all run are on the <tt>main</tt> thread, <tt>launch</tt> is suspended until <tt>run</tt> completes.
-<br/>
-If we replace <tt>Thread.sleep</tt> with <bc>kotlin.coroutines.delay</bc>, the <tt>OUTPUT</tt> is:</m>
-<pre>
-BEGINS
-Second start: Global-logo  thread=main
-First start : Global-logo thread=main
-First ended : First-run
-Second ended: Second-run 
-logo=Global-logo v1=StandaloneCoroutine{... v2=Second-run
-ENDS
-</pre>
-<m>In fact, <bc>delay</bc> does not block the thread, but releases it for the (other) coroutine and regains it back
-when the thread is further released.
-</m> </td>
-</tr>
-
-
-</tbody>	
-</table></center>
 
 
 

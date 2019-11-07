@@ -8,7 +8,8 @@ import javacode.CoapSupport
 import it.unibo.kactor.ApplMessage
 import it.unibo.kactor.MsgUtil
 
-
+@kotlinx.coroutines.ExperimentalCoroutinesApi
+@kotlinx.coroutines.ObsoleteCoroutinesApi
 class sonarOnPcSimulate( val name : String, val scope: CoroutineScope = GlobalScope )  {
 	var coapSupport : CoapSupport	 
 
@@ -41,7 +42,6 @@ class sonarOnPcSimulate( val name : String, val scope: CoroutineScope = GlobalSc
 
 	
 fun main() = runBlocking {
-
 	val a = sonarOnPcSimulate("sonaronpcsimulated")
 	val m = MsgUtil.buildEvent("", "start", "start(1)")
     a.actor.send( m )

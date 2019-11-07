@@ -15,47 +15,71 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
+		 
+		var StepTime = 1000L;  
+		var Duration=0 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("basicrobot | starts (with robotadapter in the same context)")
+						println("robot start")
+						solve("consult('basicRobotConfig.pl')","") //set resVar	
+						solve("robot(R,PORT)","") //set resVar	
+						if(currentSolution.isSuccess()) { println("USING:${getCurSol("R")},port=${getCurSol("PORT")}")
+						 }
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 				state("work") { //this:State
 					action { //it:State
+						println("robot waiting ...")
 					}
-					 transition(edgeName="t00",targetState="handleCmd",cond=whenDispatch("cmd"))
-					transition(edgeName="t01",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					 transition(edgeName="s00",targetState="handleCmd",cond=whenDispatch("cmd"))
+					transition(edgeName="s01",targetState="doStep",cond=whenDispatch("step"))
+					transition(edgeName="s02",targetState="doStop",cond=whenDispatch("stop"))
 				}	 
 				state("handleCmd") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								forward("cmd", "cmd(${payloadArg(0)})" ,"robotadapter" ) 
+								 val MoveToDo = payloadArg(0) 
 						}
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
-				state("handleObstacle") { //this:State
+				state("doStep") { //this:State
 					action { //it:State
-						forward("cmd", "cmd(h)" ,"robotadapter" ) 
-						println("basicrobot | stops (for safety) since  obstacle  ")
+						println("$name in ${currentState.stateName} | $currentMsg")
+						if( checkMsgContent( Term.createTerm("step(DURATION)"), Term.createTerm("step(T)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								StepTime = payloadArg(0).toLong()
+								startTimer()
+						}
+						stateTimer = TimerActor("timer_doStep", 
+							scope, context!!, "local_tout_basicrobot_doStep", StepTime )
 					}
-					 transition( edgeName="goto",targetState="farFromObstacle", cond=doswitch() )
+					 transition(edgeName="t03",targetState="endStep",cond=whenTimeout("local_tout_basicrobot_doStep"))   
+					transition(edgeName="t04",targetState="stepFail",cond=whenEvent("obstacle"))
 				}	 
-				state("farFromObstacle") { //this:State
+				state("endStep") { //this:State
 					action { //it:State
-						println("basicrobot |  going back (to avoid event-generation) ")
-						forward("cmd", "cmd(s)" ,"robotadapter" ) 
-						delay(250) 
-						forward("cmd", "cmd(h)" ,"robotadapter" ) 
-						stateTimer = TimerActor("timer_farFromObstacle", 
-							scope, context!!, "local_tout_basicrobot_farFromObstacle", 350.toLong() )
+						println("step DONE")
 					}
-					 transition(edgeName="t02",targetState="work",cond=whenTimeout("local_tout_basicrobot_farFromObstacle"))   
-					transition(edgeName="t03",targetState="farFromObstacle",cond=whenEvent("obstacle"))
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("stepFail") { //this:State
+					action { //it:State
+						Duration=getDuration()
+						println("stepFail Duration=$Duration ")
+					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("doStop") { //this:State
+					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
+						itunibo.robot.robotSupport.move( "h"  )
+					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 			}
 		}

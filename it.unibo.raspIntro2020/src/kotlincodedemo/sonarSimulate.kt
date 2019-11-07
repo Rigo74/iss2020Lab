@@ -11,7 +11,6 @@ fun curThread() : String {
 
 data class SonarData( val distance: Int)
 
-
 object sonarSimulator{
 	val data = listOf(
 	    SonarData( 0),  SonarData( 10), SonarData( 20), SonarData( 30),
@@ -26,7 +25,6 @@ object sonarSimulator{
         }	
 	}
 }
-
 
 fun main(  ) = runBlocking{
 	sonarSimulator.produce()

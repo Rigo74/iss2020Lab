@@ -12,9 +12,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.channels.Channel
+import kotlin.coroutines.experimental.Continuation
+import kotlin.coroutines.experimental.suspendCoroutine
+ 
 		
 fun curThread() : String { 
-	return "thread=${Thread.currentThread().name}" 
+	return "thread=${Thread.currentThread().name} / nthreads=${Thread.activeCount()}" 
 }
 
 fun runBlockThread(){
@@ -105,13 +108,53 @@ var counter = 0 //java.util.concurrent.atomic.AtomicInteger()
 val counterContext=newSingleThreadContext("CC")
 val mutex = kotlinx.coroutines.sync.Mutex()
 
+suspend fun actionWithContext( n: Int){
+ withContext(Dispatchers.Default) {
+   println("$n) thread=${Thread.currentThread().name}")  
+   delay(1000)
+   println("ActionWithContext $n done")
+ }
+}
+@kotlinx.coroutines.ExperimentalCoroutinesApi
+fun testOnContinuation(){
+    println("TEST | ${curThread()}")
+    var continuation: Continuation<Int>? = null
+    GlobalScope.launch( Dispatchers.Unconfined ) {
+        println("COROUTINE |  started")
+        suspendCoroutine<Int> {
+            println("COROUTINE | suspended ${curThread()}")
+            continuation = it
+        }
+        println("COROUTINE|resumes&finish ${curThread()}")
+    }
+    println("TEST | resumes continuation ${curThread()}")
+    continuation!!.resume(3) ?: println("MAIN | no contin")
+    println("TEST |  back after resume")	
+}
 
+@kotlinx.coroutines.ExperimentalCoroutinesApi
+@kotlinx.coroutines.ObsoleteCoroutinesApi
+fun testDispatchers() {
+runBlocking {
+  launch { //context of the parent runBlocking  
+   println("1) runBlocking | ${curThread()}")
+ }
+ launch( Dispatchers.Unconfined) { //in main thread
+   println("2) Unconfined | ${curThread()}")
+ }
+ launch( Dispatchers.Default) { //DefaultDispatcher
+   println("3) Default | ${curThread()}")
+ }
+ launch( newSingleThreadContext("MyThr")) { //new thread
+   println("4) newSingleThreadContext | ${curThread()}")
+ }
+}
+}
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 @kotlinx.coroutines.ExperimentalCoroutinesApi
-
-fun main() = runBlocking{
+fun main(){
     val cpus = Runtime.getRuntime().availableProcessors();
-    println("BEGINS with $cpus  cores")
-    channelTest()
-	println("ENDS" )
+    println("BEGINS CPU=$cpus ${curThread()}")
+	testDispatchers()
+    println("ENDS ${curThread()}")
 }
