@@ -1,0 +1,132 @@
+/*
+ * =======================================================
+ * A radargui-GUI as a service
+ * =======================================================
+ */
+System /*-trace*/ robotradarsys   
+
+mqttBroker "localhost" : 1883 
+
+Request  polar        : polar(D,A) 
+Dispatch polar        : polar(D,A) 
+Reply    fromRadarGui : fromRadarGui(X)    
+ 
+Context ctxRadarGui ip [ host= "localhost"   port= 8038 ] +mqtt
+ 
+/*
+ * -----------------------------------------------------------
+ * Embeds the radarpojo and provides message-based interaction
+ * (it is the 'exoskeleton - decorator')
+ * -----------------------------------------------------------
+ */ 
+QActor radargui context ctxRadarGui{ 
+["var DoReply     = false
+  var DistanceStr = \"0\"
+  var Distance    = 0
+  var Angle       = \"0\"
+"]
+	State s0 initial{ 
+		println("radargui start") 
+		run radarPojo.radarSupport.setUpRadarGui()
+	} 
+	Goto waitForDataToShow
+	
+	State waitForDataToShow{ println("radargui waitForDataToShow %%%% ")  } 
+	Transition t0  
+		 whenRequest polar -> showSpotReply
+		 whenMsg     polar -> showSpotNoReply
+  
+	//WARNING: the current message is lost after an empty-move
+ 	State showSpotNoReply{ 
+ 		printCurrentMessage	 
+		onMsg( polar : polar(D,A) ) {
+			["
+				DistanceStr = payloadArg(0)
+			    Distance    = DistanceStr.toInt()
+				Angle       = payloadArg(1) 
+                DoReply     = false
+			"]
+		}
+ 	} 
+ 	Goto showSpot 
+ 	
+ 
+	State showSpotReply{
+		//printCurrentMessage
+   		onMsg( polar : polar(D,A) ) {
+			["
+				DistanceStr = payloadArg(0)
+			    Distance    = DistanceStr.toInt()
+				Angle       = payloadArg(1) 
+                DoReply     = true
+			"]
+ 	 	} 
+ 	 }  
+ 	 Goto showSpot
+	
+	
+ 	State showSpot{
+  		if "Distance <= 90 "  {   
+			run radarPojo.radarSupport.update(  DistanceStr,  Angle )
+			if "DoReply" {  replyTo polar with fromRadarGui : fromRadarGui( done($DistanceStr) ) }
+ 		}   
+ 	}
+	Goto waitForDataToShow
+	
+}
+
+QActor sonarsimulator context ctxRadarGui {
+[" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store the results of run
+	State s0 initial{
+		println("demo STARTS working using dispatch")
+		delay 4000 //give time to start the GUI
+		forward radargui -m polar : polar( 0,0 )
+		delay 500
+		forward radargui -m polar : polar( 45,0 ) 
+		delay 500
+		forward radargui -m polar : polar( 90,0 )
+		delay 500
+		forward radargui -m polar : polar( 120,0 )		
+	}
+	Goto workUsingRequestNoWait //workUsingRequest
+	
+	State workUsingRequest{
+ 		run utils.sonarDataSimulator.sonarValFromUser( ResultMap, "sonarVal" ) 
+ 		//WARNING: could block all the thread, including radargui
+ 		[" val Result = ResultMap.remove(\"sonarVal\")"]
+ 		//println("Dtat from sonar: $Result")
+ 		request radargui -m polar : polar( $Result,0 ) 		
+	}  
+	Transition t0 
+		whenTime 1000          -> handleAnwerTimeout
+		whenReply fromRadarGui -> handleRadarReply   //Blocks until answer
+	
+	State handleRadarReply{
+		printCurrentMessage //msg(local_noMsg,event,sonarsimulator,none,noMsg,6) is for eps-move
+	}
+	Goto workUsingRequest
+	
+	State handleAnwerTimeout{
+		println("WARNING: the radargui does not send the answer ... ")
+	}
+	Goto workUsingRequest 
+	  
+	
+	
+	State workUsingRequestNoWait{
+   		request radargui -m polar : polar( 30,90 ) 
+   		delay 1000
+   		request radargui -m polar : polar( 50,90 )	
+   		delay 1000
+   		request radargui -m polar : polar( 70,90 )	   			
+	}  
+	Goto handleAllRadarReply    
+	
+	State handleAllRadarReply{
+		printCurrentMessage
+	}
+	Transition t0 
+		whenTime 1000          -> handleAnwerTimeout
+		whenReply fromRadarGui -> handleAllRadarReply    
+}
+

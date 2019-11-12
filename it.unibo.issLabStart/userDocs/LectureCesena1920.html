@@ -392,7 +392,7 @@ LABRaspberryPi |  Using the RaspberryPi</a>
 Introduzione all'uso di robot fisici.
 <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.robot2020/userDocs/UsingRobots2019.pdf" target="lab">UsingRobots2019.pdf</a>
 <br/>
-Analisi del codice Arduino per il robot mbot con l'obiettico di catturarne gli aspetti essenziali tramite la definzione di un modello.
+Analisi del codice Arduino per il robot mbot con l'obiettico di catturarne gli aspetti essenziali tramite la definizione di un modello.
  
 
 </td>
@@ -401,16 +401,15 @@ Analisi del codice Arduino per il robot mbot con l'obiettico di catturarne gli a
 <tr><td><m>31/10/2019 (13-16)</m></td><td>Lab3.1</td> 
 
 <td>
-Progettazione e sviluppo bottom-up: introduzione al Constrained Application Protocol (CoAP) per comunicazioni machine-to-machine (M2M) in applicazioni IOT.
-<br/>Si veda: 
-<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.coapintro/userDocs/LabCoAP.html" target="lab">
-LabCoAP | Introduction to CoAP</a>
-e
-<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.raspIntro2020/userDocs/LabSonar_2020.html" target="lab">
-LabSonar_2020 | Handling sonar data</a>
-e
+Sperimentazione del sonar HC-SR04 su RaspberryPi. Si veda
 <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.raspIntro2020/userDocs/LABRaspberryPi.html" target="lab">
 LABRaspberryPi |  Using the RaspberryPi</a>
+Introduzione al problema robotSonar/ radar: si veda
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qak.radar2020/userDocs/LabRadarGui.html" target="lab">
+LabRadarGui | Radar GUI as a service</a>
+e
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.raspIntro2020/userDocs/LabRobotRadar_2020" target="lab">
+LabRobotRadar_2020 | A robot-radar system</a>
 
 </td>
 </tr>
@@ -422,11 +421,17 @@ LABRaspberryPi |  Using the RaspberryPi</a>
     
 <tr><td><m>6/11/2019 (14-17)</m></td><td>Lab3.1</td> 
 <td>
+Il sistema robotSonar/ radar. Progettazione e sviluppo bottom-up di una soluzione a partire da componenti disponibili.
+Costruzione di un server TCP lato radar (su PC) e di un client TCP lato  RaspberryPi.
+Richiami sulla metodologia SCRUM  e analisi del codice prodotto come simulazione di uno SPRINT-review.
 </td>
 </tr>
 
 <tr><td><m>7/11/2019 (13-16)</m></td><td>Lab3.1</td> 
-<td>
+<td>Interazione con il radar tramite request. Discussione su come affrontare il refactoring del codice lato cleint e lato server.
+Il problema della ricezione lato client delle risposte in modo non bloccante.
+Opportunità di impostare il progetto del comportamento del client attraverso un automa a stati finiti.
+Definizione di un home-work.
 </td>
 </tr>
 
@@ -437,11 +442,30 @@ LABRaspberryPi |  Using the RaspberryPi</a>
     
 <tr><td><m>13/11/2019 (14-17)</m></td><td>Lab3.1</td> 
 <td>
+Discussione degli elaborati degli studenti relativi al caso di studio robotSonar/ radar mediante interazione request-response.
+Verso una formalizzazione di modelli eseguinbili basati su automi a stati finiti.
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qak.radar2020/userDocs/LabRadarGui.html" target="lab">
+LabRadarGui | Radar GUI as a service</a>
+e
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.raspIntro2020/userDocs/LabRobotRadar_2020" target="lab">
+LabRobotRadar_2020 | A robot-radar system</a>
+
+Discussione su possibili estensioni del metamodello QAkctor per agevolare
+analisi, progettazione e sviluppo di sistemi software distribuuti basati su request-response.
+<br/>
+Sperimentazione di robot reali (di tipo 'nano'): si veda BasicRobotUsageNaive nel progetto it.unibo.raspIntro2020.
 </td>
 </tr>
 
 <tr><td><m>14/11/2019 (13-16)</m></td><td>Lab3.1</td> 
 <td>
+Introduzione al Constrained Application Protocol (CoAP) per comunicazioni machine-to-machine (M2M) in applicazioni IOT.
+
+<br/>Si veda: 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.coapintro/userDocs/LabCoAP.html" target="lab">
+LabCoAP | Introduction to CoAP</a>
+Le risorse come elementi centrali nella organizzazione delle architetture distribuite e il relativo 'cambio di paradigma'.
+Impatto sulla organizzazione dei testing di integrazione e funzionali.
 </td>
 </tr>
 

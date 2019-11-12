@@ -1,8 +1,58 @@
 /*
- * Used just to configure Eclipse
+ * =======================================================
+ * A PROJECT model for the robot/radar system
+ * =======================================================
  */
-System radarusage
+System /* -trace */ radarusage 
 
-Event polar : polar(D,A)
+mqttBroker "localhost" : 1883
 
-Context ctxRadarUsage ip [ host= "localhost"   port= 8044 ]
+Event    sonar : sonar(D)
+Request  polar : polar(D,A)
+Reply    fromRadarGui : fromRadarGui(X) 
+Dispatch polar : polar(D,A)
+
+Context ctxRadar      ip [ host= "192.168.1.8"   port= 8038 ] +mqtt
+Context ctxRadarUsage ip [ host= "localhost"     port= 8044 ] +mqtt  //required for the Request-pattern
+
+ExternalQActor radargui context ctxRadar
+ 
+QActor demousage context ctxRadarUsage{
+[" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store the results of run	
+	State s0 initial{
+		println("demousage start")
+	}
+	Goto workUsingDispatch
+	
+	State workUsingDispatch{
+		forward radargui -m polar : polar( 0,90 )
+		delay 500
+		forward radargui -m polar : polar( 45,90 ) 
+		delay 500
+		forward radargui -m polar : polar( 90,90 )
+		delay 500
+		forward radargui -m polar : polar( 120,90 )
+		println("demousage now workUsingRequest") 
+	}
+ 	Goto workUsingRequest
+	
+	State workUsingRequest{
+ 		run utils.sonarDataSimulator.sonarValFromUser( ResultMap, "sonarVal" )
+ 		[" val Result = ResultMap.remove(\"sonarVal\")"]
+ 		//println("Dtat from sonar: $Result")
+ 		request radargui -m polar : polar( $Result,0 ) 		
+	}  
+	Transition t0 
+		whenTime 1000          -> handleAnwerTimeout
+		whenReply fromRadarGui -> handleRadarReply   //Blocks until answer
+	
+	State handleRadarReply{
+		printCurrentMessage
+	}
+	Goto workUsingRequest
+	
+	State handleAnwerTimeout{
+		println("WARNING: the radar does not send the answer ... ")
+	}
+	Goto workUsingRequest
+}

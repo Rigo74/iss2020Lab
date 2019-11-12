@@ -65,7 +65,7 @@ dependencies {
 	//https://mvnrepository.com/artifact/org.pushingpixels/trident
 	compile group: 'org.pushingpixels', name: 'trident', version: '1.3'
 	//ROBOT nano (SAM)
-    //compile name: 'labbaseRobotSam'
+    compile name: 'labbaseRobotSam'
 	//compile mame: 'pi4j-core' //2-12 SNAPSHOT non in gradle
  	//PLANNER
     //compile name: 'it.unibo.planner'
@@ -92,7 +92,7 @@ mainClassName = 'kotlincode.SonarOnRaspActorKt'
 //mainClassName = 'kotlincode.SonarOnRaspCoapKt'    //Must start with Upcase and end with Kt!!
 //mainClassName = 'javacode.SonarOnRaspCoap'
 
-
+/*
 jar {
     println("executing jar")
     from sourceSets.main.allSource
@@ -101,3 +101,4 @@ jar {
     }
 }
  
+*/
