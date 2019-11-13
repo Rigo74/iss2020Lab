@@ -28,11 +28,12 @@ class sonarOnRaspCoap( val name : String, val scope: CoroutineScope = GlobalScop
 	    val reader = BufferedReader(InputStreamReader(FileInputStream("coapConfig.txt")) )
 	    val coapAddr = reader.readLine()
 		val path     = reader.readLine()
-		println("$coapAddr / $path")
+		println("$coapAddr - $path")
 		coapSupport = CoapSupport(coapAddr, path)
 	}
 
     suspend fun readInputData(){
+		println("readInputData starts" )
         val numData = 10
         var dataCounter = 1
         val p : Process = Runtime.getRuntime().exec("sudo ./SonarAlone")  //machineExec("sudo ./SonarAlone")
@@ -41,7 +42,7 @@ class sonarOnRaspCoap( val name : String, val scope: CoroutineScope = GlobalScop
         while( true ){
              var data = reader.readLine()    //blocking
 			 dataCounter++
-             //println("data ${dataCounter} = $data " )
+             println("data ${dataCounter} = $data " )
              if( dataCounter % numData == 0 ) { //every numData ...
                 val m = MsgUtil.buildEvent(name, "sonar", "sonar($data)")
                 println("EMIT to CoAP: $m"  )
@@ -51,7 +52,8 @@ class sonarOnRaspCoap( val name : String, val scope: CoroutineScope = GlobalScop
     }
 }
 
-	
+@kotlinx.coroutines.ObsoleteCoroutinesApi
+@kotlinx.coroutines.ExperimentalCoroutinesApi	
 fun main() = runBlocking {
 	val maxtime = 600000L
 	val appl = sonarOnRaspCoap("sonarOnRaspCoap")

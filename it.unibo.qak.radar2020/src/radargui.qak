@@ -75,6 +75,10 @@ QActor radargui context ctxRadarGui{
 	
 }
 
+
+/*
+ * A simulator of sonar-data values that helps debugging
+ */
 QActor sonarsimulator context ctxRadarGui {
 [" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store the results of run
 	State s0 initial{
@@ -110,8 +114,6 @@ QActor sonarsimulator context ctxRadarGui {
 		println("WARNING: the radargui does not send the answer ... ")
 	}
 	Goto workUsingRequest 
-	  
-	
 	
 	State workUsingRequestNoWait{
    		request radargui -m polar : polar( 30,90 ) 

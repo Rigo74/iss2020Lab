@@ -150,7 +150,7 @@ table, th, td {
     
 <body>
 <div id="body">
-<h1>LabRadarGui | Radar GUI as a service<font size="5"></font> </h1>
+<h1>LabRadarGui | Radar GUI as a service (from BottomUp to TopDown)<font size="5"></font> </h1>
 
 In this work we will build a <em>radarGuiservice</em> that shows data on a graphical interface that looks like the screen of a radar. These  data could be:
 <ul>
@@ -227,15 +227,51 @@ mediator, like a MQTT broker, a CoAP resource, a TupleSpace etc.
 In both cases we have to write proper code 'around' our starting available resources.
 
 <h3>Interaction based on TCP</h3>
-A direct communication based on some standard protocol (e.g. TCP)  can be implemented in a quite easy way. <br/>
+A direct communication based on some standard protocol (e.g. TCP)  can be implemented in a quite easy way. 
+The <a href="https://en.wikipedia.org/wiki/Proxy_pattern" target="web">proxy design pattern</a>  can be taken as a reference point
+for the required modifications in our system architecture.
+<br/><br/>
+However, to minimize the impact of changes in the code in the case we want to change the communication protocol, 
+we have developed 
+the custom library <bc>unibonoawtsupports.jar</bc> that provides a support for communications based on connection-based, 
+two-way protocols such as <tt>TCP, UDP</tt>, etc. or a serial line (the case of <tt>Arduino</tt>).  
+
+<center><img src="./img/noawtsupport.png" alt="noawtsupport" width="40%" height="40%"></center>
+
+<hr/>
+<h4>The library <tt>unibonoawtsupports</tt> </h4>
+<m>
+The library  includes:
+<ul>
+<li>a set of specialized factories (<tt>FactoryTcpProtocol</tt>, <tt>FactoryUdpProtocol</tt>, etc.) that 
+provide protocol-specific supports (sockets, datagrams etc);  </li>
+<li> the factory <bc>FactoryProtocol</bc> that hides  details related to the specific protocol.
+Each operation of the factory returns an object that implements the interface <bc>IConnInteraction</bc> 
+(defined in the custom library <bc>uniboInterfaces.jar</bc>) 
+that can be used to send/receive information on the connection.
+
+<pre>
+public interface <k>IConnInteraction</k> {
+    void <ks>sendALine</ks>(String s) throws Exception;
+    String <ks>receiveALine</ks>() throws Exception;
+    void <ks>closeConnection</ks>() throws Exception;
+}
+</pre>
+</li>
+</ul>
+</m>
+<hr/>
+
 The main project choice is related to
 question of the location of the server-TCP socket. The most 'natural' choice seems to activate a the server-socket
 on the node that runs the <em>radarGui</em>, by considering (in a <tt>IOT</tt> perspective) the radar  as a 'service' used by the 'robot-as-thing'.
-<br/><br/>
+<div class="remark">
 The task of building such a TCP-based system is left to the reader, with the goal to keep track of the time required
 to build a working prototype and to 'document' in a proper way the solution. 
+</div>
 
-<h3>Interaction based on a CoAP-Resource</h3>
+
+<h3 id="bottomCoap">Interaction based on a CoAP-Resource</h3>
 According to 
 <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.coapintro/userDocs/LabCoAP.html" target="lab">
 LabCoAP | Introduction to CoAP</a>, let us introduce first of all a CoAP resource :
@@ -359,6 +395,8 @@ The Kotlin object <a href="../resources/coap/sonarDataSimulatorCoap.kt" target="
 <li>Launch <a href="../resources/coap/sonarDataSimulatorCoap.kt" target="code">sonarDataSimulatorCoap.kt</a></li>
 </ol>
 
+<hr/>
+<m>
 Remember that the <i>Californium framework</i> makes use of the logger library <tt>slf4j</tt> that should be included
 in the dependencies: 
 <pre>
@@ -370,7 +408,8 @@ This library
 <li>Requires the presence in the directory <k>src</k> of the file <a href="../src/log4j.properties" target="code">log4j.properties</a> </li>
 <li>generates (at run-time) the file <ks>log4jInfo.log</ks></li>
 </ul>
- 
+</m>
+<hr/> 
 <!--
 <table style="width:98%">
 <tbody>	
@@ -400,8 +439,8 @@ The <em>radarGuiservice</em> is now an observer of the CoAP resource that runs o
 <br/><br/>
 The CoAP resource can run both on the Raspberry and on the PC.
 <br/><br/>
-See <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.raspIntro2020/userDocs/LabSonar_2020.html" target="lab">
-LabSonar_2020 | The interaction robot-radar</a> 
+See <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.raspIntro2020/userDocs/LabRobotRadar_2020.html" target="lab">
+LabRobotRadar_2020 | A robot-radar system</a> 
 </td>
 </tr>
 </tbody>
@@ -552,7 +591,7 @@ The picture excludes
 <br/>
 -->
 
-<h2>Towards a standard set of high-level concepts</h2>
+<h3 id="hlconcepts">Towards a standard set of high-level concepts</h3>
 Let us introduce a more precise (although still informal) description of the terminology used so far:<br/><br/>
 <table style="width:98%">
 <tbody>	
@@ -573,12 +612,234 @@ Each of these terms captures an abstraction can should be implemented in some wa
 </tbody>
 </table>
 <br/>
-The <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
-Qak metamodel </a>  gives a formal definition of these terms, by providing also a run-time library (<tt>it.unibo.qakactor-1.2.jar</tt>) that can help
-in implementation and a software factory (the <tt>it.unibo.Qactork_1.1.7.</tt> plugins for Eclipse) that provides a custom (Domain Specific) language and code generation.
+The set of high-level concepts introduced above, can be used during problem analysis to better understand the requirements and to avoid any
+premature technology-lock. Moreover, it can be used a a guide to design and build a run-time support able to allow a software designer
+to develop the interaction between the components of a software applications in terms of <tt>dispatch/request/event</tt> 
+rather than in term of network-communication supports.
 
+<h2 id="platform">Building a platform</h2>
+A proper run-time support has been developed in the project <k>it.unibo.qakactor</k> that  includes a set
+of kotlin classes developed under <tt>IntelliJ IDEA Community Edition</tt>. Among them, there are
+:
+<ol>
+<li> <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a> is
+.
+
+</li>
+<li> <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">ActorBasicFsm.kt</a> is
+an abstract class  that extends <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a> 
+by defining the  method <k>actorBody</k> ao to implement the behavior of a <tt>FSM</tt>.  
+</li>
+<li><a href="../../it.unibo.qakactor/src/main/kotlin/ApplMessage.kt" target="code">ApplMessage.kt</a> (that requires
+<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a> )</li>
+<li><a href="../../it.unibo.qakactor/src/main/kotlin/MsgUtil.kt" target="code">MsgUtil.kt</a></li>
+</ol>
+
+<h3>ActorBasic</h3>
+
+ <table style="width:100%">
+<tr>
+ 
+<td width="50%">
+ <m><pre>
+ abstract class  ActorBasic(val name:        String,
+                           val scope:        CoroutineScope = GlobalScope,
+                           val confined :    Boolean = false,
+                           val ioBound :     Boolean = false,
+                           val channelSize : Int = 50
+                        ) : <k>MqttCallback</k> { <kc>//For MQTT messages</kc>
+
+    <kc>@kotlinx.coroutines.ExperimentalCoroutinesApi
+    @kotlinx.coroutines.ObsoleteCoroutinesApi</kc>
+    val <k>actor</k> = <ks>scope.actor&lt;ApplMessage></ks>( dispatcher, capacity=channelSize ) {
+         for( <ks>msg</ks> <k>in channel</k> ) {
+			...
+			<ks>actorBody( msg )</ks>
+		}
+    <kc>//To be defined by the application designer</kc>
+    <k>abstract suspend</k> fun <ks>actorBody</ks>(msg : ApplMessage)
+
+    <k>suspend open fun</k> <ks>autoMsg</ks>(  msg : ApplMessage) {
+      actor.send( msg )
+    }
+	
+     suspend fun <k>sendMessageToActor</k>( <kc>//Implements message-sending</kc>
+	  msg : ApplMessage , destName: String, conn : IConnInteraction? = null ) { ... }
+
+    <k>suspend fun</k> <ks>forward</ks>(msgId : String, msg: String, destName: String) {
+        val m = <ks>MsgUtil.buildDispatch</ks>(name, msgId, msg, destName)
+        <k>sendMessageToActor</k>( m, destName)	<kc>//</kc>
+     }	
+	 
+    <k>suspend fun</k> <ks>request</ks>( msgId : String, msg: String, destActor: ActorBasic) {
+        val m = <ks>MsgUtil.buildRequest</ks>(name, msgId, msg, destName)
+        <k>sendMessageToActor</k>( m, destName)	<kc>//</kc>
+	 }
+	 ...
+}
+</pre></m>
+</td>
+<td width="50%">
+<m>
+<img src="./img/actorBasic.png" alt="actorBasic" width="90" > <br/>
+<em>ActorBasic</em> is an abstract class  that implements the concept of <tt>qakactor</tt> as a message-driven entity that
+handles messages by delegating the work to the abstract the method <tt>actorBody</tt>
+<br/><br/>
+The methods that an application designer can used to deliver messages are:<br/>
+<ul>
+<li><ks>forward</ks> for a Dispatch</li>
+<li><ks>request</ks> for a Request</li>
+<li><ks>emit</ks> for an Event</li>
+</ul>
+
+To receive messages, the application designer must write the <ks>actorBody</ks> method.
+Thus, <em>ActorBasic</em> promotes a <k>message-driven</k> behavior.
+<br/><br/>
+A received message of type:
+<a href="../../it.unibo.qakactor/src/main/kotlin/ApplMessage.kt" target="code">ApplMessage.kt</a> (requires
+<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a>). Some help in building and sending
+messages is given by 
+<a href="../../it.unibo.qakactor/src/main/kotlin/MsgUtil.kt" target="code">MsgUtil.kt</a>.
+<br/><br/>
+The full code is in <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a>
+</m>
+</td>
+</tr>
+</table>
+</center>
+
+<h4>Example</h4>
+See <a href="../resources/actors/RadarGui.kt" target="code">RadarGui.kt</a>
+
+<br/><br/>
+
+<h3>ActorBasicFsm</h3>
+To provide actors with <k>message-based</k> behavior rather than <k>message-driven</k> behavior, we introduce the class
+<a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">ActorBasicFsm.kt</a>
+that allows an application designer to structure the code of a component as a
+<a href="https://en.wikipedia.org/wiki/Finite-state_machine" target="web">Finite State Machine</a> (<bc>FSM</bc>) based on the following
+concepts:
+
+<ol>
+<li>A fsm-actor can be described as a 5-tuple <ks>(States, Inputs, Outputs, Transitions, InitialState)</ks>:
+ 
+<ul>
+<li><em>States</em>: Set of possible states (called state space)</li>
+<li><em>Inputs</em>: Set of possible input elements (called <tt>input alphabet</tt>; in our case <i>messages</i>)</li>
+<li><em>Outputs</em>: Set of possible output elements (called <tt>output alphabet</tt>; in our case <i>actions</i> ) </li>
+<li><em>InitialState</em>: The initial state</li>
+<li><em>Transition</em>: A <tt>Transition</tt> defines the new state and output given the current state and input.
+It is often expressed by two functions:
+<pre>
+nextState:      States x Inputs -> States
+output:         States x Inputs -> Outputs
+</pre>
+</li>
+</ul>
+ 
+
+</li>
+<li>A fsm-actor is a <bc>Moore FSM</bc>, that generates output while it is in a particular state (output depends on state only).
+Thus, when the fsm-actor is in state, it first executes a sequence of <bc>terminating Actions</bc> and then  checks 
+for the possibility to 'fire' a transition among the set of the active transitions related to that state. </li>
+</ol>
+
+The logic of the infrastructural layer is summarized in the following figure:
+<br/><br/>
+<center><table style="width:98%">
+<tbody>	
+<tr>
+<td style="width:55%"><img src="./img/actorBasicFsm.png" alt="actorBasicFsm." width="98%" height="40%"/></td>
+ <td><m>
+
+ When a message <tt>msg</tt> is (<i>event-driven</i>) received, the actor checks for a possible transition for that <tt>msg</tt> in the <tt>current state</tt>.
+ <br/> <br/>
+If no transition is possible, the message <tt>msg</tt> is <b>discarded if it is an event</b>; otherwise it us stored in a local queue.
+ <br/> <br/>
+If the transition is possible, the actor goes into the next state related to that transition and then looks at empty moves or to transitions
+related to stored messages. 
+ <br/><br/>
+ The actor attempts to manage <b>all</b> the stored messages before looking to a new message.
+<div class="remark">
+This behavior is implemented as a 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/it.unibo.kotlin.dsl/userDocs/LabDsl.html" target="web">Kotlin internal DSL</a>
+<!-- (see <a href="#impl">About implementation</a>)
+in <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">
+it.unibo.qakactor.ActorBasicFsm.kt</a>. -->
+</div>
+</m> 
+ </td>
+</tr>
+</table>
+</center>
+<h4>Example</h4>
+This kind of actor is introduced to be used together with a DSL. An example (taken from the code generated by the Qak factory) is
+in <a href="../resources/actors/RadarGuiFsm.kt" target="code">RadarGuiFsm.kt</a>
+
+
+
+<h3>Towards distribution</h3>
+An important <em>internal requirement</em> seems to arise at this point:
+
+<div class="req"><m>
+Since the components could be allocated on different computational nodes, we should provide
+the possibility of a proper <em>system description</em>, to be used 
+to build in automatic way the proper infrastructural network support. </m>
+</div>	
+
+To achieve this goal, we start from the idea that a system is composed of a set of components (each conceived as an actor of type <em>ActorBasic</em>
+or <em>ActorBasicFsm</em>) that work into a set of (different) computational nodes (<em>Contexts</em>), of type 
+<a href="../../it.unibo.qakactor/src/main/kotlin/QakContext.kt" target="code">QakContext.kt</a>.
+<br/><br/>
+... TO BE COMPLETED ...
+<!--
+The description of the system configuration must be wriiten in Prolog syntax in a file. For example:
+<br/><br/>
+
+<center><table style="width:98%">
+<tbody>	
+
+<tr>
+<td style="width:50%">
+ 
+<h5>Description of a distributed ButtonLed system</h5>
+<pre>
+context(ctxButton,"localhost", "TCP", 8010).
+context(ctxLeds1, "localhost", "TCP", 8020).
+context(ctxLeds2, "localhost", "TCP", 8030).
+
+qactor( button,  ctxButton, "it.unibo.bls19d.chain.ButtonGuiActork").
+qactor( control, ctxButton, "it.unibo.bls19d.chain.ControlActor").
+
+qactor( led1, ctxLeds1, "it.unibo.bls19d.qak.LedActork" ).
+qactor( led2, ctxLeds1, "it.unibo.bls19d.qak.LedActork" ).
+qactor( led3, ctxLeds1, "it.unibo.bls19d.qak.LedActork" ).
+
+qactor( led4, ctxLeds2, "it.unibo.bls19d.qak.LedActork" ).
+qactor( led5, ctxLeds2, "it.unibo.bls19d.qak.LedActork" ).
+
+</pre>
+
+
+</td>
+<td><h5>Meaning of the description</h5>
+<ol>
+<li>The system is composed of three computational nodes.</li>
+<li>The <tt>control</tt> works in the same context of the <tt>button</tt>. </li>
+<li>The <tt>leds</tt> are spread on two different nodes.</li>
+</ol>
+</td>
+</tr>
+
+</tbody>	
+</table></center>
+-->
 
 <h1>A model-based approach</h1> 
+The <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+Qak metamodel </a>  gives a formal definition of the terms introduced in <a href="#hlconcepts">High-level concepts</a>, 
+and is connected with a software factory (the <tt>it.unibo.Qactork_1.1.7.</tt> plugins for Eclipse) that provides a custom (Domain Specific) language 
+and code generation that uses the run-time library (<tt>it.unibo.qakactor-1.2.jar</tt>)  introduced in <a href="#platform">Building a platform</a>.
 
 Using the <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
 Qak metamodel </a>, the <em>radarGui</em> agent can be modeled as an actor able to handle messages (Dispatch, Request) or Events. 
@@ -759,26 +1020,24 @@ will consume the replies at some later time.
 </table>
 
 <h3>Final Notes (Sprint Review)</h3>
-Initially, we put the <tt>sonarsimulator</tt> in the same context of the <em>radargui</em>. Later, it can be put
-in a different context and replaced by another actor that handles real data coming from a <tt>HC-SR04</tt> sonar device. 
-An example is given in 
-
- <br/> <br/>
 
 The model described in the file <a href="../src/radar.qak" target="code">radar.qak</a>, can be put in execution; this fact gives us
 the opportunity to interact quite soon with the customer, and to understand and fix the system requirements. All the technological details related to
 network communications are hidden behind the scenes in the Qak platform, that creates a TCP-server in each context (see
 <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html#QakInfrastructure" target="web">
 LabQakIntro2020.html | QakInfrastructure</a>).
+ <br/> <br/>
+Initially, we put the <tt>sonarsimulator</tt> in the same context of the <em>radargui</em>. Later, it can be put
+in a different context and replaced by another actor that handles real data coming from a <tt>HC-SR04</tt> sonar device. 
  
 <h2>1.2) Using a MQTT broker</h2>
 Now, let us suppose that we want to change the component interaction by using the <i>Message Queue Telemetry Transport</i> (MQTT) protocol and a 
-Moquitto MQTT broker.
+<a href="https://mosquitto.org/" target="web">Mosquitto </a>MQTT broker.
 <br/><br/>
 In a bottom-up approach, it is highly probable that we have to change our code in a significant way. But we
 must ask ourselves whether the usage of a MQTT broker changes the logic of our system. If not, the model above is still valid, and we
 should 'only' replace the default QAk infrastructure (based on Context-TCP-servers)  with another infrastructure that implements the
-high level concepts of Dispatch and Request by using the MQTT broker.
+high level concepts of Dispatch and Request by using MQTT.
 <br/><br/>
 This 'change of infrastucture' can be done by the QAk software factory by introducing a declaration for the MQTT broker to use and
 a <k>+mqtt</k> flag on the Context:
@@ -829,7 +1088,8 @@ LabRadarUsage | Using the RadarGUI service</a>
 
 
 <h2>2) Using CoAP resources</h2>
- 
+ <br/><br/>
+... TO BE COMPLETED ...
 <!--
 A ddr robot  equipped with a <tt>HC-SR04</tt> sonar device on its front can be considered as an autonomous agent, able to produce sonar data
 that can be consumed by some other (remote) agent.<br/>

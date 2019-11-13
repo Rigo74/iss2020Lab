@@ -21,6 +21,7 @@ private BufferedReader reader;
 		
 		new Thread() {
 			public void run() {
+				System.out.println("SonarOnRaspCoap reader starts  "   );
 		        int numData     = 5;
 		        int dataCounter = 1;
 		        Process p;
@@ -31,11 +32,12 @@ private BufferedReader reader;
 			        while( true ){
  			        	String data = reader.readLine();
 				        dataCounter++;
-				        //System.out.println("data  " + data )
 				        if( dataCounter % numData == 0 ) { //every numData ...
+					        System.out.println("data  " + data );
  				        	ApplMessage m = new ApplMessage(
 						        "sonar", ApplMessageType.event.toString(),
-					        	"sonarRasp", "none", data, ""+dataCounter, null);
+					        	"sonarRasp", "none", "sonar("+data+")", ""+dataCounter, null);
+ 				        	System.out.println("EMIT m=  " + m );
  				        	if( ! coapSupport.updateResource( m.toString() ) ) 
  				        		System.out.println("EMIT failure"  );
 				        }

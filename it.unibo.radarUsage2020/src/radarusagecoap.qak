@@ -1,0 +1,57 @@
+/*
+ * =======================================================
+ * A PROJECT model for the robot/radar system
+ * =======================================================
+ */
+System  /* -trace */ radarusagecoap 
+
+Event    sonar  : sonar(D)
+Dispatch sonar  : sonar(D)
+
+Context ctxRadarUsageCoap ip [ host= "localhost"     port= 8044 ]  
+
+QActor radarusagecoap  context ctxRadarUsageCoap{
+[" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store the results of run	
+	
+	State s0 initial{
+		println("radarusagecoap | start")
+		run utils.coapActorSupport.connect( myself, "coap://localhost:5683/robot/sonar"  )
+		run utils.coapActorSupport.observeResource( myself   )
+	}
+	Goto workUsingCoap
+	
+ 	
+	State workUsingCoap{
+ 		run utils.coapActorSupport.updateResource( myself, "40" )
+ 		delay 100
+ 		run utils.coapActorSupport.readResource( myself, ResultMap, "sonarVal" )
+ 		[" val Result = ResultMap.remove(\"sonarVal\")"]
+ 		println("radarusagecoap | Data GET from sonar: $Result")
+	}  
+	//Goto end
+	//Transition t0 whenEvent sonar -> handleSonarData //WRONG: events are not propagated to the emitter
+	Transition t0
+		whenMsg sonar -> handleSonarData
+		
+ 	State handleSonarData{
+		printCurrentMessage
+	}
+	Transition t0
+		whenMsg sonar -> handleSonarData
+
+	State end{
+		println("radarusagecoap | end")
+	}
+}
+
+QActor sonardataobserver context ctxRadarUsageCoap{
+	State s0 initial{	println("sonardataobserver | start") 	} 
+	Transition t0
+		whenEvent sonar -> handleSonarData
+	
+	State handleSonarData{
+		printCurrentMessage
+	}
+	Transition t0
+		whenEvent sonar -> handleSonarData
+}
