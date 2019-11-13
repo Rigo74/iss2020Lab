@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<link rel="stylesheet" type="text/css" href="style.css">
+    
+<head>
+   
+<title>SonarRadar client-server request-response</title>
+</head>
+    
+<body>
+
+<div id="top">
+<h1>SonarRadar client-server request-response</h1>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">
+    <img src="me.jpg" width="64px" height="64px" /><span style="font-size: large;">By Stefano Righini email: stefano.righini6@studio.unibo.it</span>
+</div>
+</div>  
+
+<div class="body"> 
+<h2>Introduction</h2>
+We are giong to build a software <em>system</em> composed by a <em>radar</em> and a <em>sonar</em>. 
+The <em>radar</em> has to show the data received from the <em>sonar</em>.
+
+<h2>Requirements</h2>
+<div class="req">
+    Design and build a software system with the components <em>radar</em> and a <em>sonar</em>, so that: 
+    <ul>
+        <li>the communication will be of kind request-response</li>
+        <li>the <em>sonar</em> has to send the <k>distance</k> to the <em>radar</em> that has to show it</li>
+    </ul>
+</div>
+
+<h3>Premise</h3>
+
+We know that:
+<ul>
+    <li>
+        we have already a program <em>sonar-alone</em> that reads the distance and send it in output
+    </li>
+    <li>
+        we have already a program <em>radar-pojo</em> that creates a visual radar
+    </li>
+    <li>
+        we have an implementation of this system that use a fire-and-forget kind of communication
+    </li>
+</ul>
+
+<h2>Requirement analysis</h2>
+
+In this requirements analisys we will consider the system composed by two nodes: the <em>sonar</em> and the <em>radar</em>. 
+The <em>radar</em> will be the server and the <em>sonar</em> will be the client.
+ 
+
+<h2>Problem analysis</h2>
+<h3>the sonar system</h3>
+<table>
+    <tr>
+        <td style="width: 50%">
+            Sonar
+        </td>
+        <td style="width: 50%">
+            Radar            
+        </td>
+    </tr>
+    <tr>
+        <td style="width: 50%">
+            <img src="SonarReqRes.svg" />
+        </td>
+        <td style="width: 50%">
+            <img src="RadarReqRes.svg" />            
+        </td>
+    </tr>
+</table>
+
+<h2>Project</h2> 
+
+    <table>
+    <tr>
+    <td>
+    Sonar
+    </td>
+    <td>
+    Radar            
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <pre>
+    public class SonarEntryPoint {
+
+        private static final String SERVER_HOST = "localhost";
+        private static final int SERVER_PORT = 6789;
+        private static final String EXEC_CMD = "sudo ./SonarAlone";
+        
+        public void start() throws UnknownHostException, IOException {
+            final Socket radarServer = new Socket(SERVER_HOST, SERVER_PORT);
+            final Process sonar = Runtime.getRuntime().exec(EXEC_CMD);
+            new SonarManager(
+                sonar.getInputStream(), 
+                radarServer.getOutputStream(), 
+                radarServer.getInputStream(),
+                () -> this.onConnectionEnd(radarServer)
+            ).start();
+        }
+        
+        private void onConnectionEnd(final Socket socket) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.exit(1);
+            }
+        }
+        
+        public static void main(String[] args) {
+            try {
+                new SonarEntryPoint().start();
+            } catch (Exception e) {
+                System.err.println("Error initializing the program.");
+                System.exit(1);
+            }
+        }
+
+    }
+    </pre>
+    </td>
+    <td>
+    <pre>
+    public class RadarEntryPoint {
+
+    private final int port;
+
+    public RadarEntryPoint(final int port) {
+    radarPojo.radarSupport.setUpRadarGui();
+    this.port = port;
+    }
+
+    public void start() throws Exception {
+    final ServerSocket welcomeSocket = new ServerSocket(port);
+    while(true) {
+        final Socket connectionSocket = welcomeSocket.accept();
+        new RadarServer(
+            connectionSocket.getInputStream(), 
+            connectionSocket.getOutputStream(), 
+            () -> this.onConnectionEnd(connectionSocket)
+        ).start();
+    }
+    }
+
+    private void onConnectionEnd(final Socket socket) {
+    try {
+        socket.close();
+    } catch (IOException e) {}
+    }
+
+    public static void main(String argv[]) throws Exception {
+    new RadarEntryPoint(6789).start();
+    }
+
+    }
+    </pre>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <pre>
+    public class SonarManager extends Thread {
+
+        private final BufferedReader sonarInputStream;
+        private final OutputStream radarOutputStream;
+        private final BufferedReader radarInputStream;
+        private final Runnable onEnd;
+        private boolean hasToWork = true;
+        private State state = State.WORK;
+        private Optional<String> sonarDistance = Optional.empty();
+        
+        public SonarManager(final InputStream sonarInputStream, 
+                final OutputStream radarOutputStream,
+                final InputStream radarInputStream, 
+                final Runnable onEnd) {
+            this.sonarInputStream = new BufferedReader(new InputStreamReader(sonarInputStream));
+            this.radarOutputStream = radarOutputStream;
+            this.radarInputStream = new BufferedReader(new InputStreamReader(radarInputStream));
+            this.onEnd = onEnd;
+        }
+        
+        @Override
+        public void run() {
+            while(hasToWork) {
+                switch (state) {
+                    case WORK: work(); break;
+                    case SEND_DISTANCE: sendDistance(); break;
+                    case WAIT_REPLY: waitReply(); break;
+                    case STOP: stopWork(); break;
+                    default: break;
+                }
+            }
+        }
+        
+        private void work() {
+            sonarDistance = receiveMessage(sonarInputStream);
+            state = State.SEND_DISTANCE;
+        }
+        
+        private void sendDistance() {
+            sonarDistance.ifPresent(this::sendMessage);
+            state = State.WAIT_REPLY;
+        }
+        
+        private void waitReply() {
+            final Optional<String> data = receiveMessage(radarInputStream);
+            data.ifPresent(message -> {
+                if (Message.ACK.getMessage().equals(message))
+                    state = State.WORK;
+            });
+        }
+        
+        private Optional<String> receiveMessage(final BufferedReader in) {
+            try {
+                return Optional.ofNullable(in.readLine());
+            } catch (IOException e) {
+                System.err.println("ERROR: Message cannot be received.");
+                state = State.STOP;
+                return Optional.empty();
+            }
+        }
+        
+        private void sendMessage(final String data) {
+            try {
+                radarOutputStream.write((data + "\n").getBytes());
+            } catch (IOException e) {
+                System.err.println("ERROR: Message cannot be sent.");
+                state = State.STOP;
+            }
+        }
+        
+        private void stopWork() {
+            hasToWork = false;
+            try {
+                sonarInputStream.close();
+                radarOutputStream.close();
+                onEnd.run();
+            } catch (IOException e) {
+                onEnd.run();
+            }
+        }
+        
+        private enum State {
+            WORK,SEND_DISTANCE,WAIT_REPLY,STOP
+        }
+    }
+    </pre>
+    </td>
+    <td>
+    <pre>
+    public class RadarServer extends Thread {
+
+    private static final String THETA = "0.0";
+    private final BufferedReader sonarInputStream;
+    private final OutputStream sonarOutputStream;
+    private final Runnable onEnd;
+    private boolean hasToWork = true;
+    private Optional<String> sonarDistance = Optional.empty();
+    private State state = State.WORK;
+
+    public RadarServer(final InputStream sonarInputStream, 
+                    final OutputStream sonarOutputStream,
+                    final Runnable onEnd) {
+    this.sonarInputStream = new BufferedReader(new InputStreamReader(sonarInputStream));
+    this.sonarOutputStream = sonarOutputStream;
+    this.onEnd = onEnd;
+    }
+
+    @Override
+    public void run() {
+    while(hasToWork)
+        switch (state) {
+            case WORK: work(); break;
+            case UPDATE_POJO: updatePojo(); break;
+            case REPLY: reply(); break;
+            case STOP: stopWork(); break;
+            default: break;
+        }
+    }
+
+    private void work() {
+    sonarDistance = receiveMessage();
+    state = State.UPDATE_POJO;
+    }
+
+    private void updatePojo() {
+    sonarDistance.ifPresent(distance -> 
+        radarPojo.radarSupport.update(String.valueOf(Double.parseDouble(distance)), THETA));
+    state = State.REPLY;
+    }
+
+    private void reply() {
+    sendMessage(Message.ACK.getMessage());
+    state = State.WORK;
+    }
+
+    private Optional<String> receiveMessage() {
+    try {
+        return Optional.ofNullable(sonarInputStream.readLine());
+    } catch (IOException e) {
+        state = State.STOP;
+        return Optional.empty();
+    }
+    }
+
+    private void sendMessage(final String message) {
+    try {
+        sonarOutputStream.write((message + "\n").getBytes());
+    } catch (IOException e) {
+        state = State.STOP;
+    }
+    }
+
+    private void stopWork() {
+    hasToWork = false;
+    try {
+        sonarInputStream.close();
+        sonarOutputStream.close();
+        onEnd.run();
+    } catch (IOException e) {
+        onEnd.run();
+    }
+    }
+
+    private enum State {
+    WORK,UPDATE_POJO,REPLY,STOP
+    }
+
+    }
+    </pre>
+    </td>
+    </tr>
+    </table>
+
+</div>
+</body>
+</html>
