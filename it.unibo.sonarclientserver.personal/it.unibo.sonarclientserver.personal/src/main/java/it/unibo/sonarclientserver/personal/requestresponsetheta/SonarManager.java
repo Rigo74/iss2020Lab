@@ -1,4 +1,4 @@
-package it.unibo.sonarclientserver.personal.requestresponse;
+package it.unibo.sonarclientserver.personal.requestresponsetheta;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +18,7 @@ public class SonarManager extends Thread {
 	private boolean hasToWork = true;
 	private State state = State.WORK;
 	private Optional<String> sonarDistance = Optional.empty();
+	private Optional<String> sonarTheta = Optional.empty();
 	
 	public SonarManager(final InputStream sonarInputStream, 
 			final OutputStream radarOutputStream,
@@ -36,6 +37,8 @@ public class SonarManager extends Thread {
 				case WORK: work(); break;
 				case SEND_DISTANCE: sendDistance(); break;
 				case WAIT_REPLY: waitReply(); break;
+				case SEND_THETA: sendTheta(); break;
+				case WAIT_ACK: waitAck(); break;
 				case STOP: stopWork(); break;
 				default: break;
 			}
@@ -43,8 +46,14 @@ public class SonarManager extends Thread {
 	}
 	
 	private void work() {
-		sonarDistance = receiveMessage(sonarInputStream);
-		state = State.SEND_DISTANCE;
+		receiveMessage(sonarInputStream).ifPresent(sonarData -> {
+			final String[] datas = sonarData.split("-");
+			if (datas.length == 2) {
+				sonarDistance = Optional.ofNullable(datas[0]);
+				sonarTheta = Optional.ofNullable(datas[1]);
+				state = State.SEND_DISTANCE;
+			}
+		});
 	}
 	
 	private void sendDistance() {
@@ -53,9 +62,22 @@ public class SonarManager extends Thread {
 	}
 	
 	private void waitReply() {
-		final Optional<String> data = receiveMessage(radarInputStream);
-		data.ifPresent(message -> {
-			if (Message.ACK.getMessage().equals(message))
+		receiveMessage(radarInputStream).ifPresent(reply -> {
+			if (Message.REQUEST_THETA.getMessage().equals(reply))
+				state = State.SEND_THETA;
+			else if (Message.ACK.getMessage().equals(reply))
+				state = State.WORK;
+		});
+	}
+	
+	private void sendTheta() {
+		sonarTheta.ifPresent(this::sendMessage);
+		state = State.WAIT_ACK;
+	}
+	
+	private void waitAck() {
+		receiveMessage(radarInputStream).ifPresent(reply -> {
+			if (Message.ACK.getMessage().equals(reply))
 				state = State.WORK;
 		});
 	}
@@ -91,6 +113,6 @@ public class SonarManager extends Thread {
 	}
 	
 	private enum State {
-		WORK,SEND_DISTANCE,WAIT_REPLY,STOP
+		WORK,SEND_DISTANCE,WAIT_REPLY,SEND_THETA,WAIT_ACK,STOP
 	}
 }

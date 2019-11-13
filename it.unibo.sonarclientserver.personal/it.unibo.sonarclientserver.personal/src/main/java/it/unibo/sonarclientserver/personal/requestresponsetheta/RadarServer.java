@@ -1,4 +1,4 @@
-package it.unibo.sonarclientserver.personal.requestresponse;
+package it.unibo.sonarclientserver.personal.requestresponsetheta;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,12 +11,12 @@ import it.unibo.sonarclientserver.personal.commons.Message;
 
 public class RadarServer extends Thread {
 	
-	private static final String THETA = "0.0";
 	private final BufferedReader sonarInputStream;
 	private final OutputStream sonarOutputStream;
 	private final Runnable onEnd;
 	private boolean hasToWork = true;
 	private Optional<String> sonarDistance = Optional.empty();
+	private Optional<String> sonarTheta = Optional.empty();
 	private State state = State.WORK;
 	
 	public RadarServer(final InputStream sonarInputStream, final OutputStream sonarOutputStream, final Runnable onEnd) {
@@ -30,6 +30,7 @@ public class RadarServer extends Thread {
 		while(hasToWork)
 			switch (state) {
 				case WORK: work(); break;
+				case REQUEST_THETA: requestTheta(); break;
 				case UPDATE_POJO: updatePojo(); break;
 				case REPLY: reply(); break;
 				case STOP: stopWork(); break;
@@ -39,12 +40,20 @@ public class RadarServer extends Thread {
 	
 	private void work() {
 		sonarDistance = receiveMessage();
+		state = State.REQUEST_THETA;
+	}
+	
+	private void requestTheta() {
+		sendMessage(Message.REQUEST_THETA.getMessage());
+		sonarTheta = receiveMessage();
 		state = State.UPDATE_POJO;
 	}
 	
 	private void updatePojo() {
-		sonarDistance.ifPresent(distance -> 
-			radarPojo.radarSupport.update(String.valueOf(Double.parseDouble(distance)), THETA));
+		sonarDistance.ifPresent(distance -> sonarTheta.ifPresent(theta -> 
+			radarPojo.radarSupport.update(
+					String.valueOf(Double.parseDouble(distance)),
+					String.valueOf(Double.parseDouble(theta)))));
 		state = State.REPLY;
 	}
 	
@@ -82,7 +91,8 @@ public class RadarServer extends Thread {
 	}
 	
 	private enum State {
-		WORK,UPDATE_POJO,REPLY,STOP
+		WORK,REQUEST_THETA,UPDATE_POJO,REPLY,STOP
 	}
 
 }
+

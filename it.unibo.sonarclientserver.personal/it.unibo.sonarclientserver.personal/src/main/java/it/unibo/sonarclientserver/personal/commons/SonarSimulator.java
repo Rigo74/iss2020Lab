@@ -1,4 +1,4 @@
-package it.unibo.sonarclientserver.personal.simulator;
+package it.unibo.sonarclientserver.personal.commons;
 
 import java.util.Random;
 
@@ -9,8 +9,9 @@ public class SonarSimulator {
 		while(true) {
 			try {
 				Thread.sleep(500);
-				int value = rand.nextInt() % 100;
-				System.out.println(value < 0 ? -value : value);
+				int distance = rand.nextInt(100);
+				int theta = rand.nextInt(360);
+				System.out.println(distance + "-" + theta);
 			} catch (InterruptedException e) {
 				System.exit(1);
 			}
