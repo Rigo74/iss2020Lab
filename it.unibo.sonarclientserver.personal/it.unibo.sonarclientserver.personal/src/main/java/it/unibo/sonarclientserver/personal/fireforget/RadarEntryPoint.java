@@ -5,11 +5,11 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class RadarServer {
+public class RadarEntryPoint {
 	
 	private final int port;
 	
-	public RadarServer(final int port) {
+	public RadarEntryPoint(final int port) {
 		radarPojo.radarSupport.setUpRadarGui();
 		this.port = port;
 	}
@@ -38,7 +38,7 @@ public class RadarServer {
 	}
 	
 	public static void main(String argv[]) throws Exception {
-		new RadarServer(6789).start();
+		new RadarEntryPoint(6789).start();
 	}
 	
 }

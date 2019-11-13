@@ -2,7 +2,7 @@ package it.unibo.sonarclientserver.personal.fireforget;
 
 import java.net.Socket;
 
-public class EntryPoint {
+public class SonarEntryPoint {
 
 	private static final String SERVER_HOST = "localhost";
 	private static final int SERVER_PORT = 6789;
