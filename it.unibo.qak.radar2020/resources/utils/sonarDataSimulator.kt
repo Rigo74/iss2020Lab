@@ -18,6 +18,27 @@ var dataCounter = 1
 			job.join()
 		}
      }
+	
+	/*
+ WARNING: it could block other actors, since blocks a thread
+    */
+	fun  getSonarValBlocking() : String{
+		print("\nsonarValBlocking>" )
+		var data = readLine()
+		println("getSonarValBlocking value=$data " )
+		return data!!
+	}
+
+	suspend fun  getSonarVal() : String{
+		print("\nsonarValFromUser>" )
+		var data : String? = null
+		val job = GlobalScope.launch{	//TO AVOID BLOCKING OF OTHER ACTORS IN THE CONTEXT
+		    data = readLine()
+		    println("getSonarVal value=$data " )
+ 		}
+		job.join()
+		return data!!
+	}
 
 }
  

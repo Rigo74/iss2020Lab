@@ -330,7 +330,7 @@ The system event is <em>not emitted</em> if a message can be handled before that
 
 
 <h2 id="impl">About implementation</h2>
-The metamodel is supported by the <tt>qak-infrastructure</tt> deployed in <bc>it.unibo.qakactor-1.0.jar</bc> 
+The metamodel is supported by the <tt>qak-infrastructure</tt> deployed in <bc>it.unibo.qakactor-1.2.jar</bc> 
 and defined in the project <k>it.unibo.qakactor</k>. This project includes a set
 kotlin classes developed under <tt>IntelliJ IDEA Community Edition</tt>. Among them, there are:
 <ol>
@@ -352,28 +352,97 @@ by defining the  method <k>actorBody</k> ao to implement the behavior of a <tt>F
 
  <table style="width:100%">
 <tr>
-<td width="20%">
-<center>
-<img src="./img/actorBasic.png" alt="actorBasic" width="130" height="100"></center> 
-</td>
-<td width="40%">
+ 
+<td width="50%">
+ <m><pre>
+ abstract class  ActorBasic(val name:        String,
+                           val scope:        CoroutineScope = GlobalScope,
+                           val confined :    Boolean = false,
+                           val ioBound :     Boolean = false,
+                           val channelSize : Int = 50
+                        ) : <k>MqttCallback</k> { <kc>//For MQTT messages</kc>
 
- <pre>
- <center><img src="./img/ActorBasicCode.png" alt="ActorBasicCode" width="450" height="400"></center> 
+    <kc>@kotlinx.coroutines.ExperimentalCoroutinesApi
+    @kotlinx.coroutines.ObsoleteCoroutinesApi</kc>
+    val <k>actor</k> = <ks>scope.actor&lt;ApplMessage></ks>( dispatcher, capacity=channelSize ) {
+         for( <ks>msg</ks> <k>in channel</k> ) {
+			...
+			<ks>actorBody( msg )</ks>
+		}
+    <kc>//To be defined by the application designer</kc>
+    <k>abstract suspend</k> fun <ks>actorBody</ks>(msg : ApplMessage)
 
+    <k>suspend open fun</k> <ks>autoMsg</ks>(  msg : ApplMessage) {
+      actor.send( msg )
+    }
+	
+     suspend fun <k>sendMessageToActor</k>( <kc>//Implements message-sending</kc>
+	  msg : ApplMessage , destName: String, conn : IConnInteraction? = null ) { ... }
+
+    <k>suspend fun</k> <ks>forward</ks>(msgId : String, msg: String, destName: String) {
+        val m = <ks>MsgUtil.buildDispatch</ks>(name, msgId, msg, destName)
+        <k>sendMessageToActor</k>( m, destName)	<kc>//</kc>
+     }	
+	 
+    <k>suspend fun</k> <ks>request</ks>( msgId : String, msg: String, destActor: ActorBasic) {
+        val m = <ks>MsgUtil.buildRequest</ks>(name, msgId, msg, destName)
+        <k>sendMessageToActor</k>( m, destName)	<kc>//</kc>
+	 }
+	 ...
+}
+</pre></m>
 </td>
-<td width="40%">
+<td width="50%">
 <m>
-The application designer must write the <tt>actorBody</tt> method to  handle:
-<li>the received message of type 
-<a href="../../it.unibo.qakactor/src/main/kotlin/ApplMessage.kt" target="code">ApplMessage.kt</a> (that requires
-<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a> )</li>
-<li>with the help of <a href="../../it.unibo.qakactor/src/main/kotlin/MsgUtil.kt" target="code">MsgUtil.kt</a></li>
+<img src="./img/actorBasic.png" alt="actorBasic" width="90" > <br/>
+<em>ActorBasic</em> is an abstract class  that implements the concept of <tt>qakactor</tt> as a message-driven entity that
+handles messages by delegating the work to the abstract the method <tt>actorBody</tt>
+<br/><br/>
+The methods that an application designer can used to deliver messages are:<br/>
+<ul>
+<li><ks>forward</ks> for a Dispatch</li>
+<li><ks>request</ks> for a Request</li>
+<li><ks>emit</ks> for an Event</li>
+</ul>
+
+To receive messages, the application designer must write the <ks>actorBody</ks> method.
+Thus, <em>ActorBasic</em> promotes a <k>message-driven</k> behavior.
+<br/><br/>
+A received message of type:
+<a href="../../it.unibo.qakactor/src/main/kotlin/ApplMessage.kt" target="code">ApplMessage.kt</a> (requires
+<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a>). Some help in building and sending
+messages is given by 
+<a href="../../it.unibo.qakactor/src/main/kotlin/MsgUtil.kt" target="code">MsgUtil.kt</a>.
+<br/><br/>
+The full code is in <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a>
 </m>
 </td>
 </tr>
 </table>
 </center>
+<m>
+We highlight that
+<ol>
+<li>Each <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a> 
+is associated to a dispatcher defined as follows:
+
+<pre>
+    protected val dispatcher =
+        if( <k>confined</k> ) sysUtil.singleThreadContext
+        else  if( <k>ioBound</k> ) sysUtil.ioBoundThreadContext
+              else sysUtil.cpusThreadContext <kc>//Default</kc>
+</pre>
+The default is to use a dispatcher of type <tt>kotlinx.coroutines.newFixedThreadPoolContext</tt> that
+handles as many Threads as the number of CPUs available.
+</li>
+<li>If <k>confined=true</k>, then the actor is activated with a <tt>kotlinx.coroutines.newSingleThreadContext</tt>
+that makes use of just 1 Thread </li>
+
+<li>If <k>confined=true</k>, then the actor is activated with a <tt>kotlinx.coroutines.newFixedThreadPoolContext</tt>
+with 64 Threads </li>
+
+</ol>
+</m>
 
 <br/><br/>
 
