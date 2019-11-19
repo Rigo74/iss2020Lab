@@ -54,8 +54,8 @@ class RadarGuiFsm(name: String, scope: CoroutineScope) : ActorBasicFsm(name, sco
 fun main() = runBlocking {
 	println("RadarGuiFsm | START")
 	val radar = RadarGuiFsm("radarguifsm", this) //this is a CoroutineScope
-	delay(2000)
-	MsgUtil.sendMsg("main", "polar", "polar(60,0)", radar)
-	delay(2000)
-	MsgUtil.sendMsg("main", "polar", "polar(80,0)", radar)
+//	delay(2000)
+//	MsgUtil.sendMsg("main", "polar", "polar(60,0)", radar)
+//	delay(2000)
+//	MsgUtil.sendMsg("main", "polar", "polar(80,0)", radar)
 }

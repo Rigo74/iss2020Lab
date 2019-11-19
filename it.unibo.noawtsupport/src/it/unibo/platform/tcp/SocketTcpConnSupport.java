@@ -94,9 +94,10 @@ private BufferedReader inputChannel;
 			println( "SocketTcpConnSupport | has read ... " +line + " on "+ socket.getLocalPort() );
 			//if( line == null ) Thread.sleep(2000);	//Oct2019
 			return line;		
-		} catch (SocketException e) {
-	 		println( "SocketTcpConnSupport | receiveALine timeOut on" +  socket.getLocalPort());	 		
-			throw e;
+		} catch (Exception e) {
+	 		println( "SocketTcpConnSupport | receiveALine ERROR " + e.getMessage() + " on " +  socket.getLocalPort());	 
+ 	 		//return "msg(error,event,tcpsupport,none,connection(end),1)";  //NOV 2019
+	 		throw e;
 		}
 	}
 	

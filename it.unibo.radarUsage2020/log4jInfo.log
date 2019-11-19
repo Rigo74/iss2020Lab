@@ -218,3 +218,105 @@
 2019-11-12 17:24:50 INFO  UDPConnector:187 - UDPConnector listening on 0.0.0.0/0.0.0.0:50019, recv buf = 65536, send buf = 65536, recv packet size = 2048
 2019-11-12 17:24:50 INFO  CoapEndpoint:485 - Started endpoint at coap://0.0.0.0:50019
 2019-11-12 17:24:50 INFO  EndpointManager:140 - created implicit endpoint coap://0.0.0.0:50019 for coap
+2019-11-13 16:54:32 INFO  NetworkConfig:372 - loading properties from file C:\Didattica2018Work\iss2020Lab\it.unibo.radarUsage2020\Californium.properties
+2019-11-13 16:54:33 INFO  RandomTokenGenerator:55 - using tokens of 8 bytes in length
+2019-11-13 16:54:33 INFO  CoapEndpoint:423 - CoapEndpoint uses udp plain
+2019-11-13 16:54:33 INFO  BlockwiseLayer:207 - BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000 and MAX_RESOURCE_BODY_SIZE=8192
+2019-11-13 16:54:33 INFO  ReliabilityLayer:83 - ReliabilityLayer uses ACK_TIMEOUT=2000, ACK_RANDOM_FACTOR=1.5, and ACK_TIMEOUT_SCALE=2.0
+2019-11-13 16:54:33 INFO  CoapEndpoint:452 - Endpoint [coap://0.0.0.0:0] requires an executor to start, using default single-threaded daemon executor
+2019-11-13 16:54:33 INFO  UDPConnector:161 - UDPConnector starts up 4 sender threads and 4 receiver threads
+2019-11-13 16:54:33 INFO  UDPConnector:187 - UDPConnector listening on 0.0.0.0/0.0.0.0:57484, recv buf = 65536, send buf = 65536, recv packet size = 2048
+2019-11-13 16:54:33 INFO  CoapEndpoint:485 - Started endpoint at coap://0.0.0.0:57484
+2019-11-13 16:54:33 INFO  EndpointManager:140 - created implicit endpoint coap://0.0.0.0:57484 for coap
+2019-11-13 17:11:22 INFO  NetworkConfig:372 - loading properties from file C:\Didattica2018Work\iss2020Lab\it.unibo.radarUsage2020\Californium.properties
+2019-11-13 17:11:23 INFO  RandomTokenGenerator:55 - using tokens of 8 bytes in length
+2019-11-13 17:11:23 INFO  CoapEndpoint:423 - CoapEndpoint uses udp plain
+2019-11-13 17:11:23 INFO  BlockwiseLayer:207 - BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000 and MAX_RESOURCE_BODY_SIZE=8192
+2019-11-13 17:11:23 INFO  ReliabilityLayer:83 - ReliabilityLayer uses ACK_TIMEOUT=2000, ACK_RANDOM_FACTOR=1.5, and ACK_TIMEOUT_SCALE=2.0
+2019-11-13 17:11:23 INFO  CoapEndpoint:452 - Endpoint [coap://0.0.0.0:0] requires an executor to start, using default single-threaded daemon executor
+2019-11-13 17:11:23 INFO  UDPConnector:161 - UDPConnector starts up 4 sender threads and 4 receiver threads
+2019-11-13 17:11:23 INFO  UDPConnector:187 - UDPConnector listening on 0.0.0.0/0.0.0.0:59094, recv buf = 65536, send buf = 65536, recv packet size = 2048
+2019-11-13 17:11:23 INFO  CoapEndpoint:485 - Started endpoint at coap://0.0.0.0:59094
+2019-11-13 17:11:23 INFO  EndpointManager:140 - created implicit endpoint coap://0.0.0.0:59094 for coap
+2019-11-13 17:16:26 INFO  NetworkConfig:372 - loading properties from file C:\Didattica2018Work\iss2020Lab\it.unibo.radarUsage2020\Californium.properties
+2019-11-13 17:16:27 INFO  RandomTokenGenerator:55 - using tokens of 8 bytes in length
+2019-11-13 17:16:27 INFO  CoapEndpoint:423 - CoapEndpoint uses udp plain
+2019-11-13 17:16:27 INFO  BlockwiseLayer:207 - BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000 and MAX_RESOURCE_BODY_SIZE=8192
+2019-11-13 17:16:27 INFO  ReliabilityLayer:83 - ReliabilityLayer uses ACK_TIMEOUT=2000, ACK_RANDOM_FACTOR=1.5, and ACK_TIMEOUT_SCALE=2.0
+2019-11-13 17:16:27 INFO  CoapEndpoint:452 - Endpoint [coap://0.0.0.0:0] requires an executor to start, using default single-threaded daemon executor
+2019-11-13 17:16:27 INFO  UDPConnector:161 - UDPConnector starts up 4 sender threads and 4 receiver threads
+2019-11-13 17:16:27 INFO  UDPConnector:187 - UDPConnector listening on 0.0.0.0/0.0.0.0:58794, recv buf = 65536, send buf = 65536, recv packet size = 2048
+2019-11-13 17:16:27 INFO  CoapEndpoint:485 - Started endpoint at coap://0.0.0.0:58794
+2019-11-13 17:16:27 INFO  EndpointManager:140 - created implicit endpoint coap://0.0.0.0:58794 for coap
+2019-11-13 17:18:26 INFO  NetworkConfig:372 - loading properties from file C:\Didattica2018Work\iss2020Lab\it.unibo.radarUsage2020\Californium.properties
+2019-11-13 17:18:27 INFO  RandomTokenGenerator:55 - using tokens of 8 bytes in length
+2019-11-13 17:18:27 INFO  CoapEndpoint:423 - CoapEndpoint uses udp plain
+2019-11-13 17:18:27 INFO  BlockwiseLayer:207 - BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000 and MAX_RESOURCE_BODY_SIZE=8192
+2019-11-13 17:18:27 INFO  ReliabilityLayer:83 - ReliabilityLayer uses ACK_TIMEOUT=2000, ACK_RANDOM_FACTOR=1.5, and ACK_TIMEOUT_SCALE=2.0
+2019-11-13 17:18:27 INFO  CoapEndpoint:452 - Endpoint [coap://0.0.0.0:0] requires an executor to start, using default single-threaded daemon executor
+2019-11-13 17:18:27 INFO  UDPConnector:161 - UDPConnector starts up 4 sender threads and 4 receiver threads
+2019-11-13 17:18:27 INFO  UDPConnector:187 - UDPConnector listening on 0.0.0.0/0.0.0.0:61454, recv buf = 65536, send buf = 65536, recv packet size = 2048
+2019-11-13 17:18:27 INFO  CoapEndpoint:485 - Started endpoint at coap://0.0.0.0:61454
+2019-11-13 17:18:27 INFO  EndpointManager:140 - created implicit endpoint coap://0.0.0.0:61454 for coap
+2019-11-13 17:19:20 WARN  CoapClient:1377 - exception while handling response
+java.lang.ClassCastException: alice.tuprolog.Int cannot be cast to alice.tuprolog.Struct
+	at it.unibo.kactor.ApplMessage.<init>(ApplMessage.kt:44)
+	at utils.MyHandler.onLoad(coapActorSupport.kt:23)
+	at org.eclipse.californium.core.CoapClient$ObserveMessageObserverImpl.deliver(CoapClient.java:1446)
+	at org.eclipse.californium.core.CoapClient$MessageObserverImpl$1.run(CoapClient.java:1375)
+	at org.eclipse.californium.core.CoapClient.execute(CoapClient.java:1223)
+	at org.eclipse.californium.core.CoapClient$MessageObserverImpl.succeeded(CoapClient.java:1371)
+	at org.eclipse.californium.core.CoapClient$MessageObserverImpl.onResponse(CoapClient.java:1361)
+	at org.eclipse.californium.core.CoapClient$Adapter.onNotification(CoapClient.java:1327)
+	at org.eclipse.californium.core.network.CoapEndpoint$NotificationDispatcher.onNotification(CoapEndpoint.java:696)
+	at org.eclipse.californium.core.network.BaseMatcher$2.onResponse(BaseMatcher.java:240)
+	at org.eclipse.californium.core.coap.Request.setResponse(Request.java:701)
+	at org.eclipse.californium.core.network.EndpointManager$ClientMessageDeliverer.deliverResponse(EndpointManager.java:272)
+	at org.eclipse.californium.core.network.stack.BaseCoapStack$StackTopAdapter.receiveResponse(BaseCoapStack.java:170)
+	at org.eclipse.californium.core.network.stack.AbstractLayer.receiveResponse(AbstractLayer.java:86)
+	at org.eclipse.californium.core.network.stack.ObserveLayer.receiveResponse(ObserveLayer.java:157)
+	at org.eclipse.californium.core.network.stack.BlockwiseLayer.receiveResponse(BlockwiseLayer.java:679)
+	at org.eclipse.californium.core.network.stack.ReliabilityLayer.receiveResponse(ReliabilityLayer.java:286)
+	at org.eclipse.californium.core.network.stack.AbstractLayer.receiveResponse(AbstractLayer.java:86)
+	at org.eclipse.californium.core.network.stack.BaseCoapStack.receiveResponse(BaseCoapStack.java:104)
+	at org.eclipse.californium.core.network.CoapEndpoint$InboxImpl$3.runStriped(CoapEndpoint.java:953)
+	at org.eclipse.californium.core.network.StripedExchangeJob.run(StripedExchangeJob.java:65)
+	at eu.javaspecialists.tjsn.concurrency.stripedexecutor.StripedExecutorService$SerialJob.run(StripedExecutorService.java:548)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)
+2019-11-13 17:19:23 WARN  CoapClient:1377 - exception while handling response
+java.lang.ClassCastException: alice.tuprolog.Int cannot be cast to alice.tuprolog.Struct
+	at it.unibo.kactor.ApplMessage.<init>(ApplMessage.kt:44)
+	at utils.MyHandler.onLoad(coapActorSupport.kt:23)
+	at org.eclipse.californium.core.CoapClient$ObserveMessageObserverImpl.deliver(CoapClient.java:1446)
+	at org.eclipse.californium.core.CoapClient$MessageObserverImpl$1.run(CoapClient.java:1375)
+	at org.eclipse.californium.core.CoapClient.execute(CoapClient.java:1223)
+	at org.eclipse.californium.core.CoapClient$MessageObserverImpl.succeeded(CoapClient.java:1371)
+	at org.eclipse.californium.core.CoapClient$MessageObserverImpl.onResponse(CoapClient.java:1361)
+	at org.eclipse.californium.core.CoapClient$Adapter.onNotification(CoapClient.java:1327)
+	at org.eclipse.californium.core.network.CoapEndpoint$NotificationDispatcher.onNotification(CoapEndpoint.java:696)
+	at org.eclipse.californium.core.network.BaseMatcher$2.onResponse(BaseMatcher.java:240)
+	at org.eclipse.californium.core.coap.Request.setResponse(Request.java:701)
+	at org.eclipse.californium.core.network.EndpointManager$ClientMessageDeliverer.deliverResponse(EndpointManager.java:272)
+	at org.eclipse.californium.core.network.stack.BaseCoapStack$StackTopAdapter.receiveResponse(BaseCoapStack.java:170)
+	at org.eclipse.californium.core.network.stack.AbstractLayer.receiveResponse(AbstractLayer.java:86)
+	at org.eclipse.californium.core.network.stack.ObserveLayer.receiveResponse(ObserveLayer.java:157)
+	at org.eclipse.californium.core.network.stack.BlockwiseLayer.receiveResponse(BlockwiseLayer.java:679)
+	at org.eclipse.californium.core.network.stack.ReliabilityLayer.receiveResponse(ReliabilityLayer.java:286)
+	at org.eclipse.californium.core.network.stack.AbstractLayer.receiveResponse(AbstractLayer.java:86)
+	at org.eclipse.californium.core.network.stack.BaseCoapStack.receiveResponse(BaseCoapStack.java:104)
+	at org.eclipse.californium.core.network.CoapEndpoint$InboxImpl$3.runStriped(CoapEndpoint.java:953)
+	at org.eclipse.californium.core.network.StripedExchangeJob.run(StripedExchangeJob.java:65)
+	at eu.javaspecialists.tjsn.concurrency.stripedexecutor.StripedExecutorService$SerialJob.run(StripedExecutorService.java:548)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source)
+	at java.util.concurrent.FutureTask.run(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.access$201(Unknown Source)
+	at java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.lang.Thread.run(Unknown Source)

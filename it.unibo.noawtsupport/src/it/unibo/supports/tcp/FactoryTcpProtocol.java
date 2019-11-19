@@ -37,6 +37,7 @@ private SocketTcpSupport tcpSupport ;
 	public  IConnInteraction createServerProtocolSupport( int portNum ) throws Exception{
 //		println("createServerProtocolSupport " + portNum  );
 		ServerSocket serverSocket = tcpSupport.connectAsReceiver( portNum );
+		//serverSocket.setSoTimeout(10000);
  		IConnInteraction conn = acceptAConnection(serverSocket); //blocking
 		return conn;  		 
   	}
@@ -55,8 +56,8 @@ private SocketTcpSupport tcpSupport ;
 		return new SocketTcpConnSupport(worker,socket,env);
 	}
 	public  ITcpConnection createServerSupport(  ) throws Exception{
- 		ITcpConnection supportUdp = new SocketTcpSupport(worker, env ); 
- 		return supportUdp;  		 
+ 		ITcpConnection support  = new SocketTcpSupport(worker, env ); 
+ 		return support ;  		 
 	} 
 	protected void showMsg(String msg){
 		System.out.println(msg);

@@ -27,11 +27,15 @@ class Radarusagecoap ( name: String, scope: CoroutineScope ) : ActorBasicFsm( na
 				}	 
 				state("workUsingCoap") { //this:State
 					action { //it:State
-						utils.coapActorSupport.updateResource(myself ,"40" )
-						delay(100) 
+						utils.coapActorSupport.updateResource(myself ,"80" )
+						delay(500) 
 						utils.coapActorSupport.readResource(myself ,ResultMap, "sonarVal" )
 						 val Result = ResultMap.remove("sonarVal")
 						println("radarusagecoap | Data GET from sonar: $Result")
+						delay(5000) 
+						utils.coapActorSupport.updateResource(myself ,"10" )
+						delay(5000) 
+						utils.coapActorSupport.updateResource(myself ,"50" )
 					}
 					 transition(edgeName="t00",targetState="handleSonarData",cond=whenDispatch("sonar"))
 				}	 

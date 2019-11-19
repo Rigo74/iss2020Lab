@@ -146,7 +146,7 @@ table, th, td {
     
 <head>
    
-<title>LabSonar_2020</title></head>
+<title>LabRadarGui</title></head>
     
 <body>
 <div id="body">
@@ -226,40 +226,10 @@ mediator, like a MQTT broker, a CoAP resource, a TupleSpace etc.
 
 In both cases we have to write proper code 'around' our starting available resources.
 
-<h3>Interaction based on TCP</h3>
+<h3 id="TCPinteract">Interaction based on TCP</h3>
 A direct communication based on some standard protocol (e.g. TCP)  can be implemented in a quite easy way. 
 The <a href="https://en.wikipedia.org/wiki/Proxy_pattern" target="web">proxy design pattern</a>  can be taken as a reference point
 for the required modifications in our system architecture.
-<br/><br/>
-However, to minimize the impact of changes in the code in the case we want to change the communication protocol, 
-we have developed 
-the custom library <bc>unibonoawtsupports.jar</bc> that provides a support for communications based on connection-based, 
-two-way protocols such as <tt>TCP, UDP</tt>, etc. or a serial line (the case of <tt>Arduino</tt>).  
-
-<center><img src="./img/noawtsupport.png" alt="noawtsupport" width="40%" height="40%"></center>
-
-<hr/>
-<h4>The library <tt>unibonoawtsupports</tt> </h4>
-<m>
-The library  includes:
-<ul>
-<li>a set of specialized factories (<tt>FactoryTcpProtocol</tt>, <tt>FactoryUdpProtocol</tt>, etc.) that 
-provide protocol-specific supports (sockets, datagrams etc);  </li>
-<li> the factory <bc>FactoryProtocol</bc> that hides  details related to the specific protocol.
-Each operation of the factory returns an object that implements the interface <bc>IConnInteraction</bc> 
-(defined in the custom library <bc>uniboInterfaces.jar</bc>) 
-that can be used to send/receive information on the connection.
-
-<pre>
-public interface <k>IConnInteraction</k> {
-    void <ks>sendALine</ks>(String s) throws Exception;
-    String <ks>receiveALine</ks>() throws Exception;
-    void <ks>closeConnection</ks>() throws Exception;
-}
-</pre>
-</li>
-</ul>
-</m>
 <hr/>
 
 The main project choice is related to
@@ -270,6 +240,11 @@ The task of building such a TCP-based system is left to the reader, with the goa
 to build a working prototype and to 'document' in a proper way the solution. 
 </div>
 
+<h4>A SPRINT Review meeting and Retrospective</h4>
+ 
+A report about our meetings related to SPRINT Review and SPRINT Retrospective is given in 
+<a href="LabRadarGuiTcpSprintReview.html" target="web">LabRadarGuiTcp | Sprint Review</a> 
+that includes also some possible refactoring of the code.
 
 <h3 id="bottomCoap">Interaction based on a CoAP-Resource</h3>
 According to 

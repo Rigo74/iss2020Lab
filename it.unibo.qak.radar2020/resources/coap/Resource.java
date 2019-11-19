@@ -22,7 +22,7 @@ private String lastMsg = "msg(sonar,event,sonarOnRaspCoap,none,sonar(00),0)";
 	
 	@Override
 	public void handleGET(CoapExchange exchange) {
-		//System.out.println("Resource " + getName() + " | handleGET from:" + exchange.getSourceAddress() + " arg:" + exchange.getRequestText()  );
+		System.out.println("Resource " + getName() + " | handleGET from:" + exchange.getSourceAddress() + " arg:" + exchange.getRequestText()  );
 		exchange.respond( lastMsg );
 	}
 
@@ -55,7 +55,7 @@ private String lastMsg = "msg(sonar,event,sonarOnRaspCoap,none,sonar(00),0)";
 	@Override
 	public void handlePUT(CoapExchange exchange) {
 		String arg = exchange.getRequestText() ;		
-		//System.out.println("Resource " + getName() + " | PUT arg=" + arg + " from " + exchange.getRequestCode() );
+		System.out.println("Resource " + getName() + " | PUT arg=" + arg + " from " + exchange.getRequestCode() );
 		lastMsg = arg;
  		changed();	// notify all CoAp observers		
     	/*
@@ -85,6 +85,7 @@ private String lastMsg = "msg(sonar,event,sonarOnRaspCoap,none,sonar(00),0)";
 		
 		CoapSupport support = new CoapSupport("coap://localhost:5683", "robot/sonar");
 		support.updateResource("msg(sonar,event,sonarOnRaspCoap,none,sonar(10),1)");
+//		support.updateResource("44");
 		
 		String v = support.readResource();
 		System.out.println("v=" + v);

@@ -22,11 +22,18 @@ QActor radarusagecoap  context ctxRadarUsageCoap{
 	
  	
 	State workUsingCoap{
- 		run utils.coapActorSupport.updateResource( myself, "40" )
- 		delay 100
+ 		run utils.coapActorSupport.updateResource( myself, "80" )
+ 		delay 500
  		run utils.coapActorSupport.readResource( myself, ResultMap, "sonarVal" )
  		[" val Result = ResultMap.remove(\"sonarVal\")"]
  		println("radarusagecoap | Data GET from sonar: $Result")
+ 		
+ 		delay 5000
+  		run utils.coapActorSupport.updateResource( myself, "10" )
+ 		delay 5000
+   		run utils.coapActorSupport.updateResource( myself, "50" )
+ 		//delay 5000
+ 		
 	}  
 	//Goto end
 	//Transition t0 whenEvent sonar -> handleSonarData //WRONG: events are not propagated to the emitter

@@ -218,19 +218,21 @@ loosing in performance.</li>
 For the examples hereunder, put the code after <tt>----</tt> in  a main and use the following import:
 <pre>
 import kotlin.system.measureTimeMillis
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.^
+import kotlinx.coroutines.channels.*
+import kotlinx.coroutines.channels.actor
+
+<kc>//More detailed</kc>
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.channels.Channel
+
 
 
 <kc>Coroutines API are still experimental ... </kc>
@@ -442,16 +444,16 @@ println( " ${square(3)} " ) //9
 </tr>
  
 <td>
-<h3>Reused declarations</h3>
+<h3>Declarations reused later</h3>
 <pre>
-val action : () -> Unit 	   
-	//function type (no args, returns nothing useful (Unit)
+val action : <k>() -> Unit</k> 	   
+	<kc>//function type (no args, returns nothing (Unit)</kc>
 
-val sum : ( Int,  Int) -> Int  
-	//function type (two args, returns an Int)
+val sum : <k>( Int,  Int) -> Int </k> 
+	<kc>//function type (two args, returns an Int)</kc>
 
-val greet: ( String )-> ()->Unit
-	//returns another function  
+val greet: <k>(String )-> <ks>()->Unit</ks></k>
+	<kc>//returns another function  </kc>
 </td>
 <td><m><em>Function type</em> is just a syntactic sugar for an interface, but the interface cannot be used explicitly.
 We can  use it to type local variables, properties or arguments.
@@ -469,23 +471,23 @@ A  way to provide a value function is to use a <em>function literal</em>:
 
 <tr>
 <td><pre>
-action	= { println("hello") }  //lambda expression
+action	= <k>{</k> println("hello") <k>}</k>  <kc>//lambda expression</kc>
 <kc>------</kc>
 action() //hello
 
-sum = { x:Int, y:Int -> x+y }  //lambda expression
+sum = <k>{</k>  x:Int, y:Int -> x+y <k>}</k>  <kc>//lambda expression</kc>
 val a = sum(1,2)
 <kc>------</kc>
-println("a=$a")	      //a=3
+println("a=$a")	      <kc>//a=3</kc>
 
-greet = { m: String -> { println(m)}  }
+greet = <k>{</k>  m: String -> { println(m)}   <k>}</k>
 <kc>------</kc>
-greet( "Hello World" )() //Hello World
-{ println( "Welcome" ) }()  //Welcome
+greet( "Hello World" )() 	<kc>//Hello World</kc>
+{ println( "Welcome" ) }()  <kc>//Welcome</kc>
 
-val fl = { print( "Last exp val=" ); 100 }
+val fl = <k>{</k>  print( "Last exp val=" ); 100  <k>}</k>
 <kc>------</kc>
-println( "${fl()}" )  //Last exp val=100
+println( "${fl()}" )  <kc>//Last exp val=100</kc>
 </td>
 <td><m><em>Lambda Expression literal</em>: it can be assigned to a variable, just like any other literal. 
 Returns (the value of the) <bc>last</bc> expression </m> </td>
@@ -493,21 +495,21 @@ Returns (the value of the) <bc>last</bc> expression </m> </td>
 
 <tr>
 <td><pre>
-val action: ()->Unit = fun() { println("Hello") }
+val action: <k>()-> Unit</k> = <ks>fun()</ks> { println("Hello") }
 <kc>------</kc>
 action() //hello
 
-val sum: (Int)->Int  = fun(x) = x * x
+val sum: <k>(Int)->Int</k>  = <ks>fun(x)</ks> = x * x
 <kc>------</kc>
 println("sum=${sum(1,2)}")	      //sum=3
 
-val greet: (String)->()->Unit = 
-		fun(m:String) = fun() { println("Printing $m") }
+val greet: <k>(String)-><kc>()->Unit</kc></k> = 
+		<ks>fun(m:String)</ks> = <kc>fun()</kc>{ println("Printing $m") }
 <kc>------</kc>
-greet( "Hello World" )() //Printing Hello World
+greet<ks>( "Hello World" )</ks><kc>( )</kc> //Printing Hello World
 
 ------------------------------------------
-fun exec23( op: ( Int, Int) -> Int ) {  op(2,3)  }
+fun exec23( op: <k>( Int, Int) -> Int</k> ) {  op(2,3)  }
 
 val v4 =  exec23( fun(x:Int,y:Int):Int{return x+y} )
 <kc>------</kc>
@@ -2087,12 +2089,12 @@ class <ks>CounterMsg</ks>(
   val response:CompletableDeferred&ltInt>?=null){
 }
 
-val <ks>counter</ks> = <k>actor%lt;CounterMsg></k> {
+val <ks>counter</ks> = <k>GlobalScope.actor&lt;CounterMsg></k> {
     var localCounter = 0 <kc>// actor state</kc>
     for (<k>msg in channel</k>) { <kc>// iterate over incoming messages</kc>
 	     if( localCounter % 10000 == 0 ) 
 			println("${msg.cmd} | $localCounter in ${curThread()}")
-        when ( msg.cmd ) {
+        <k>when</k> ( msg.cmd ) {
             "INC" -> localCounter++
             "DEC" -> localCounter--
             "GET" -> msg.response?.complete(localCounter) 
@@ -2724,7 +2726,9 @@ fun main(){
 		married=${p.married} adult=${p.isAdult} ")
 }
 </pre> </td>
-<td><m><em>Backing field</em>: a field <i>generated</i> by the compiler if we reference it explicitly or if we use the default accessor implementation.</m>
+<td>
+<m><h3 id="backingfield">Backing field</h3>
+is a field <i>generated</i> by the compiler if we reference it explicitly or if we use the default accessor implementation.</m>
 
 <pre>
 //OUTPUT
