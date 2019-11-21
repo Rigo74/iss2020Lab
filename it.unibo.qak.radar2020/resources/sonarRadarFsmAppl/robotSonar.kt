@@ -1,5 +1,14 @@
 package sonarRadarFsmAppl.robotSonar
-
+/*
+ robotSonar.kt
+ ------------------------------------------------------------------------------------------
+ High-level communications embedded in the hlComm library (working upon lowLevelComms)
+ Explicit representation of states and of transitions
+ Explicit definition of msgId promoted:
+ 	robotSonar --> polar : polar( D,A )  --> radarGui
+               <-- answer : work(done)  <--
+ ------------------------------------------------------------------------------------------
+*/
 import it.unibo.supports.FactoryProtocol
 import it.unibo.kactor.ActorBasicFsm
 import kotlinx.coroutines.runBlocking

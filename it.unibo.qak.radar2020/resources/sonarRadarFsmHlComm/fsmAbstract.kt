@@ -1,4 +1,19 @@
 package sonarRadarFsmHlComm
+/*
+ fsmAbstract.kt
+ ------------------------------------------------------------------------------------------
+ Abstract class that implements the behavior of a FSM with
+ states             represented as String
+ transitions		as an operation that handles input updating a currentMsg
+ 
+ Defines the abstract operation  work()
+ 
+ 1) Make the methods connectAsReceiver()> and connectAsSender() configurable
+ according to the protocol, by using a reusable support for layered communications
+ as unibonoawtsupports.
+ ------------------------------------------------------------------------------------------
+*/
+
 import highLevelComms.hlComm
 import it.unibo.kactor.ApplMessage
 import alice.tuprolog.Term
@@ -10,7 +25,7 @@ import it.unibo.`is`.interfaces.protocols.IConnInteraction
 
 abstract class fsmAbstract( val name : String ){
 	
-	var state         : String = "INIT"
+	var state         : String       = "INIT"
 	var currentMsg    : ApplMessage? =  null
 	var hlCommSupport : hlComm?      =  null
 	
@@ -27,7 +42,7 @@ abstract class fsmAbstract( val name : String ){
 			state = nextState; return
 		}
 		try{
-			val msg      =  hlCommSupport!!.receive()
+			val msg      =  hlCommSupport!!.receive()  //WARNING !!!: too limited
 		    currentMsg   = ApplMessage( msg )
 			if( msgId.equals( currentMsg!!.msgId() ) ) state = nextState
 			else println( "radarGui | input NOT EXPECTED: $msg" )

@@ -594,11 +594,9 @@ rather than in term of network-communication supports.
 
 <h2 id="platform">Building a platform</h2>
 A proper run-time support has been developed in the project <k>it.unibo.qakactor</k> that  includes a set
-of kotlin classes developed under <tt>IntelliJ IDEA Community Edition</tt>. Among them, there are
-:
+of kotlin classes developed under <tt>IntelliJ IDEA Community Edition</tt>. Among them, there are:
 <ol>
-<li> <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a> is
-.
+<li> <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasic.kt" target="code">ActorBasic.kt</a>.
 
 </li>
 <li> <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">ActorBasicFsm.kt</a> is
@@ -606,8 +604,8 @@ an abstract class  that extends <a href="../../it.unibo.qakactor/src/main/kotlin
 by defining the  method <k>actorBody</k> ao to implement the behavior of a <tt>FSM</tt>.  
 </li>
 <li><a href="../../it.unibo.qakactor/src/main/kotlin/ApplMessage.kt" target="code">ApplMessage.kt</a> (that requires
-<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a> )</li>
-<li><a href="../../it.unibo.qakactor/src/main/kotlin/MsgUtil.kt" target="code">MsgUtil.kt</a></li>
+<a href="http://tuprolog.sourceforge.net/doc/2p-guide.pdf">tuProlog</a>).</li>
+<li><a href="../../it.unibo.qakactor/src/main/kotlin/MsgUtil.kt" target="code">MsgUtil.kt</a>.</li>
 </ol>
 
 <h3>ActorBasic</h3>
@@ -690,7 +688,9 @@ See <a href="../resources/actors/RadarGui.kt" target="code">RadarGui.kt</a>
 
 <h3>ActorBasicFsm</h3>
 To provide actors with <k>message-based</k> behavior rather than <k>message-driven</k> behavior, we introduce the class
-<a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">ActorBasicFsm.kt</a>
+<a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">ActorBasicFsm.kt</a> whose behavior
+s summarized in the following figure:
+<!--
 that allows an application designer to structure the code of a component as a
 <a href="https://en.wikipedia.org/wiki/Finite-state_machine" target="web">Finite State Machine</a> (<bc>FSM</bc>) based on the following
 concepts:
@@ -720,6 +720,7 @@ for the possibility to 'fire' a transition among the set of the active transitio
 </ol>
 
 The logic of the infrastructural layer is summarized in the following figure:
+-->
 <br/><br/>
 <center><table style="width:98%">
 <tbody>	
@@ -736,8 +737,10 @@ related to stored messages.
  <br/><br/>
  The actor attempts to manage <b>all</b> the stored messages before looking to a new message.
 <div class="remark">
-This behavior is implemented as a 
-<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/it.unibo.kotlin.dsl/userDocs/LabDsl.html" target="web">Kotlin internal DSL</a>
+This behavior is better described in
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/ActorBasicFsm.html" target="web">
+LabQak | ActorBasicFsm</a>. The implementation is based on a
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.kotlin.dsl/userDocs/LabDsl.html" target="web">Kotlin internal DSL</a>
 <!-- (see <a href="#impl">About implementation</a>)
 in <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">
 it.unibo.qakactor.ActorBasicFsm.kt</a>. -->
@@ -753,7 +756,7 @@ in <a href="../resources/actors/RadarGuiFsm.kt" target="code">RadarGuiFsm.kt</a>
 
 
 
-<h3>Towards distribution</h3>
+<h3 id="towardDistr">Towards distribution</h3>
 An important <em>internal requirement</em> seems to arise at this point:
 
 <div class="req"><m>

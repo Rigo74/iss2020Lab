@@ -2,9 +2,9 @@ package sonarRadarFsmHlComm
 /*
  radarGui.kt
  ------------------------------------------------------------------------------------------
- High-level communications embedded in the hlComm library (up to lowLevelComms)
+ High-level communications embedded in the hlComm library (working upon lowLevelComms)
  Explicit representation of states and of transitions
- Explicit definition of msgId required:
+ Explicit definition of msgId promoted:
  	robotSonar --> polar : polar( D,A )  --> radarGui
                <-- answer : work(done)  <--
  ------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ class radarGui( name: String ) : fsmAbstract(name) {
 			"INIT" -> {
 				radarPojo.radarSupport.setUpRadarGui()
 				//connectAsReceiver()
-				connectAsReceiver( "TCP", 8010 )
+				connectAsReceiver( "TCP", 8010 )  //Using unibonoawtsupport
  				transition("polar", "ELAB")	
 			}
  			"ELAB" -> {

@@ -4,6 +4,8 @@ package sonarRadarNaive
  ------------------------------------------------------------------------------------------
 Solution expressed in a main program: no structure. Interaction based on  java.net.
 Behavior expressed as a control-flow with comments to mark logical states.
+ 
+Code refactoring required 
 ------------------------------------------------------------------------------------------
 */
 import java.net.ServerSocket

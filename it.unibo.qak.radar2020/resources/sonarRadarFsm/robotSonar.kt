@@ -6,6 +6,10 @@ package sonarRadarFsm
  The standard interface IConnInteraction is introduced
  The states are implemented with an enum
  There is a SINGLE INPUT source for the answer (The TCP connection)
+ 
+  1) Introduce an explicit representation of transitions
+ 	(eliminate receiveALine in state WAITANSWER)
+  2) Introduce the concept of high-level communication
  ------------------------------------------------------------------------------------------
 */
 

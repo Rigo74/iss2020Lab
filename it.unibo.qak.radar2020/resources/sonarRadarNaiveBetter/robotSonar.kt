@@ -5,6 +5,9 @@ package sonarRadarNaiveBetter
  The details of TCP-based communications are embedded in the lowLevelComms library
  The standard interface IConnInteraction is introduced
  The states are implemented in the control-flow
+ 
+ 1) Introduce an explicit representation of states for the FSM
+ 2) Introduce the concept of high-level communication
  ------------------------------------------------------------------------------------------
 */
 

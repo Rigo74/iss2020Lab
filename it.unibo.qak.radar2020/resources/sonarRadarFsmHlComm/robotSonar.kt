@@ -2,9 +2,9 @@ package sonarRadarFsmHlComm
 /*
  robotSonar.kt
  ------------------------------------------------------------------------------------------
- High-level communications embedded in the hlComm library (up to lowLevelComms)
+ High-level communications embedded in the hlComm library (working upon lowLevelComms)
  Explicit representation of states and of transitions
- Explicit definition of msgId required:
+ Explicit definition of msgId promoted:
  	robotSonar --> polar : polar( D,A )  --> radarGui
                <-- answer : work(done)  <--
  ------------------------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 package sonarRadarFsmAppl
-
+/*
+ msgNetServer.kt
+ ------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------------------
+*/
 import it.unibo.kactor.ActorBasicFsm
 import highLevelComms.hlComm
 import it.unibo.kactor.ApplMessage
@@ -32,6 +36,8 @@ class msgNetServer( val a : ActorBasicFsm ){
 	 	    }
 			return hlconn
 	}
+	
+	
 }
 
  

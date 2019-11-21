@@ -248,11 +248,11 @@ Let us introduce also some utility function:
 <h3>Utilities</h3>
 
 <pre>
+val cpus = Runtime.getRuntime().availableProcessors();
+
 fun <k>curThread()</k> : String { 
-	return "thread=${Thread.currentThread().name}" 
+	return "thread=${Thread.currentThread().name} / nthreads=${Thread.activeCount()}" 
 }
-
-
 inline fun <k>measureTimeMillis</k>(block: () -> Unit): Long {
     val start = System.currentTimeMillis()
     block()
@@ -986,16 +986,20 @@ fun runBlockThread(){
 }
 
 fun main(){
+	println("BEGINS CPU=$cpus ${curThread()}")
 	runBlockThread()
 	println("BYE")
+	println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>The current Thread (<tt>main</tt>) waits for <tt>1500</tt> msecs.<br></m>
 <pre>
 <kc>//OUTPUT</kc>
-Out start: thread=main
-Out ended: thread=main
+BEGINS CPU=4 thread=main / nthreads=1
+Out start: thread=main / nthreads=1
+Out ended: thread=main / nthreads=1
 BYE
+ENDS thread=main / nthreads=1
 </pre>
 </td>
 </tr>
@@ -1009,9 +1013,11 @@ BYE
 </m>
 <pre>
 fun main(){
+	println("BEGINS CPU=$cpus ${curThread()}")
 	<k>GlobalScope.launch{</k> runBlockThread() <k>}</k>
 	println("BYE")
-	Thread.sleep(1510) <kc>//Required to see the output</kc>
+	Thread.sleep(1600) <kc>//Required to see the output</kc>
+	println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>
@@ -1019,9 +1025,11 @@ The <tt>runBlockThread</tt> is now called in the default Thread devoted to Corou
 </m>
 <pre>
 <kc>//OUTPUT</kc>
+BEGINS CPU=4 thread=main / nthreads=1
 BYE
-Out start: thread=DefaultDispatcher-worker-2
-Out ended: thread=DefaultDispatcher-worker-2
+Out start: thread=DefaultDispatcher-worker-1 / nthreads=4
+Out ended: thread=DefaultDispatcher-worker-1 / nthreads=4
+ENDS thread=main / nthreads=4
 </pre>
 <m>
 Without the <tt>Thread.sleep</tt> the programs ends immediately and no output is shown.  
@@ -1068,7 +1076,11 @@ scope of the outer coroutine (that of <bc>runBlocking</bc> in this case).
 </m>
 <pre>
 fun main() = <k>runBlocking</k> { 
+	println("BEGINS CPU=$cpus ${curThread()}")
 	<k>launch</k>{  runBlockThread()  }
+	println("BYE")
+	//Thread.sleep(1600) <kc>//NO MORE Required </kc>
+	println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>
@@ -1077,9 +1089,11 @@ No <tt>Thread.sleep</tt> tis required now.  <br/>
 
 <pre>
 <kc>//OUTPUT</kc>
+BEGINS CPU=4 thread=main / nthreads=1
 BYE
-Out start: thread=main
-Out ended: thread=main
+ENDS thread=main / nthreads=1
+Out start: thread=main / nthreads=1
+Out ended: thread=main / nthreads=1
 </pre>
 <m>
 <bc>runBlocking</bc>  is designed to bridge regular blocking code to libraries written in suspending style, 
@@ -1092,14 +1106,16 @@ to be used in main functions and in tests.
 <tr>
 <td>
 <m><h3>launch output</h3> 
-Coroutines started by (GlobalScope)<bc>launch</bc> return a  <k>Job</k> immediately, 
+Coroutines started by (<tt>GlobalScope</tt>)<bc>launch</bc> return a  <k>Job</k> immediately, 
 which we can use to <tt>cancel</tt> 
 the computation or <em>await</em> its completion with <bc>join</bc>.</m> 
 <pre>
 fun main() =  runBlocking {  
+	println("BEGINS CPU=$cpus ${curThread()}")
 	<k>val job</k> =  <k>launch</k>{ runBlockThread()  }
 	<k>job.join()</k>
 	println("BYE")
+	println("ENDS ${curThread()}")
 }
 </pre> 
 </td>
@@ -1109,9 +1125,11 @@ fun main() =  runBlocking {
 
 <pre>
 <kc>//OUTPUT</kc>
-Out start: thread=main
-Out ended: thread=main
+BEGINS CPU=4 thread=main / nthreads=1
+Out start: thread=main / nthreads=1
+Out ended: thread=main / nthreads=1
 BYE
+ENDS thread=main / nthreads=1
 </pre>
 <m>
 Since we use <bc>launch</bc> instead of <bc>GlobalScope.launch</bc>, then the coroutine is launched in the
@@ -1145,16 +1163,20 @@ but only from <k>another suspend</k> function or from a <em>Coroutine</em>.
 }
 
 fun main() =  runBlocking {  
+	println("BEGINS CPU=$cpus ${curThread()}")
 	ioBoundFun()
 	println("BYE")
+	println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td>
 <pre>
 <kc>//OUTPUT</kc>
-IO operation | STARTS in thread=main
+BEGINS CPU=4 thread=main / nthreads=1
+IO operation | STARTS in thread=main / nthreads=1
 IO operation | Done, TIME=1031
 BYE
+ENDS thread=main / nthreads=1
 </pre>
 <m>If we execute:</m>
 <pre>
@@ -1167,9 +1189,11 @@ fun main() =  runBlocking {
 <br/>
 <pre>
 <kc>//OUTPUT</kc>
+BEGINS CPU=4 thread=main / nthreads=1
 BYE
-IO operation | STARTS in thread=main
-IO operation | Done, TIME=1008
+ENDS thread=main / nthreads=1
+IO operation | STARTS in thread=main / nthreads=1
+IO operation | Done, TIME=1015
 </pre>
 
 </td>
@@ -1288,9 +1312,9 @@ suspend fun activate(){
 }
 
 fun main() = runBlocking{
-    println("BEGINS")
+	println("BEGINS CPU=$cpus ${curThread()}")
     activate()
-    println("ENDS")
+    println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>
@@ -1301,14 +1325,16 @@ fun main() = runBlocking{
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS
+BEGINS CPU=4 thread=main / nthreads=1
+IO operation | STARTS in thread=DefaultDispatcher-worker-1 / nthreads=4
 Waiting for completion
-IO operation thread=DefaultDispatcher-worker-3
-IO operation thread=DefaultDispatcher-worker-2
-IO operation done, time=530
-IO operation done, time=530
-All jobs done end1=kotlin.Unit end2=kotlin.Unit
-ENDS
+IO operation | STARTS in thread=DefaultDispatcher-worker-2 / nthreads=5
+IO operation | Done, TIME=1016
+IO operation | Done, TIME=1016
+All jobs done
+BYE
+ENDS thread=main / nthreads=6
+
 </pre>
 </td>
 </tr>
@@ -1317,7 +1343,9 @@ ENDS
 <td>
 
 <pre>
-<h3 id="Dispatchers">Dispatchers</h3> 
+<h3 id="Dispatchers">Dispatchers</h3>
+@kotlinx.coroutines.ObsoleteCoroutinesApi
+@kotlinx.coroutines.ExperimentalCoroutinesApi
 fun testDispatchers() {
 runBlocking {
    <k>launch {</k> <kc>//context of the parent runBlocking </kc> 
@@ -1335,9 +1363,9 @@ runBlocking {
 }
 }
 fun main(){
-    val cpus = Runtime.getRuntime().availableProcessors();
     println("BEGINS CPU=$cpus ${curThread()}")
 	testDispatchers()
+	println("BYE")
     println("ENDS ${curThread()}")
 }
 </pre> </td>
@@ -1365,9 +1393,10 @@ The size of this thread pool is 64</li>
 <kc>//OUPUT</kc>
 BEGINS CPU=4 thread=main / nthreads=1
 2) Unconfined | thread=main / nthreads=1
-3) Default | thread=DefaultDispatcher-worker-1 / nthreads=4
-1) runBlocking | thread=main / nthreads=5
+3) Default | thread=DefaultDispatcher-worker-2 / nthreads=4
 4) newSingleThreadContext | thread=MyThr / nthreads=5
+1) runBlocking | thread=main / nthreads=5
+BYE
 ENDS thread=main / nthreads=5
 </pre>
 </td>
@@ -1481,9 +1510,9 @@ suspend fun actionWithContext( n: Int){
  }
 }
 fun main() = runBlocking{
-   println("BEGIN")
+   println("BEGINS CPU=$cpus ${curThread()}")
    for(i in 1..3) launch{ actionWithContext(i) } 
-   println("END")
+   println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m><em>withContext</em>: allows to 
@@ -1491,14 +1520,15 @@ change the context that will be used to run a part of the code inside a coroutin
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS
-ENDS
+BEGINS CPU=4 thread=main / nthreads=1
+BYE
+ENDS thread=main / nthreads=1
 2) thread=DefaultDispatcher-worker-2
 1) thread=DefaultDispatcher-worker-1
 3) thread=DefaultDispatcher-worker-3
+ActionWithContext 3 done
 ActionWithContext 2 done
 ActionWithContext 1 done
-ActionWithContext 3 done
 </pre>
 See <a href="https://proandroiddev.com/demystifying-coroutinecontext-1ce5b68407ad" target="web">Demystifying CoroutineContext</a>.
 
@@ -1598,7 +1628,7 @@ var counter = 0
         val jobs = List(n) {
             <k>launch</k> { <ks>repeat(k)</ks> { <ks>action()</ks> }  }
         }
-        jobs.forEach { it.join() }
+        jobs.forEach { it.join() } <kc>//wait for termination of all coroutines</kc>
     }
     println("Completed ${n * k} actions in $time ms")    
 }
@@ -1650,10 +1680,10 @@ Since the increment operation <tt>counter++</tt> is <bc>not atomic</bc> some inc
 and the final value is less then <tt>10000</tt>.</m>
 <pre>
 fun main() = runBlocking<Unit>{
-    val cpus = Runtime.getRuntime().availableProcessors();
-    println("BEGINS with $cpus cores")
-    <ks>GlobalScope.massiveRun { counter++ }</ks>
-    println("ENDS with Counter = $counter")
+	println("BEGINS CPU=$cpus ${curThread()}")
+	<ks>GlobalScope.massiveRun { counter++ }</ks>
+ 	println("BYE with Counter = $counter")
+	println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>We use the multi-threaded <bc>Dispatcher.Defaults</bc> within a computer with <tt>4</tt> cores.
@@ -1661,9 +1691,10 @@ fun main() = runBlocking<Unit>{
 </m>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS with 4  cores
-Completed 100000 actions in 55 ms
-ENDS with Counter = 83987
+BEGINS CPU=4 thread=main / nthreads=1
+Completed 100000 actions in 40 ms
+BYE with Counter = 88239
+ENDS thread=main / nthreads=5
 </pre>
 </td>
 </tr>
@@ -1677,8 +1708,7 @@ that works both for threads and for coroutines.</m>
 var counter = <k>java.util.concurrent.atomic.AtomicInteger()</k>
 
 fun main() = runBlocking<Unit>{
-    val cpus = Runtime.getRuntime().availableProcessors();
-    println("BEGINS with $cpus  cores")
+    println("BEGINS CPU=$cpus ${curThread()}")
     <ks>GlobalScope.massiveRun{counter.incrementAndGet()}</ks>
     println("ENDS with Counter = ${counter.get()}")
 }
@@ -1686,9 +1716,10 @@ fun main() = runBlocking<Unit>{
 <td>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS with 4  cores
-Completed 100000 actions in 75 ms
-ENDS with Counter = 100000
+BEGINS CPU=4 thread=main / nthreads=1
+Completed 100000 actions in 73 ms
+BYE with Counter = 100000
+ENDS thread=main / nthreads=5
 </pre>
 <m>However, <em>Thread-safe data</em> does not easily scale to complex state or to complex operations.</m> 
 </td>
@@ -1704,31 +1735,41 @@ to a single-threaded context.
 </m>
 <pre>
 var counter = 0  
-val <k>counterContext=newSingleThreadContext("CC")</k>
-
-fun main() = runBlocking<Unit>{
-  val cpus = Runtime.getRuntime().availableProcessors();
-  println("BEGINS with $cpus  cores")
+@kotlinx.coroutines.ObsoleteCoroutinesApi
+@kotlinx.coroutines.ExperimentalCoroutinesApi
+suspend fun runMassiveWithIncConfined(){
+  val <k>counterContext=newSingleThreadContext("CC")</k>
   <ks>GlobalScope.massiveRun {</ks>
    <kc>//run each coroutine with DefaultDispathcer</kc> 
    <k>withContext(counterContext) {</k>
       <kc>//confine each increment to single-threaded context</kc>
-      counter++
-  <k>}</k>
+      counter++	
+   }
  }
- println("ENDS with Counter = $counter")
+}
+
+
+
+fun main() = runBlocking<Unit>{
+  println("BEGINS CPU=$cpus ${curThread()}")
+  runMassiveWithIncConfined()
+  println("BYE with Counter = $counter")
+  println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td>
 
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS with 4  cores
-Completed 100000 actions in 902 ms
-ENDS with Counter = 100000
+BEGINS CPU=4 thread=main / nthreads=1
+Completed 100000 actions in 910 ms
+BYE with Counter = 100000
+ENDS thread=main / nthreads=6
 </pre>
 <m>Each individual increment switches from multi-threaded <bc>Dispatchers.Default</bc> context to the 
-<bc>newSingleThreadContext</bc> using <bc>withContext</bc> block. Thus, the code works more slowly.
+<bc>newSingleThreadContext</bc> using <bc>withContext</bc> block. 
+<br/><br/>
+Thus, the code works more slowly.
 </m> </td>
 </tr>
 
@@ -1741,35 +1782,42 @@ A <em>Critical section</em> protects all modifications of a shared state so that
 </m>
 <pre>
 var counter = 0
+
+suspend fun runMassiveWithMutex(){
+val  <k>mutex = kotlinx.coroutines.sync.Mutex()</k>
+	ks>GlobalScope.massiveRun{</ks> 
+		<k>mutex.withLock</k><ks>{counter++}}</ks>
+}
 val <k>mutex = kotlinx.coroutines.sync.Mutex()</k>
 
 fun main() = runBlocking<Unit>{
-    val cpus = Runtime.getRuntime().availableProcessors();
-    println("BEGINS with $cpus  cores")
-    <ks>GlobalScope.massiveRun{</ks> 
-		<k>mutex.withLock</k><ks>{counter++}}</ks>
-    println("ENDS with Counter = $counter")
+	println("BEGINS CPU=$cpus ${curThread()}")
+	runMassiveWithMutex()
+    println("BYE with Counter = $counter")
+	println("ENDS ${curThread()}")	
 }
 </pre> </td>
 <td>
 <pre>
 <kc>//OUTPUT</kc> 
-BEGINS with 4  cores
-Completed 100000 actions in 480 ms
-ENDS with Counter = 100000
+BEGINS CPU=4 thread=main / nthreads=1
+Completed 100000 actions in 427 ms
+BYE with Counter = 100000
+ENDS thread=main / nthreads=5
 </pre>
 <m>
 The locking here is fine-grained and the execution is quite slow. However, it can be  it is a good solution
  when there is no natural thread in which we can confine a shared state to be modified.</m>
  </td>
 </tr>
-
+<!--
 <tr>
 <td>
 <m><h3>Actor-based solution</h3>
  </td>
  <td>See <a href="#actorconcur">Overcoming concurrency problems with actors</a></td>
 </tr>
+-->
 </tbody>	
 </table></center>
 
@@ -1830,29 +1878,30 @@ Kotlin defines several types of channels:
 The example shows the usage of an <bc>ArrayChannel</bc> of capacity <tt>2</tt>. 
 <pre>
 fun main() = runBlocking{
-  val cpus = Runtime.getRuntime().availableProcessors();
-  println("BEGINS with $cpus  cores")
-  <ks>channelTest()</ks>
-  println("ENDS" )
+	println("BEGINS CPU=$cpus ${curThread()}")
+	<ks>channelTest()</ks>
+	println("BYE" )
+	println("ENDS ${curThread()}")
 }
 </pre>
 </m>
 
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS with 4  cores
-SENDER | sent 0 in thread=DefaultDispatcher-worker-1
-SENDER | sent 1 in thread=DefaultDispatcher-worker-1
-RECEIVER | receives 0 in thread=DefaultDispatcher-worker-1
-RECEIVER | receives 1 in thread=DefaultDispatcher-worker-1
-RECEIVER | receives 2 in thread=DefaultDispatcher-worker-1
-SENDER | sent 2 in thread=DefaultDispatcher-worker-3
-SENDER | sent 3 in thread=DefaultDispatcher-worker-3
-SENDER | sent 4 in thread=DefaultDispatcher-worker-3
-RECEIVER | receives 3 in thread=DefaultDispatcher-worker-1
-RECEIVER | receives 4 in thread=DefaultDispatcher-worker-1
-Done. time=3539
-ENDS
+BEGINS CPU=4 thread=main / nthreads=1
+SENDER | sent 0 in thread=DefaultDispatcher-worker-2 / nthreads=4
+SENDER | sent 1 in thread=DefaultDispatcher-worker-2 / nthreads=4
+RECEIVER | receives 0 in thread=DefaultDispatcher-worker-2 / nthreads=4
+SENDER | sent 2 in thread=DefaultDispatcher-worker-3 / nthreads=4
+SENDER | sent 3 in thread=DefaultDispatcher-worker-3 / nthreads=4
+RECEIVER | receives 1 in thread=DefaultDispatcher-worker-2 / nthreads=4
+RECEIVER | receives 2 in thread=DefaultDispatcher-worker-2 / nthreads=4
+RECEIVER | receives 3 in thread=DefaultDispatcher-worker-2 / nthreads=4
+RECEIVER | receives 4 in thread=DefaultDispatcher-worker-2 / nthreads=5
+SENDER | sent 4 in thread=DefaultDispatcher-worker-3 / nthreads=5
+Done. time=3568
+BYE
+ENDS thread=main / nthreads=5
 </pre>
 
 

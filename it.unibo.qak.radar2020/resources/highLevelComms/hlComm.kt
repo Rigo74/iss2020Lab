@@ -1,10 +1,15 @@
 package highLevelComms
-
+/*
+  hlComm.kt
+ ------------------------------------------------------------------------------------------
+ High-level communications library 
+ The provided operations 'wrap' lowLevelComms by promoting the idea of
+ dispatch (forward), request, answer, event (emit)
+ ------------------------------------------------------------------------------------------
+*/
 import it.unibo.kactor.MsgUtil
 import it.unibo.`is`.interfaces.protocols.IConnInteraction  //WARNING !!!
  
- 
-
 class hlComm( val conn : IConnInteraction ) {
 	
 	fun forward( senderName : String, msgId : String, msgContent : String, destName : String  ){

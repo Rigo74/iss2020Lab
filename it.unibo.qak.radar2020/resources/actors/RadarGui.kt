@@ -11,6 +11,7 @@ var radar : ActorBasic? = null
 var sonar : ActorBasic? = null
 var other : ActorBasic? = null
 
+
 class RadarGui( name : String, scope : CoroutineScope, confined : Boolean = false ) :
 			ActorBasic( name, scope, confined ){
 
@@ -72,12 +73,13 @@ class DummyActor( name : String, scope : CoroutineScope, confined : Boolean = fa
 	}
 }
 
+val cpus = Runtime.getRuntime().availableProcessors();
+
 fun curThread() : String { 
 	return "thread=${Thread.currentThread().name} / nthreads=${Thread.activeCount()}" 
 }
  
-fun main() = runBlocking {
-    val cpus = Runtime.getRuntime().availableProcessors();
+fun main() = runBlocking {    
     println("RadarGui | START  CPU=$cpus ${curThread()}")
 	radar = RadarGui("radargui", this, true)	         //WARNING: confined=true means 1 Thread
 	sonar = SonarSimulator("sonarsimulator", this, true) //WARNING: confined=true means 1 Thread
