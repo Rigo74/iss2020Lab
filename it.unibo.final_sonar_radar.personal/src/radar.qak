@@ -1,0 +1,24 @@
+System radar
+
+Dispatch sonar : sonar(Distance, Theta)
+
+Context radarCtx ip [host="localhost" port=6789]
+
+QActor radar context radarCtx {
+	State init initial {
+		//start radar
+		run radarPojo.radarSupport.setUpRadarGui()
+	} Goto work
+	
+	State work {
+		println("[Radar] Waiting data...")
+	}
+	Transition dataReceived
+		whenMsg sonar -> updateRadar
+		
+	State updateRadar {
+		onMsg(sonar: sonar(Distance, Theta)) {
+			run radarPojo.radarSupport.update(payloadArg(0), payloadArg(1))	
+		}
+	} Goto work
+}

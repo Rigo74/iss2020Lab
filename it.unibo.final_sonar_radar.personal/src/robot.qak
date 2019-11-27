@@ -1,0 +1,26 @@
+System robot
+
+Dispatch sonar : sonar(Distance, Theta)
+
+Context radarCtx ip [host="192.168.1.10" port=6789]
+Context robotCtx ip [host="localhost" port=7000]
+
+ExternalQActor radar context radarCtx
+CodedQActor sonarActor context robotCtx className "it.unibo.sonar.SonarActor"
+
+QActor robot context robotCtx {
+	State init initial {
+	} Goto work
+	
+	State work {
+		println("[Robot] Waiting data...")
+	}
+	Transition dataReceived
+		whenMsg sonar -> sendData
+		
+	State sendData {
+		onMsg(sonar: sonar(Distance, Theta)) {
+			forward radar -m sonar : sonar($payloadArg(0), $payloadArg(1))
+		}
+	} Goto work
+}

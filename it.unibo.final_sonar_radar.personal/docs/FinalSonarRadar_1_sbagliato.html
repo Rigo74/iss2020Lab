@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<link rel="stylesheet" type="text/css" href="style.css">
+    
+<head>
+   
+<title>SonarRadar</title>
+</head>
+    
+<body>
+
+<div id="top">
+<h1>SonarRadar</h1>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">
+    <img src="me.jpg" width="64px" height="64px" /><span style="font-size: large;">By Stefano Righini email: stefano.righini6@studio.unibo.it</span>
+</div>
+</div>  
+
+<div class="body">
+<h2>Requirements</h2>
+<div class="req">
+    Build a system <em>sonar</em> that has to send its data related to the distance and its angle to a system <em>radar</em>.
+</div>
+
+<h3>Premise</h3>
+<m>
+    We know that:
+    <ul>
+        <li>
+            the sonar has already built-in a program that reads the distance value from the world and gives it as
+            an output;
+        </li>
+        <li>
+            we have a program radar-pojo in our software system that already creates a visual radar;
+        </li>
+    </ul>
+</m>
+
+<h2>Requirement analysis</h2>
+<div>
+    Reading the requirements we can understand that the system is composed by two elements, <em>sonar</em> and <em>radar</em>
+    that have to communicate between them. We're dealing with a distributed system. <br/>
+    The two elements can communicate with a fire and forget communication since the requirements don't tell anything specific
+    about a possible response from one or the other. The sonar will send the data to the radar.
+    Like said before we already have sonarAlone and radarPojo elements that have to be integrated with other elements.
+</div>
+<img src="sonarRadar.svg">
+
+<h2>Problem analysis</h2>
+<p>
+    In order to handle in the future more elements from the robot we create a new component called <em>robot</em> 
+    that will represent the robot's brain. As a conseguence, <em>sonar</em> and <em>radar</em> won't communicate directly 
+    but there will be the <em>robot</em> element as a mediator between them.
+    We can represent the system with FSM for each of its elements.
+</p>
+<table style="margin-left: -25px;">
+    <tr>
+        <td>Radar</td>
+        <td>Sonar</td>
+        <td>Robot</td>
+    </tr>
+    <tr>
+        <td>
+            <img src="http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuOhMYbNGrRLJyCpBBE424LOAHOafYKK1-LdvUiMf9Q45GI2kUsccXYONM842K7LuVb4s5nU8LD1D0V932r8IIrB1AgqKYlFp4eiqKZA1TkGbf-gKPAIM90BregX1s54A5aOeLy2YNa4t1sQfGsfU2j3T0000" alt="">
+        </td>
+        <td>
+            <img src="http://www.plantuml.com/plantuml/svg/JSwn2i9030RWFK_nZoeztJj81HTd1mTnYEQAnVO2kHHVtpkXwF8JaYyaNNOsdwUHhfiRGjZZb0Qd6YtoB8hjBcjYEuoQ8dq7AEgYzYAgsS8Y2uITqPjE-ESL84XPECSansA8bgf5h_PcavNfNRsH8JkdHspy6PtNFuWmBXUxqYhFVW00" alt="">
+        </td>
+        <td>
+            <img src="http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuOhMYbNGrRLJyCpBBE7Y0f4AG5vuVb4s5nU8LD1D0VA3K_DIN19B4gqKKZA1MlEIKxcu469f-KNbYKKf6aM9AOb5EZ0LEYKPgIM9cWY52hevCACTW490sm40" alt="">
+        </td>
+    </tr>
+</table>
+
+<h2>Project</h2>
+Using all the elements from the previous sections we decide to use Qactor language for a fast and easy construction of the system.
+To be more specific:
+<ul>
+    <li>
+        <em>radar</em> and  <em>robot</em> can be realized using the qak dsl
+    </li>
+    <li>
+        <em>sonar</em> can be realized using a CodedQActor in order to realize a better interaction with SonarAlone program
+    </li>
+</ul>
+
+<table>
+    <tr>
+        <td>
+<pre>
+System radar
+
+Dispatch sonar : sonar(Distance, Theta)
+
+Context radarCtx ip [host="localhost" port=6789]
+
+QActor radar context radarCtx {
+    State init initial {
+        //start radar
+        run radarPojo.radarSupport.setUpRadarGui()
+    } Goto work
+    
+    State work {
+        println("[Radar] Waiting data...")
+    }
+    Transition dataReceived
+        whenMsg sonar -> updateRadar
+        
+    State updateRadar {
+        onMsg(sonar: sonar(Distance, Theta)) {
+            run radarPojo.radarSupport.update(payloadArg(0), payloadArg(1))	
+        }
+    } Goto work
+}
+</pre>
+        </td>
+        <td>
+<pre>
+System robot
+
+Dispatch sonar : sonar(Distance, Theta)
+
+Context radarCtx ip [host="192.168.1.10" port=6789]
+Context robotCtx ip [host="localhost" port=7000]
+
+ExternalQActor radar context radarCtx
+CodedQActor sonarActor context robotCtx className "it.unibo.sonar.SonarActor"
+
+QActor robot context robotCtx {
+    State init initial {
+    } Goto work
+    
+    State work {
+        println("[Robot] Waiting data...")
+    }
+    Transition dataReceived
+        whenMsg sonar -> sendData
+        
+    State sendData {
+        onMsg(sonar: sonar(Distance, Theta)) {
+            forward radar -m sonar : sonar($payloadArg(0), $payloadArg(1))
+        }
+    } Goto work
+}
+</pre>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+<pre>
+class SonarActor(name: String, scope: CoroutineScope) : ActorBasicFsm(name, scope) {
+
+    val EXEC_CMD: String = "sudo ./sonarAlone"
+    var sonarData: BufferedReader? = null;
+    var distance: String = ""
+    var theta: Int = 0
+
+    override fun getInitialState(): String {
+        return "init"
+    }
+
+    override fun getBody(): (ActorBasicFsm.() -> Unit) {
+        return {
+            state("init") {
+                action {
+                    val process: Process = Runtime.getRuntime().exec(EXEC_CMD)
+                    sonarData = BufferedReader(InputStreamReader(process.getInputStream()))
+                }
+                transition(edgeName = "goto", targetState = "work", cond = doswitch())
+            }
+            state("work") {
+                action {
+                    Thread.sleep(2000)
+                    distance = sonarData!!.readLine()
+                    theta = Random().nextInt(360)
+                }
+                transition(edgeName = "data obtained", targetState = "sendData", cond = doswitch())
+            }
+            state("sendData") {
+                action {
+                    forward("sonar", "sonar(${distance},${theta})", "robot")
+                }
+                transition(edgeName = "data sent", targetState = "work", cond = doswitch())
+            }
+        }
+    }
+}
+</pre>
+        </td>
+    </tr>
+</table>
+
+</div>
+</body>
+</html>
