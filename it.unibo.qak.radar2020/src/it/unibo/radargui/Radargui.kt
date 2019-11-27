@@ -33,6 +33,7 @@ class Radargui ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, sc
 					}
 					 transition(edgeName="t00",targetState="showSpotReply",cond=whenRequest("polar"))
 					transition(edgeName="t01",targetState="showSpotNoReply",cond=whenDispatch("polar"))
+					transition(edgeName="t02",targetState="showSpotNoReply",cond=whenEvent("polar"))
 				}	 
 				state("showSpotNoReply") { //this:State
 					action { //it:State

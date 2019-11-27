@@ -190,5 +190,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Didattica2018Work/iss2019Lab/libs/it.unibo.qakactor-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Didattica2018Work/iss2019Lab/libs/labbaseRobotSam.jar"/>
 	<classpathentry kind="output" path="bin/default"/>
 </classpath>

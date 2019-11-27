@@ -18,7 +18,7 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("basicrobot | starts (with robotadapter in the same context)")
+						println("	basicrobot | starts (with robotadapter in the same context)")
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
@@ -26,12 +26,24 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 					action { //it:State
 					}
 					 transition(edgeName="t00",targetState="handleCmd",cond=whenDispatch("cmd"))
-					transition(edgeName="t01",targetState="handleObstacle",cond=whenEvent("obstacle"))
+					transition(edgeName="t01",targetState="handleUserCmd",cond=whenEvent("userCmd"))
+					transition(edgeName="t02",targetState="handleObstacle",cond=whenEvent("obstacle"))
 				}	 
 				state("handleCmd") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("	basicrobot | redirect userCmd to robotadapter ")
+								forward("cmd", "cmd(${payloadArg(0)})" ,"robotadapter" ) 
+						}
+					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("handleUserCmd") { //this:State
+					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
+						if( checkMsgContent( Term.createTerm("userCmd(X)"), Term.createTerm("userCmd(X)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								forward("cmd", "cmd(${payloadArg(0)})" ,"robotadapter" ) 
 						}
@@ -41,21 +53,18 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("handleObstacle") { //this:State
 					action { //it:State
 						forward("cmd", "cmd(h)" ,"robotadapter" ) 
-						println("basicrobot | stops (for safety) since  obstacle  ")
+						println("	basicrobot | stops (for safety) since  obstacle  ")
 					}
-					 transition( edgeName="goto",targetState="farFromObstacle", cond=doswitch() )
+					 transition( edgeName="goto",targetState="movefarFromObstacle", cond=doswitch() )
 				}	 
-				state("farFromObstacle") { //this:State
+				state("movefarFromObstacle") { //this:State
 					action { //it:State
-						println("basicrobot |  going back (to avoid event-generation) ")
+						println("	basicrobot |  going back (to avoid event-generation) ")
 						forward("cmd", "cmd(s)" ,"robotadapter" ) 
-						delay(250) 
+						delay(150) 
 						forward("cmd", "cmd(h)" ,"robotadapter" ) 
-						stateTimer = TimerActor("timer_farFromObstacle", 
-							scope, context!!, "local_tout_basicrobot_farFromObstacle", 350.toLong() )
 					}
-					 transition(edgeName="t02",targetState="work",cond=whenTimeout("local_tout_basicrobot_farFromObstacle"))   
-					transition(edgeName="t03",targetState="farFromObstacle",cond=whenEvent("obstacle"))
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 			}
 		}

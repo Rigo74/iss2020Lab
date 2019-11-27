@@ -218,6 +218,58 @@ it.unibo.qakactor.ActorBasicFsm.kt</a>. -->
 </table>
 </center>
 
+The availability of a platform like that introduced in  
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qak.radar2020/userDocs/LabRadarGui.html#platform" target="lab">
+LabRadarGui | Building a platform</a> allows us to exploit the class 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qak.radar2020/userDocs/LabRadarGui.html#ActorBasicFsm" target="lab">
+LabRadarGui | ActorBasicFsm</a> to write code of each component with an explicit representation of the states and of the transitions:
+
+<pre><m>class robotSonar( name : String, scope : CoroutineScope  ) : <k>ActorBasicFsm</k>( name, scope ) {
+	<ks>override fun</ks> <k>getInitialState()</k>: String{ return <ks>"INIT"</ks>}	
+	<ks>override fun</ks> <k>getBody()</k> : (ActorBasicFsm.() -> Unit){ 	 <kc>//See <a href="../../it.unibo.kotlin.dsl/userDocs/LabDsl.html#lamdarec" target="code">Lambda with receiver</a></kc>
+ 		return {
+			<k>state</k>(<ks>"INIT"</ks>) { <kc>//state is defined by  <tt>ActorBasicFsm</tt>: add a state to a state list</kc>
+				<k>action</k>{     <kc>//action is defined by <a href="#State">State</a>: add an action to a action list</kc>
+					<ks>//Sequence of (terminating) actions written by the application designer</ks>
+				}
+				<k>transition</k>(edgeName="t0",targetState=<ks>"SENDREQUEST"</ks>,cond=<k>doswitch()</k> ) <kc>//EMPTY MOVE</kc>
+				 <kc>//transition is defined by <a href="#State">State</a>: add a state to a state list</kc>
+				 <kc>//doswitch is defined by <tt>ActorBasicFsm</tt>: set an <ks>edgeEventHandler</ks> that checks for firing</kc>
+			}
+			<k>state</k>(<ks>"SENDREQUEST"</ks>) {
+				<k>action</k>{
+					//<kc> ... </kc>
+				}
+				<k>transition</k>(edgeName="t0",targetState=<ks>"ELABANSWER"</ks>, cond=<k>whenReply("answer")</k> ) <kc>//EMPTY MOVE</kc>
+			}
+		}
+	}
+}
+</m></pre>
+
+We highlight that:
+<ul>
+<li>a call to the operation <k>transition(...)</k> does not perform any <tt>receive</tt> operation. It is just a way to 'denote interest' for a message.
+The input-handling part is implemented by a proper separate component within the platform (see
+<a href="../../it.unibo.qakactor/src/main/kotlin/QakContextServer.kt" target="code">
+QakContextServer.kt</a>)<br/><br/></li>
+<li>the <k>doswitch()</k> operation represents an 'empty move', i.e. the transition specifies that the components goes from the state<m> <ks>INIT</ks></m> 
+to the state <m><ks>SENDREQUEST</ks></m>  without waiting any information from the outside world.<br/><br/></li>
+<li>the <k>whenReply( msgId : String )</k> operation means that transition will go to the specified state ( <m><ks>ELABANSWER</ks></m> in the example) 
+when the message of type <m><ks>reply</ks></m> and identifier <m><ks>answer</ks></m> is received. A similar task is done by the operations
+ <m><k>whenEvent( msgId : String ) </k></m>, <m><k>whenDispatch( msgId : String )</k></m> and <m><k>whenRequest( msgId : String )</k></m>.<br/><br/>
+</li>
+<li>the operations of form <k>whenXXXGuarded</k>( msgId: String, <k>guard:()->Boolean</k>) implement the concept of guarded transitions, i.e. a
+transition that can 'fire' only if the given <ks>guard</ks> is true.<br/><br/></li>
+</ul>
+ 
+The class  <em>ActorBasicFsm</em> is expressed in a domain-specific language  by exploiting the Kotlin capability to define internal-DSL.
+See <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.kotlin.dsl/userDocs/LabDsl.html" target="lab">
+LABDsl | Kotlin Internal DSL</a>
+and
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/ActorBasicFsm.html" target="lab">LabQak | ActorBasicFsm</a>
+ 
+
 
 
 <center><table style="width:98%">
@@ -226,7 +278,7 @@ it.unibo.qakactor.ActorBasicFsm.kt</a>. -->
 <tr>
 <td style="width:50%">
 <h3>State</h3>
-<m>A state is </m>
+<m></m>
 </td>
 <td>
 <h3>Transition</h3>
@@ -234,7 +286,7 @@ it.unibo.qakactor.ActorBasicFsm.kt</a>. -->
 </tr>
 
 <tr>
-<td >
+<td id="State">
 <pre><m>
 class <k>State</k>(val stateName : String ) {
     private val edgeList          = mutableListOf&lt;Transition>()
@@ -317,19 +369,18 @@ abstract class <k>ActorBasicFsm</k>(
 		<ks>setBody( getBody(), getInitialState() )</ks>
 	}
     <k>abstract fun getBody()</k> : (<ks>ActorBasicFsm.() -> Unit</ks>)
+							<kc>//See <a href="../../it.unibo.kotlin.dsl/userDocs/LabDsl.html#lamdarec" target="code">Lambda with receiver</a></kc>
     <k>abstract fun getInitialState()</k> : String
 
     override suspend fun <k>actorBody</k>(msg: ApplMessage) {
          if( msg.msgId() == autoStartMsg.msgId() && ! isStarted ) {          
             fsmStartWork()
-         }else{
-            fsmwork(msg)
-         }
+         }else{  fsmwork(msg)  }
 	}
-    fun fsmStartWork() {
+	fun fsmStartWork() {
 		isStarted = true
-        currentState.enterState()
-        <ks>checkDoEmptyMove()</ks>
+		currentState.enterState()
+		<ks>checkDoEmptyMove()</ks>
 	}
 
     fun fsmwork(msg : ApplMessage) {
@@ -347,17 +398,26 @@ abstract class <k>ActorBasicFsm</k>(
  
 </td>
 <td><m>
-<pre>ActorBasicFsm.() -> Unit</pre> is a Kotlin <bc>lambda with receiver</bc>
-(see <a href="../../it.unibo.kotlin.dsl/userDocs/LabDsl.html" target="lecture">LabDsl.html</a>)
-.
+<pre>
+    private fun <ks>checkTransition</ks>(msg: ApplMessage): State? {
+        val <k>trans</k> = <ks>currentState.getTransitionForMessage(msg)</ks>
+          return if (trans != null) {
+           <k>trans</k>.<ks>enterTransition { getStateByName(it) }</ks>
+        } else {
+              null
+        }
+    }
+
+</pre>
 
 <br/><br/>
-The code is in 
+The full code is in 
 <a href="../../it.unibo.qakactor/src/main/kotlin/ActorBasicFsm.kt" target="code">ActorBasicFsm.kt</a>
 </m>
 </td>
 </tr>
 
+<!--
 <tr>
 <td style="width:50%">
 <h3>STRUCTURAL</h3>
@@ -391,12 +451,13 @@ The code is in
 
 </tbody>	
 </table></center>
+-->
 
 <center><table style="width:98%">
 <tbody>	
 
 
-
+<!--
 <tr>
 <td style="width:50%">
 <h3>Example</h3>
@@ -406,7 +467,7 @@ fun main() = runBlocking {
         state(name = "init") {
             action { println("hello init") }
             action { scope.launch{ autoMsg( NoMsg ) } }
-            transition(name = "e1", targetState = "s1", cond=goto())
+            transition(name = "e1", targetState = "s1", cond=doSwitch())
         }
         state(name = "s1") {
             action { println("$currentMsg") }
@@ -423,7 +484,7 @@ fun main() = runBlocking {
 </tbody>	
 </table></center>
 
-
+-->
  
  
 </p>

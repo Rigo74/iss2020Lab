@@ -21,15 +21,14 @@ class Sonarsimulator ( name: String, scope: CoroutineScope ) : ActorBasicFsm( na
 					action { //it:State
 						println("demo STARTS working using dispatch")
 						delay(4000) 
-						forward("polar", "polar(0,0)" ,"radargui" ) 
+						forward("polar", "polar(0,45)" ,"radargui" ) 
 						delay(500) 
-						forward("polar", "polar(45,0)" ,"radargui" ) 
+						forward("polar", "polar(45,45)" ,"radargui" ) 
 						delay(500) 
-						forward("polar", "polar(90,0)" ,"radargui" ) 
+						forward("polar", "polar(90,45)" ,"radargui" ) 
 						delay(500) 
-						forward("polar", "polar(120,0)" ,"radargui" ) 
+						forward("polar", "polar(120,45)" ,"radargui" ) 
 					}
-					 transition( edgeName="goto",targetState="workUsingRequestNoWait", cond=doswitch() )
 				}	 
 				state("workUsingRequest") { //this:State
 					action { //it:State
@@ -39,8 +38,8 @@ class Sonarsimulator ( name: String, scope: CoroutineScope ) : ActorBasicFsm( na
 						stateTimer = TimerActor("timer_workUsingRequest", 
 							scope, context!!, "local_tout_sonarsimulator_workUsingRequest", 1000.toLong() )
 					}
-					 transition(edgeName="t02",targetState="handleAnwerTimeout",cond=whenTimeout("local_tout_sonarsimulator_workUsingRequest"))   
-					transition(edgeName="t03",targetState="handleRadarReply",cond=whenReply("fromRadarGui"))
+					 transition(edgeName="t03",targetState="handleAnwerTimeout",cond=whenTimeout("local_tout_sonarsimulator_workUsingRequest"))   
+					transition(edgeName="t04",targetState="handleRadarReply",cond=whenReply("fromRadarGui"))
 				}	 
 				state("handleRadarReply") { //this:State
 					action { //it:State
@@ -70,8 +69,8 @@ class Sonarsimulator ( name: String, scope: CoroutineScope ) : ActorBasicFsm( na
 						stateTimer = TimerActor("timer_handleAllRadarReply", 
 							scope, context!!, "local_tout_sonarsimulator_handleAllRadarReply", 1000.toLong() )
 					}
-					 transition(edgeName="t04",targetState="handleAnwerTimeout",cond=whenTimeout("local_tout_sonarsimulator_handleAllRadarReply"))   
-					transition(edgeName="t05",targetState="handleAllRadarReply",cond=whenReply("fromRadarGui"))
+					 transition(edgeName="t05",targetState="handleAnwerTimeout",cond=whenTimeout("local_tout_sonarsimulator_handleAllRadarReply"))   
+					transition(edgeName="t06",targetState="handleAllRadarReply",cond=whenReply("fromRadarGui"))
 				}	 
 			}
 		}

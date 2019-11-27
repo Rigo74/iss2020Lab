@@ -1,18 +1,25 @@
 package itunibo.robotMbot
+/*
+ -------------------------------------------------------------------------------------------------
+ A factory that creates the support for the nano robot
+ -------------------------------------------------------------------------------------------------
+ */
+
 import it.unibo.kactor.ActorBasic
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import it.unibo.kactor.ActorBasicFsm
 import it.unibo.kactor.MsgUtil
+import itunibo.robot.rx.ApplActorDataStream
 
 object mbotSupport{
 	lateinit var owner   : ActorBasic
  	lateinit var conn    : SerialPortConnSupport
 	var dataSonar        : Int = 0 ; //Double = 0.0
  			
-	fun create( owner: ActorBasic, port : String  ){
+	fun create( owner: ActorBasic, port : String   ){
 		this.owner = owner
-		initConn( port  )
+		initConn( port   )
 	}
 	
 	private fun initConn( port : String ){ 
@@ -21,7 +28,7 @@ object mbotSupport{
 			val serialConn = JSSCSerialComm()
 			conn = serialConn.connect(port)	//returns a SerialPortConnSupport
 			println("   	%%% mbotSupport |  initConn port=$port conn= $conn")						
- 			robotDataSourceArduino("robotDataSourceArduino", owner,   conn)
+ 			robotDataSourceArduino("robotDataSourceArduino", owner,   conn )
 		}catch(  e : Exception) {
 			println("   	%%% mbotSupport |  ERROR ${e }"   );
 		}		

@@ -38,7 +38,7 @@ QActor basicrobot context ctxBasicRobot {
 			//run itunibo.robotVirtual.clientWenvObjTcp.sendMsg( payloadArg(0 ))	//ANALYSIS
 			run itunibo.robot.robotSupport.move( payloadArg(0 )   )					//PROJECT
 		}
- 	}
+ 	} 
  	Goto work
  	
 	State handleObstacle{
