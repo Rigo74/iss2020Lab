@@ -46,10 +46,10 @@ object mbotSupport{
 			"msg(s)", "s" -> conn.sendALine("s")
 			"msg(a)", "a" -> conn.sendALine("a")
 			"msg(d)", "d" -> conn.sendALine("d")
-			"msg(l)", "l" -> sendToPython("l")	//conn.sendALine("l")
-			"msg(r)", "r" -> sendToPython("r")	//conn.sendALine("r")
-			"msg(z)", "z" -> sendToPython("z")	//conn.sendALine("z")
-			"msg(x)", "x" -> sendToPython("x")	//conn.sendALine("x")
+			"msg(l)", "l" -> conn.sendALine("l") //sendToPython("l")	//
+			"msg(r)", "r" -> conn.sendALine("r") //sendToPython("r")	//
+			"msg(z)", "z" -> conn.sendALine("z") //sendToPython("z")
+			"msg(x)", "x" -> conn.sendALine("x") //sendToPython("x")	//
 			"msg(h)", "h" -> conn.sendALine("h")
 			else -> println("   	%%% mbotSupport | command $cmd unknown")
 		}

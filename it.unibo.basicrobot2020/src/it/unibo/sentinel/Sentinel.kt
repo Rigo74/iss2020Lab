@@ -20,17 +20,7 @@ class Sentinel ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, sc
 					action { //it:State
 						delay(1000) 
 						println("	sentinel | STARTS")
-						  
-						//CREATE A PIPE for the sonar-data stream
-						//WARNING: use myself to denote the sentinel actor, since this refers to the state
-						
-						val logger   = itunibo.robot.rx.Logger("logger")
-						val filter   = itunibo.robot.rx.sonaractorfilter("filter", myself)  //generates obstacle
-						val forradar = itunibo.robot.rx.sonarforradar("forradar", myself)  //generates polar
-						//itunibo.robot.robotSupport.subscribe( logger ).subscribe( filter )
-						itunibo.robot.robotSupport.subscribe( filter ).subscribe( forradar ) 
 					}
-					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 
 				state("work") { //this:State
 					action { //it:State

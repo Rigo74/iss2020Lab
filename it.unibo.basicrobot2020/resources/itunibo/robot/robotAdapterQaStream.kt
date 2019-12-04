@@ -29,7 +29,11 @@ class robotAdapterQaStream( name : String ) : ActorBasic( name ){
 				println("	--- robotAdapterQaStream | USING $host : $port")
 				val dsh = sonardsh("sonardsh", this)
 				this.subscribe(dsh)		//set the start object of data-stream pipes
-				itunibo.robot.robotSupport.create( this,host,port,dsh  )
+				//defines a filter
+				val filter   = itunibo.robot.rx.sonaractorfilter("filter", this)
+				dsh.subscribe( filter )
+				//give the end of the PIPE to the robotSupport
+				itunibo.robot.robotSupport.create( this,host,port,filter  )
 			}
 		}		  		      
     }

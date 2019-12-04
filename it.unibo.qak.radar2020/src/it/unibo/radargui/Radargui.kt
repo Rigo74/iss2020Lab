@@ -29,7 +29,6 @@ class Radargui ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, sc
 				}	 
 				state("waitForDataToShow") { //this:State
 					action { //it:State
-						println("radargui waitForDataToShow %%%% ")
 					}
 					 transition(edgeName="t00",targetState="showSpotReply",cond=whenRequest("polar"))
 					transition(edgeName="t01",targetState="showSpotNoReply",cond=whenDispatch("polar"))
@@ -37,7 +36,6 @@ class Radargui ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, sc
 				}	 
 				state("showSpotNoReply") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("polar(D,A)"), Term.createTerm("polar(D,A)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								

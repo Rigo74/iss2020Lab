@@ -174,11 +174,59 @@ QActor context-server;<br/><br/> </li>
  </m>
   </td>
 </tr>
-
- 
-
 </table>
 </center>
+
+<h2>Configurations</h2>
+Let us suppose that a qak actor <ks>A</ks> has to interact with another actor <ks>R</ks> working in a different context and that such a context
+makes use of the <k>+mqtt</k> flag.
+Now, interaction problems could arise when the description of the context of <ks>R</ks> by <ks>A</ks> is not identical to the original one.
+In order to show the possible different cases, we will use the following notations:
+<center><table style="width:98%">
+<tbody>	
+<tr>
+<td  style="width:60%"><img src="./img/extcases.png" alt="extcases" width="88%" /></td>
+
+ <td style="width:40%">
+ <m>Possible definitions related to <ks>R</ks> are:
+ <pre>
+Context ctxR ip [ host= "localhost" port= 8020 ]   +mqtt
+QActor R context ctxR { ... }
+</pre>
+Possible definitions related to <ks>A</ks> are:
+ <pre>
+Context ctxR ip [ host= "localhost"   port= 8020 ]   +mqtt
+Context ctxA ip [ host= "192.168.1.5" port= 8020 ]   
+
+<k>External</k> QActor R context ctxR  
+QActor A context ctxA { ... }
+</pre>
+
+ </m>
+  </td>
+</tr>
+</table>
+</center>
+
+The different situations are summarized in the following pictures:
+
+ <center><table style="width:98%">
+<tbody>	
+<tr>
+<td  style="width:50%"><img src="./img/extcasesA.png" alt="extcasesA" width="88%" /></td>
+
+ <td style="width:50%"><img src="./img/extcasesB.png" alt="extcasesB" width="88%" /></td>
+
+ <m> 
+ </m>
+  </td>
+</tr>
+</table>
+</center>
+<br/>
+An example of these possible cases can be done with reference to the project <i>it.unibo.smartrobot2020</i>
+(see <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.smartrobot2020/userDocs/Lab3_2020.html" target="lab">
+Lab3_2020 | A smartrobot</a>).
 
 <h2>Rules</h2>
 <hr/>

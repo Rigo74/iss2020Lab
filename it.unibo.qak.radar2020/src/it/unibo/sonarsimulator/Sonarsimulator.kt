@@ -19,7 +19,7 @@ class Sonarsimulator ( name: String, scope: CoroutineScope ) : ActorBasicFsm( na
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("demo STARTS working using dispatch")
+						println("demo STARTS working using dispatch on 45")
 						delay(4000) 
 						forward("polar", "polar(0,45)" ,"radargui" ) 
 						delay(500) 

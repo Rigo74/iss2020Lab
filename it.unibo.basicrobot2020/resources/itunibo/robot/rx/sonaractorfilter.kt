@@ -28,7 +28,7 @@ class sonaractorfilter (name : String,  val owner : ActorBasic,
  		val delta    = Math.abs( Distance - LastDistance )
 		var testDelta = delta >= maxDelta  //FOR REAL ROBOT only
  		if( testDelta && Distance > minDistance     ){
- 		 	emitLocalStreamEvent( "any", "any($data)" )  	//PROPAGATE data to the pipe
+ 		 	emitLocalStreamEvent( "any", "any($data)" )  //PROPAGATE data to the pipe
 			LastDistance = Distance
 			if(Distance < LimitDistance){
 	 			val m1 = MsgUtil.buildEvent(name, "obstacle", "obstacle($data)")

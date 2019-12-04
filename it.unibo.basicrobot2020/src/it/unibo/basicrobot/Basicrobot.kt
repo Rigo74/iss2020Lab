@@ -18,6 +18,14 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
+						  
+						//The PIPE could be completely created by the robotAdapterQaStream
+						//WARNING: use myself to denote the basicrobot actor, since this refers to the state
+						 
+						//val filter   = itunibo.robot.rx.sonaractorfilter("filter", myself)  //generates obstacle
+						//val logger   = itunibo.robot.rx.Logger("logger")
+						val forradar = itunibo.robot.rx.sonarforradar("forradar", myself)  //generates polar
+						itunibo.robot.robotSupport.subscribe( forradar ) 
 						println("	basicrobot | starts (with robotadapter in the same context)")
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
@@ -34,7 +42,6 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("cmd(X)"), Term.createTerm("cmd(X)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								println("	basicrobot | redirect userCmd to robotadapter ")
 								forward("cmd", "cmd(${payloadArg(0)})" ,"robotadapter" ) 
 						}
 					}
@@ -59,9 +66,9 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("movefarFromObstacle") { //this:State
 					action { //it:State
-						println("	basicrobot |  going back (to avoid event-generation) ")
+						println("	basicrobot | going back (to avoid event-generation) ")
 						forward("cmd", "cmd(s)" ,"robotadapter" ) 
-						delay(150) 
+						delay(100) 
 						forward("cmd", "cmd(h)" ,"robotadapter" ) 
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )

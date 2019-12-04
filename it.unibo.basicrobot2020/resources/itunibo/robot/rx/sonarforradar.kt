@@ -13,7 +13,7 @@ class sonarforradar (name : String,  val owner : ActorBasic ) : ApplActorDataStr
  	}
  	
 	override suspend fun elabData( data : String ){ //
-		//println("   $name |  data = $data ")		
+		//println("   $name |  propagates $data ")		
   		val m1 = MsgUtil.buildEvent(name, "polar", "polar($data, 0)")
 		println("   ${name} |  emit m1= $m1")
 		owner.emit( m1 ) 				//emits the qak event polar

@@ -1,7 +1,8 @@
 %====================================================================================
 % smartrobot description   
 %====================================================================================
-context(ctxsmartrobotcaller, "localhost",  "TCP", "8023").
-context(ctxsmartrobot, "192.168.1.6",  "TCP", "8020").
- qactor( smartrobot, ctxsmartrobot, "external").
-  qactor( smartrobotcaller, ctxsmartrobotcaller, "it.unibo.smartrobotcaller.Smartrobotcaller").
+mqttBroker("localhost", "1883").
+context(ctxsmartrobot, "localhost",  "MQTT", "8020").
+context(ctxbasicrobot, "127.0.0.1",  "MQTT", "8018").
+ qactor( basicrobot, ctxbasicrobot, "external").
+  qactor( smartrobot, ctxsmartrobot, "it.unibo.smartrobot.Smartrobot").

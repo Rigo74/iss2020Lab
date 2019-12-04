@@ -25,7 +25,7 @@ class sonardsh (name : String,   val owner : ActorBasic,
   		if( delta >= maxDelta  ){ 
 			LastDistance = Distance
  			val m1 = MsgUtil.buildEvent(name, "sonarRobot", "sonar($data)")
-			//println("   ${name} |  emit m1= $m1")
+			//println("   ${name} |  propagates m1= $m1")
 	 		emitLocalStreamEvent( m1 )  	//PROPAGATE to the pipe
 			//owner.emit( m1 ) 				//emits the qak event sonarRobot
     	}else{

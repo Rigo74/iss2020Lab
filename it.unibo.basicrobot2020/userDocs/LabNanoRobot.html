@@ -266,7 +266,9 @@ when the sonar distance is under a prefixed limit.
 <li>A radar service (project model): 
  <a href="../../it.unibo.qak.radar2020/src/radargui.qak" target="web">radargui.qak</a> in project <em>it.unibo.qak.radar2020</em></li>
 </ol>
+<!--
 
+See LabRobotUsage
 
 <h2>Run</h2>
 <ol>
@@ -285,7 +287,27 @@ in project <em>it.unibo.qak.radar2020</em>
 and open a browser on <tt>PC-IP:8080</tt>
 </li>
 </ol>
+-->
 
+<h1>Requirements</h1>
+<div class="req">
+Build a robot-radar system that includes a <em>basicrobot</em> (equipped with a <em>robot-sonar</em>), a <em>userconsole</em> 
+and a <em>radarGui</em> so that:
+
+<ol>
+<h3>SPRINT1</h3>
+<li><m><kc>REQ-SHOW-DATA</kc></m>: the data produced by the <em>robot-sonar</em> should be <i>properly</i> shown by the <em>radarGui</em>.</li>
+<li><m><kc>REQ-MOVE</kc></m>: an human user can move the robot by using the  <em>userconsole</em>.</li>
+<h3>SPRINT2</h3>
+<li><m><kc>REQ-TURN</kc></m>:  the<em>basicrobot</em> must be able to detect obstacles and turn left of <m><k>90</k></m> degrees when an obstacle
+is detected.</li>
+<h3>SPRINT3</h3>
+<li><m><kc>REQ-STEP</kc></m>:  the <em>basicrobot</em> must be able to execute a command <m><k>step(T)</k></m> that moves the robot for
+the given time <m><k>T</k></m>.
+</ol>
+</div>
+
+See <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.basicrobotusage/userDocs/LabRobotUsage.html" target="lab">LabRobotUsage | Using the basicrobot</a>
  
 </div>  
 

@@ -39,9 +39,9 @@ class  robotDataSourceArduino( name : String, val owner : ActorBasic ,
 				//handle too fast change ?? NOT HERE
   				var dataSonar = v.toInt();													
  				//if( dataSonar < 350 ){ /REMOVED since USING STREAMS
- 				//println("   	%%% $name | mbotSupport sonar: ${ dataSonar }"   );						
  				val event = MsgUtil.buildEvent( name,"sonarRobot","sonar( $dataSonar )")								
- 				//owner.emit(  event )
+  				//println("   	%%% $name | mbotSupport event: ${ event } owner=${owner.name}"   );						
+				//owner.emit(  event )
 				owner.emitLocalStreamEvent( event )
 			    
  				//Oct2019 : emit the event obstacle

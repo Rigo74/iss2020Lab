@@ -5,7 +5,7 @@
  */
 System /*-trace*/ robotradarsys   
 
-mqttBroker "localhost" : 1883 
+mqttBroker "localhost" : 1883  
 
 /*
  * NOTE THAT the msg polar:polar(D,A) can be sent as a dispatch, as a request or as an event
@@ -17,7 +17,7 @@ Reply    fromRadarGui : fromRadarGui(X)
  
 Context ctxRadarGui ip [ host= "localhost"   port= 8038 ] +mqtt
   
-/*
+/* 
  * -----------------------------------------------------------
  * Embeds the radarpojo and provides message-based interaction
  * (it is the 'exoskeleton - decorator')
@@ -35,7 +35,7 @@ QActor radargui context ctxRadarGui{
 	} 
 	Goto waitForDataToShow
 	
-	State waitForDataToShow{ println("radargui waitForDataToShow %%%% ")  } 
+	State waitForDataToShow{   } 
 	Transition t0  
 		 whenRequest polar -> showSpotReply
 		 whenMsg     polar -> showSpotNoReply
@@ -43,7 +43,7 @@ QActor radargui context ctxRadarGui{
   
 	//WARNING: the current message is lost after an empty-move
  	State showSpotNoReply{ 
- 		printCurrentMessage	 
+ 		//printCurrentMessage	 
 		onMsg( polar : polar(D,A) ) {
 			["
 				DistanceStr = payloadArg(0)
@@ -67,7 +67,7 @@ QActor radargui context ctxRadarGui{
 			"]
  	 	} 
  	 }  
- 	 Goto showSpot
+ 	 Goto showSpot  
 	
 	
  	State showSpot{
@@ -87,7 +87,7 @@ QActor radargui context ctxRadarGui{
 QActor sonarsimulator context ctxRadarGui {
 [" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store the results of run
 	State s0 initial{
-		println("demo STARTS working using dispatch")
+		println("demo STARTS working using dispatch on 45")
 		delay 4000 //give time to start the GUI
 		forward radargui -m polar : polar( 0,45 )
 		delay 500
