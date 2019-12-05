@@ -18,7 +18,6 @@ Reply    stepdone  :  stepdone(V)
 Reply    stepfail  :  stepfail(DURATION, CAUSE)
 Dispatch stop      :  stop(V)   		//sent by an external user to block the step
 
-
 Event    boundary  : boundary(V)
 
 Event  obstacle    : obstacle( DISTANCE )  
@@ -47,7 +46,7 @@ var WithResource = true
 var DoStepAnswer = false	//avoid to send answer after a step
 "]  	
 	State s0 initial{
-		run kotlincode.resourceObserver.init("coap://localhost:5683","robot/pos") 
+		//run kotlincode.resourceObserver.init("coap://localhost:5683","robot/pos") 
 		forward basicrobot -m cmd : cmd( a ) 
 		delay 1000
 		forward basicrobot -m cmd : cmd( d )
@@ -67,7 +66,7 @@ var DoStepAnswer = false	//avoid to send answer after a step
 		//run kotlincode.coapSupport.readResource(myself, "robot/pos") 
 		//run kotlincode.coapSupport.readResource(myself, "robot/sonar")
 	}
-	Goto work
+	Goto work 
 	
 	State work{	}
 	Transition s0 

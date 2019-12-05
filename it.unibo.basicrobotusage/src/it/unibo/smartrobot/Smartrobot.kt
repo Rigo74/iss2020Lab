@@ -23,7 +23,6 @@ class Smartrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						kotlincode.resourceObserver.init( "coap://localhost:5683", "robot/pos"  )
 						forward("cmd", "cmd(a)" ,"basicrobot" ) 
 						delay(1000) 
 						forward("cmd", "cmd(d)" ,"basicrobot" ) 

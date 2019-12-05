@@ -781,11 +781,11 @@ We are reproducing oo programming style (<i>instance</i> and <i>state encapsulat
 <tr>
 <td><pre>
 fun getInput() : String{
-    println("Input  ...")
+    println("Input  ... | ${curThread()} ")
     return "myinput"
 }
 fun submit( v: Int, msg: String ) : String{
-    println("Submit ...")
+    println("Submit ... | ${curThread()} ")
     return "$msg-$v"
 }
 fun handle( msg: String ){
@@ -811,11 +811,11 @@ With reference to the set of functions on the left, let us execute a <em>Normal 
 The output is:</m>
 <pre>
 <kc>//OUPUT</kc>
-BEGINS
-Input  ...
-Submit ...
-Handle myinput-10
-ENDS
+BEGINS thread=main / nthreads=2
+Input  ... | thread=main / nthreads=2
+Submit ... | thread=main / nthreads=2
+Handle myinput: 100 | thread=main / nthreads=2
+ENDS thread=main / nthreads=2
 </pre>
 <m>Now, let us suppose that the operation <bc>getInput</bc> takes a long time and that we do not want to block
 the computation. As a solution we could introduce:
@@ -835,23 +835,23 @@ the computation. As a solution we could introduce:
 <tr>
 <td><pre>
 fun doJobCps( n: Int  ){
-    getInputCps(
-        { input -> submitCps( n, input, {
-              msg ->  handle( msg )
-            }//handle
-        )}//submitCps
-     )//getInputCps	
+    getInputCps( <kc>//lambda</kc>
+        { input : String-> submitCps( n, input, {  
+              msg ->  handle( msg )  
+            } 
+        )}<kc>//submitCps</kc>
+     )<kc>//getInputCps</kc>	
 }
-fun getInputCps( callback:( String )-> Unit):Unit{
-    println("Input  ...${curThread()}")
+fun getInputCps(<k>callback:( String )-> Unit</k>):Unit{
+    println("Input  ... | ${curThread()}")
     callback( "myinputcps" )
 }
-fun submitCps(v:Int,msg:String,callback:(String)->Unit){
-    println("Submit ... ${curThread()}")
+fun submitCps(v:Int,msg:String,<k>callback:(String)->Unit</k>){
+    println("Submit ... | ${curThread()}")
     callback( "$msg-$v" )
 }
 fun main() = runBlocking{
-    println("BEGINS ${curThread()}")
+    println("BEGINS CPU=$cpus ${curThread()}")
     doJobCps( 10  )
     println("ENDS ${curThread()}")
 }
@@ -871,11 +871,11 @@ In order to avoid the <bc>anti-pattern</bc> known as
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS thread=main
-Input  ... thread=main 
-Submit ... thread=main
-Handle myinputcps-10  thread=main 
-ENDS thread=main
+BEGINS thread=main / nthreads=2
+Input  ... | thread=main / nthreads=2
+Submit ... | thread=main / nthreads=2
+Handle myinputcps: 10 | thread=main / nthreads=2
+ENDS thread=main / nthreads=2
 </pre>
  
 </td>
@@ -885,19 +885,25 @@ ENDS thread=main
 <td><pre>
 fun getInputAsynchCps(  callback : ( String ) -> Unit ) : Unit{
   kotlin.concurrent.thread(start = true) {
-    println("Input  ...")
+    println("Input  ... | ${curThread()} ")
     Thread.sleep(1000)
 	println("Input received ")
     callback( "myinputasynchcps" )
   }
 }
-fun doJobCps( n: Int  ){
+fun doJobAsynchCps( n: Int  ){
   getInputAsynchCps(
    { input -> submitCps( n, input, {
                  msg ->  handle( msg )
              }//handle
      )}//submitCps
   )//getInputAsynchCps	
+}
+
+fun main() = runBlocking{
+    println("BEGINS CPU=$cpus ${curThread()}")
+    doJobAsynchCps( 10  )
+    println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>
@@ -913,12 +919,13 @@ Note the <a href="https://kotlinlang.org/docs/reference/java-interop.html#sam-co
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS thread=main
-ENDS thread=main
-Input  ... thread=Thread-0 
-Input received thread=Thread-0 
-Submit ... thread=Thread-0
-Handle myinputasynchcps-10  thread=Thread-0 
+BEGINS thread=main / nthreads=2
+ENDS thread=main / nthreads=3
+Input  ...
+Input received 
+Submit ... | thread=Thread-0 / nthreads=3
+Handle myinputasynchcps: 10 | thread=Thread-0 / nthreads=3
+
 </pre>
 </td>
 </tr>
@@ -988,18 +995,16 @@ fun runBlockThread(){
 fun main(){
 	println("BEGINS CPU=$cpus ${curThread()}")
 	runBlockThread()
-	println("BYE")
 	println("ENDS ${curThread()}")
 }
 </pre> </td>
 <td><m>The current Thread (<tt>main</tt>) waits for <tt>1500</tt> msecs.<br></m>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-Out start: thread=main / nthreads=1
-Out ended: thread=main / nthreads=1
-BYE
-ENDS thread=main / nthreads=1
+BEGINS CPU=4 thread=main / nthreads=2
+Out start: thread=main / nthreads=2
+Out ended: thread=main / nthreads=2
+ENDS thread=main / nthreads=2
 </pre>
 </td>
 </tr>
@@ -1015,7 +1020,6 @@ ENDS thread=main / nthreads=1
 fun main(){
 	println("BEGINS CPU=$cpus ${curThread()}")
 	<k>GlobalScope.launch{</k> runBlockThread() <k>}</k>
-	println("BYE")
 	Thread.sleep(1600) <kc>//Required to see the output</kc>
 	println("ENDS ${curThread()}")
 }
@@ -1025,11 +1029,11 @@ The <tt>runBlockThread</tt> is now called in the default Thread devoted to Corou
 </m>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
+BEGINS CPU=4 thread=main / nthreads=2
 BYE
-Out start: thread=DefaultDispatcher-worker-1 / nthreads=4
-Out ended: thread=DefaultDispatcher-worker-1 / nthreads=4
-ENDS thread=main / nthreads=4
+Out start: thread=DefaultDispatcher-worker-2 / nthreads=5
+Out ended: thread=DefaultDispatcher-worker-2 / nthreads=5
+ENDS thread=main / nthreads=5
 </pre>
 <m>
 Without the <tt>Thread.sleep</tt> the programs ends immediately and no output is shown.  
@@ -1089,11 +1093,11 @@ No <tt>Thread.sleep</tt> tis required now.  <br/>
 
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
+BEGINS CPU=4 thread=main / nthreads=2
 BYE
-ENDS thread=main / nthreads=1
-Out start: thread=main / nthreads=1
-Out ended: thread=main / nthreads=1
+ENDS thread=main / nthreads=2
+Out start: thread=main / nthreads=2
+Out ended: thread=main / nthreads=2
 </pre>
 <m>
 <bc>runBlocking</bc>  is designed to bridge regular blocking code to libraries written in suspending style, 
@@ -1125,11 +1129,11 @@ fun main() =  runBlocking {
 
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-Out start: thread=main / nthreads=1
-Out ended: thread=main / nthreads=1
+BEGINS CPU=4 thread=main / nthreads=2
+Out start: thread=main / nthreads=2
+Out ended: thread=main / nthreads=2
 BYE
-ENDS thread=main / nthreads=1
+ENDS thread=main / nthreads=2
 </pre>
 <m>
 Since we use <bc>launch</bc> instead of <bc>GlobalScope.launch</bc>, then the coroutine is launched in the
@@ -1172,11 +1176,11 @@ fun main() =  runBlocking {
 <td>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-IO operation | STARTS in thread=main / nthreads=1
-IO operation | Done, TIME=1031
+BEGINS CPU=4 thread=main / nthreads=2
+IO operation | STARTS in thread=main / nthreads=2
+IO operation | Done, TIME=1013
 BYE
-ENDS thread=main / nthreads=1
+ENDS thread=main / nthreads=2
 </pre>
 <m>If we execute:</m>
 <pre>
@@ -1189,11 +1193,11 @@ fun main() =  runBlocking {
 <br/>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
+BEGINS CPU=4 thread=main / nthreads=2
 BYE
-ENDS thread=main / nthreads=1
-IO operation | STARTS in thread=main / nthreads=1
-IO operation | Done, TIME=1015
+ENDS thread=main / nthreads=2
+IO operation | STARTS in thread=main / nthreads=2
+IO operation | Done, TIME=1024
 </pre>
 
 </td>
@@ -1304,7 +1308,7 @@ suspend fun activate(){
     val job2 = <k>GlobalScope.async</k>{
         ioBoundFun()
     }
-    if(! job1.isCompleted || ! job2.isCompleted)
+    if(<ks>! job1.isCompleted || ! job2.isCompleted</ks>)
     println("Waiting for completion")
     val end1 = job1<k>.await()</k>
     val end2 = job2<k>.await()</k>
@@ -1325,16 +1329,15 @@ fun main() = runBlocking{
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-IO operation | STARTS in thread=DefaultDispatcher-worker-1 / nthreads=4
+BEGINS CPU=4 thread=main / nthreads=2
 Waiting for completion
-IO operation | STARTS in thread=DefaultDispatcher-worker-2 / nthreads=5
-IO operation | Done, TIME=1016
-IO operation | Done, TIME=1016
+IO operation | STARTS in thread=DefaultDispatcher-worker-1 / nthreads=6
+IO operation | STARTS in thread=DefaultDispatcher-worker-2 / nthreads=6
+IO operation | Done, TIME=1054
+IO operation | Done, TIME=1056
 All jobs done
 BYE
-ENDS thread=main / nthreads=6
-
+ENDS thread=main / nthreads=7
 </pre>
 </td>
 </tr>
@@ -1391,13 +1394,13 @@ The size of this thread pool is 64</li>
 </m> 
 <pre>
 <kc>//OUPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-2) Unconfined | thread=main / nthreads=1
-3) Default | thread=DefaultDispatcher-worker-2 / nthreads=4
-4) newSingleThreadContext | thread=MyThr / nthreads=5
-1) runBlocking | thread=main / nthreads=5
+BEGINS CPU=4 thread=main / nthreads=2
+2) Unconfined | thread=main / nthreads=2
+3) Default | thread=DefaultDispatcher-worker-1 / nthreads=5
+1) runBlocking | thread=main / nthreads=6
+4) newSingleThreadContext | thread=MyThr / nthreads=6
 BYE
-ENDS thread=main / nthreads=5
+ENDS thread=main / nthreads=6
 </pre>
 </td>
 </tr>
@@ -1691,10 +1694,10 @@ fun main() = runBlocking<Unit>{
 </m>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-Completed 100000 actions in 40 ms
-BYE with Counter = 88239
-ENDS thread=main / nthreads=5
+BEGINS CPU=4 thread=main / nthreads=2
+Completed 100000 actions in 82 ms
+BYE with Counter = 95798
+ENDS thread=main / nthreads=6
 </pre>
 </td>
 </tr>
@@ -1710,16 +1713,17 @@ var counter = <k>java.util.concurrent.atomic.AtomicInteger()</k>
 fun main() = runBlocking<Unit>{
     println("BEGINS CPU=$cpus ${curThread()}")
     <ks>GlobalScope.massiveRun{counter.incrementAndGet()}</ks>
+	println("BYE with Counter = $counter")
     println("ENDS with Counter = ${counter.get()}")
 }
 </pre> </td>
 <td>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-Completed 100000 actions in 73 ms
+BEGINS CPU=4 thread=main / nthreads=2
+Completed 100000 actions in 105 ms
 BYE with Counter = 100000
-ENDS thread=main / nthreads=5
+ENDS thread=main / nthreads=6
 </pre>
 <m>However, <em>Thread-safe data</em> does not easily scale to complex state or to complex operations.</m> 
 </td>
@@ -1888,19 +1892,18 @@ fun main() = runBlocking{
 
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS CPU=4 thread=main / nthreads=1
-SENDER | sent 0 in thread=DefaultDispatcher-worker-2 / nthreads=4
-SENDER | sent 1 in thread=DefaultDispatcher-worker-2 / nthreads=4
-RECEIVER | receives 0 in thread=DefaultDispatcher-worker-2 / nthreads=4
-SENDER | sent 2 in thread=DefaultDispatcher-worker-3 / nthreads=4
-SENDER | sent 3 in thread=DefaultDispatcher-worker-3 / nthreads=4
-RECEIVER | receives 1 in thread=DefaultDispatcher-worker-2 / nthreads=4
-RECEIVER | receives 2 in thread=DefaultDispatcher-worker-2 / nthreads=4
-RECEIVER | receives 3 in thread=DefaultDispatcher-worker-2 / nthreads=4
-RECEIVER | receives 4 in thread=DefaultDispatcher-worker-2 / nthreads=5
-SENDER | sent 4 in thread=DefaultDispatcher-worker-3 / nthreads=5
-Done. time=3568
-BYE
+BEGINS CPU=4 thread=main / nthreads=2
+SENDER | sent 0 in thread=DefaultDispatcher-worker-1 / nthreads=5
+SENDER | sent 1 in thread=DefaultDispatcher-worker-1 / nthreads=5
+RECEIVER | receives 0 in thread=DefaultDispatcher-worker-1 / nthreads=5
+RECEIVER | receives 1 in thread=DefaultDispatcher-worker-1 / nthreads=5
+RECEIVER | receives 2 in thread=DefaultDispatcher-worker-1 / nthreads=5
+SENDER | sent 2 in thread=DefaultDispatcher-worker-2 / nthreads=5
+SENDER | sent 3 in thread=DefaultDispatcher-worker-2 / nthreads=5
+SENDER | sent 4 in thread=DefaultDispatcher-worker-2 / nthreads=5
+RECEIVER | receives 3 in thread=DefaultDispatcher-worker-1 / nthreads=5
+RECEIVER | receives 4 in thread=DefaultDispatcher-worker-1 / nthreads=5
+Done. time=3573
 ENDS thread=main / nthreads=5
 </pre>
 
@@ -1921,9 +1924,9 @@ but this goes contrary to common sense that results must be returned from functi
 There is a convenient coroutine builder named <bc>produce</bc> that makes it easy to do it right on producer side, 
 and an extension function <bc>consumeEach</bc>, that replaces a for loop on the consumer side.
 <br/><br/>
-A <em>Producer</em> is associated with the channel that it sends elements to (a <bc>ReceiveChannel</bc>) and works as follows:
+A <em>Producer</em> is associated with the channel that it sends elements to (a <bc>ReceiveChannel</bc> interface) and works as follows:
 <ul>
-<li>suspends after a value s produced and  resumes when a new value is requested (similar to suspending sequences and iterators)</li>
+<li>suspends after a value is produced and  resumes when a new value is requested (similar to suspending sequences and iterators)</li>
 <li>can be built with the coroutine builder <bc>produce</bc> and 
 a specific <tt>CoroutineContext</tt> (as with <bc>launch</bc> or <bc>async</bc>) </li>
 <li>the body of the suspending lambda that is passed can suspend at any point</li>
@@ -1942,7 +1945,7 @@ a specific <tt>CoroutineContext</tt> (as with <bc>launch</bc> or <bc>async</bc>)
 val <ks>simpleProducer</ks> : <tt>ReceiveChannel&lt;Int></tt> =
   <k>GlobalScope.produce {</k>
     for( i in 1..3 ){
-        println( "simpleProducer produces $i")
+        println( "simpleProducer produces $i in  ${curThread()}")
         <k>send( i )</k>
     }
   }
@@ -1971,14 +1974,14 @@ The channel has <b>no buffer by default</b>; it is closed when the coroutine com
 <br/> 
 <pre>
 <kc>//OUTPUT</kc>
-BEGIN
-simpleProducer produces 1 in thread=DefaultDispatcher-worker-1
-simpleProducer produces 2 in thread=DefaultDispatcher-worker-1
-consume receives 1 in thread=main
-consume receives 2 in thread=main
-simpleProducer produces 3 in thread=DefaultDispatcher-worker-1
-consume receives 3 in thread=main
-END
+simpleProducer produces 1 in thread=DefaultDispatcher-worker-2 / nthreads=5
+BEGINS CPU=4 thread=main / nthreads=5
+simpleProducer produces 2 in thread=DefaultDispatcher-worker-2 / nthreads=5
+consume receives 1 in thread=main / nthreads=5
+consume receives 2 in thread=main / nthreads=5
+simpleProducer produces 3 in thread=DefaultDispatcher-worker-2 / nthreads=5
+consume receives 3 in thread=main / nthreads=5
+ENDS thread=main / nthreads=5
 </pre>
 <m> The full code is in <a href="../src/prodCons/simpleProducerKotlin.kt" target="code">simpleProducerKotlin.kt</a></m>
  
@@ -2080,14 +2083,14 @@ fun main() = runBlocking{
 <br/>The output is:</m>
 <pre>
 <kc>//OUTPUT</kc>
-aProducer produces 1 in thread=DefaultDispatcher-worker-2
-BEGIN
-END
-consumer2 receives 1 in thread=main
-aProducer produces 2 in thread=DefaultDispatcher-worker-2
-aProducer produces 3 in thread=DefaultDispatcher-worker-2
-consumer1 receives 2 in thread=main
-consumer2 receives 3 in thread=main
+aProducer produces 1 in thread=DefaultDispatcher-worker-1 / nthreads=5
+BEGINS CPU=4 thread=main / nthreads=5
+ENDS thread=main / nthreads=5
+consumer2 receives 1 in thread=main / nthreads=5
+aProducer produces 2 in thread=DefaultDispatcher-worker-1 / nthreads=5
+aProducer produces 3 in thread=DefaultDispatcher-worker-1 / nthreads=5
+consumer1 receives 2 in thread=main / nthreads=6
+consumer2 receives 3 in thread=main / nthreads=6
 </pre>
 <m>The full code is in <a href="../src/prodCons/prodManyConsKotlin.kt" target="code">prodManyConsKotlin.kt</a>.
  
@@ -2122,12 +2125,17 @@ As a consequence, our previous <a href="#concur">concurrency problem</a> can be 
 <ul>
 <li>confines the access of a state to a single Coroutine</li>
 <li>is associated with the <bc>channel</bc> (<tt>unbuffered</tt> by default ) that it receives messages from</li>
-<li>has type <bc>SendChannel&ltT></bc> where <tt>T</tt> is the type of message it can handle</li>
+<li>has type <bc>SendChannel&ltT></bc> (interface) where <tt>T</tt> is the type of message it can handle</li>
 <li>modifies the state by handling the messages received on its <bc>channel</bc> </li>
 </ul>
 
+The object of interface <em>CompletableDeferred</em>  
+(see <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-completable-deferred/" target="web">CompletableDeferred</a>))
+is a <tt>Deferred</tt> that can be completed via public functions <bc>complete</bc> or <bc>cancel</bc>.
+All functions on this interface and on all interfaces derived from it, are <bc>thread-safe</bc> and can be safely invoked 
+from concurrent coroutines without external synchronization.
 
-
+<br/><br/>
 <center><table style="width:95%">
 <tbody>	
 
@@ -2142,7 +2150,9 @@ val <ks>counter</ks> = <k>GlobalScope.actor&lt;CounterMsg></k> {
     var localCounter = 0 <kc>// actor state</kc>
     for (<k>msg in channel</k>) { <kc>// iterate over incoming messages</kc>
 	     if( localCounter % 10000 == 0 ) 
-			println("${msg.cmd} | $localCounter in ${curThread()}")
+			println("${msg.cmd} | $localCounter 
+						in ${curThread()} 
+						channel full=${channel.isFull}")
         <k>when</k> ( msg.cmd ) {
             "INC" -> localCounter++
             "DEC" -> localCounter--
@@ -2152,19 +2162,18 @@ val <ks>counter</ks> = <k>GlobalScope.actor&lt;CounterMsg></k> {
 }
 
 fun main() = runBlocking<Unit>{
-    val cpus = Runtime.getRuntime().availableProcessors();
-    println("BEGINS with $cpus  cores")
-    val initVal = CompletableDeferred<Int>()
+	println("BEGINS CPU=$cpus ${curThread()}")
+    val initVal = CompletableDeferred&lt;Int>()
     <ks>counter</ks>.send(CounterMsg("GET", initVal))
     println("Counter INITIAL VALUE=${initVal.await()}")
-    massiveRun {
+    massiveRun { <kc>//see demoConcurrency.kt</kc>
         counter.send(CounterMsg("INC") )
     }
-    val finalVal = CompletableDeferred<Int>()
+    val finalVal = CompletableDeferred&lt;Int>()
     <ks>counter</ks>.send(CounterMsg("GET", finalVal))
-    println("Counter FINAL VALUE= = ${finalVal.await()}")
-    <ks>counter</ks>.close() <ks>// shutdown the actor</ks>
-    println("ENDS ")
+    println("Counter FINAL VALUE= = ${ <k>finalVal.await()</k> }")
+    <ks>counter</ks>.close() <kc>// shutdown the actor</kc>
+    println("ENDS ${curThread()}")
 }
 <m>
 </m>
@@ -2189,23 +2198,23 @@ and <tt>response</tt> bound to an object that will include the response, once av
 <br/>
 <pre>
 <kc>//OUTPUT</kc>
-BEGINS with 4  cores
-GET | 0 in thread=DefaultDispatcher-worker-2
+BEGINS CPU=4 thread=main / nthreads=5
+GET | 0 in thread=DefaultDispatcher-worker-2 / nthreads=5 channel full=true
 Counter INITIAL VALUE=0
-INC | 0 in thread=DefaultDispatcher-worker-2
-INC | 10000 in thread=DefaultDispatcher-worker-2
-INC | 20000 in thread=DefaultDispatcher-worker-2
-INC | 30000 in thread=DefaultDispatcher-worker-1
-INC | 40000 in thread=DefaultDispatcher-worker-1
-INC | 50000 in thread=DefaultDispatcher-worker-2
-INC | 60000 in thread=DefaultDispatcher-worker-4
-INC | 70000 in thread=DefaultDispatcher-worker-1
-INC | 80000 in thread=DefaultDispatcher-worker-3
-INC | 90000 in thread=DefaultDispatcher-worker-2
-Completed 100000 actions in 676 ms
-GET | 100000 in thread=DefaultDispatcher-worker-2
+INC | 0 in thread=DefaultDispatcher-worker-3 / nthreads=5 channel full=true
+INC | 10000 in thread=DefaultDispatcher-worker-1 / nthreads=6 channel full=true
+INC | 20000 in thread=DefaultDispatcher-worker-2 / nthreads=6 channel full=true
+INC | 30000 in thread=DefaultDispatcher-worker-4 / nthreads=6 channel full=true
+INC | 40000 in thread=DefaultDispatcher-worker-2 / nthreads=6 channel full=true
+INC | 50000 in thread=DefaultDispatcher-worker-1 / nthreads=6 channel full=true
+INC | 60000 in thread=DefaultDispatcher-worker-3 / nthreads=6 channel full=true
+INC | 70000 in thread=DefaultDispatcher-worker-2 / nthreads=6 channel full=true
+INC | 80000 in thread=DefaultDispatcher-worker-2 / nthreads=6 channel full=true
+INC | 90000 in thread=DefaultDispatcher-worker-2 / nthreads=6 channel full=true
+Completed 100000 actions in 1639 ms
+GET | 100000 in thread=DefaultDispatcher-worker-2 / nthreads=6 channel full=true
 Counter FINAL VALUE= = 100000
-ENDS  
+ENDS thread=main / nthreads=6
 </pre>
 </m> 
 </td>
@@ -2214,11 +2223,6 @@ ENDS
 </tbody>	
 </table></center>
 
-The object of interface <em>CompletableDeferred</em>  
-(see <a href="https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-completable-deferred/" target="web">CompletableDeferred</a>))
-is a <tt>Deferred</tt> that can be completed via public functions <bc>complete</bc> or <bc>cancel</bc>.
-All functions on this interface and on all interfaces derived from it, are <bc>thread-safe</bc> and can be safely invoked 
-from concurrent coroutines without external synchronization.
 
 <h2><a id="dispatch"/>Dispatchers</h2>
 <center><table style="width:95%">

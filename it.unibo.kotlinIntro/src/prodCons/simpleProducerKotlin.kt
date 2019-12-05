@@ -1,5 +1,6 @@
 package prodCons
 
+import kotlindemo.cpus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
@@ -20,15 +21,16 @@ val simpleProducer : ReceiveChannel<Int> = GlobalScope.produce{
 suspend fun consume(){
     val v = simpleProducer.receive()
     println( "consume receives ${v} in ${curThread()}" )
+    /*
     simpleProducer.consumeEach {
         println( "consume receives $it in ${curThread()}" )
-    }
+    }*/
 }
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 fun main() = runBlocking{
-	println( "BEGIN")
+    println("BEGINS CPU=$cpus ${kotlindemo.curThread()}")
     consume()
-    println( "END")
+    println("ENDS ${kotlindemo.curThread()}")
 }
