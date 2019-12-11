@@ -33,7 +33,7 @@ public class TerminalControl {
 		IBaseRobotCommand right       = new BaseRobotRight(speedMedium);
 		IBaseRobotCommand stop        = new BaseRobotStop( speedLow );
 		IBaseRobotCommand last        = stop;
-
+/*
 		IBaseRobot robot = Configurator.getInstance().getBaseRobot();
 
 		Configurator configurator = Configurator.getInstance();
@@ -51,11 +51,12 @@ public class TerminalControl {
 				  }				
 			}
 		}.start();
-		  
+*/		  
 //		 Set<ISensor<?>> lineSet= configurator.getSensors(SensorType.DISTANCE);
 //		 for (ISensor<?> iSensor : lineSet) {
 //			 System.out.println("!!!!!! " + iSensor.getDefStringRep());
 //		 }
+		/*
 		robot.execute(forward);
 		Thread.sleep(1000);
 		robot.execute(backward);
@@ -63,11 +64,12 @@ public class TerminalControl {
 		robot.execute(stop);
 		
 		System.out.println("w = forward, a =  left, d = right, s = back, h = stop");
-		
+		*/
 //		String[] cmd = { "/bin/sh", "-c", "stty  -icanon min 1  raw -echo </dev/tty" };
 //		Runtime.getRuntime().exec(cmd).waitFor();
 		
 		Console console = System.console();
+		System.out.println("console "+console);
 		Reader reader   = console.reader();
 
 		while (true) {
@@ -76,7 +78,7 @@ public class TerminalControl {
 			if( t == 10 || t == 13 ) continue;
 			char cmd = (char) t;
 			System.out.println("EXCECUTE "+cmd + " " + t); 
-			
+/*			
 			switch( cmd ) {
 				case 'h' : robot.execute(stop); break;
 				case 'w' : robot.execute(forward); break;
@@ -85,6 +87,7 @@ public class TerminalControl {
 				case 'd' : robot.execute(right); break;
 				default: { System.out.println("Bye "); System.exit(0);}
  			}
+ 			*/
 //			if (b == 'h') {
 //				robot.execute(stop);
 //			} else if (b == 'w') {

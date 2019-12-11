@@ -16,19 +16,16 @@ class resRobotSonar( val owner: ActorBasic, name : String) : CoapResource( name 
 		println("resource $name  | created  " );		
 	}
 	override fun handleGET( exchange : CoapExchange ) {
-		println("resource $name  | GET: ${exchange.getRequestText()} distance=$distance")
+		println(" $name  | GET: ${exchange.getRequestText()} distance=$distance")
 		exchange.respond( distance );
 	}
-//	override fun handlePOST( exchange : CoapExchange ) {
-//	}
+ 
 	override fun handlePUT( exchange : CoapExchange) {
+		println(" $name  | PUT: ${exchange.getRequestText()} distance=$distance")
 		distance = exchange.getRequestText()
 		changed()	// notify all CoAp observers
 		exchange.respond(CHANGED)
 	}
-//	override fun handleDELETE( exchange : CoapExchange) {
-//		delete();
-//		exchange.respond(DELETED);
-//	}
+ 
 	
 }

@@ -132,6 +132,13 @@ div.req{
     margin: 10px;
 }    
 
+div.remark{
+	background-color: #FFFC33;     
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}  
+
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
@@ -1914,6 +1921,10 @@ ENDS thread=main / nthreads=5
 </tbody>	
 </table></center>
 
+<div class="remark">
+Do not communicate by sharing memory; instead, share memory by communicating.
+</div>
+
 <h2><a id="kotlinprodcons"/>Producers-consumers in Kotlin</h2>
 <m>
 The pattern where a coroutine is producing a sequence of elements is quite common. 
@@ -2146,7 +2157,8 @@ class <ks>CounterMsg</ks>(
   val response:CompletableDeferred&ltInt>?=null){
 }
 
-val <ks>counter</ks> = <k>GlobalScope.actor&lt;CounterMsg></k> {
+val <ks>counter</ks> : <tt>SendChannel&lt;CounterMsg></tt> = 
+  <k>GlobalScope.actor&lt;CounterMsg></k> {
     var localCounter = 0 <kc>// actor state</kc>
     for (<k>msg in channel</k>) { <kc>// iterate over incoming messages</kc>
 	     if( localCounter % 10000 == 0 ) 

@@ -580,34 +580,203 @@ Such a resource is implemented as a <m><k>CoAP resource</k></m> with url=<m><ks>
 <li>Is able to start the <m><k>CoAP resource</k></m> in automatic way, together with a <em>resourceObserver</em>.
 However, another way to look at the resource evolution can be done also via 'alien' components, including Copper. </li>
 <li>Can receive commands from a 'conventional' console (for example a console written in python) or from  a <tt>CoAP client</tt>
-that sends to the resource <m><k>PUT</k></m> commands with argument <tt>"p"</tt>.</li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
+that sends commands to the resource <m><k>PUT</k></m> verb.</li>
+
 </ol>
 
 
-To see the code,  <a href="../src/smartrobot.qak" target="code">smartrobot.qak</a>.
+To see some code:  <a href="../src/smartrobot.qak" target="code">smartrobot.qak</a>.
 
 <br/><br/>
+
+
+<h2 id="incrbuild">Incremental building</h2>
  <table style="width:98%">
 <tbody>	
 
-<tr>
-<td style="width:50%" ><m>
-<pre><m>
+ <tr>
+<td style="width:50%" >
+<h3>Coroutines, channels, actors</h3>
+ <img src="./img/ActorBasic.png" alt="ActorBasic.png" width="50%"  /> 
+<m><div class="remark">
+Do not communicate by sharing memory; instead, share memory by communicating
+</div>
+</m>
+</td>
+<td><m> 
+<em>ActorBasic</em> is a kotlin class that embeds an <ks>actor</ks>. It works in a message-driven way. It could be part of a
+context of type <em>QakContext</em>.
+<br/><br/>
+ An <em>actor</em> is a coroutine builder a dual of <k>produce</k> coroutine builder. 
+ It is made up of a <ks>coroutine</ks> and a <ks>channel</ks> to communicate with other coroutines.<br/><br/>
+<em>Coroutines</em> are <i>suspended functions</i>, i.e. computations that can be suspended without blocking a thread.<br/>
+<k>send</k> and <k>receive</k> are suspending functions used for providing and consuming (FIFO) objects from a <ks>Channel&lt;T></ks><br/>  
+<br/>  See 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.kotlinIntro/userDocs/LabIntroductionToKotlin.html#actors" target="web">
+LabKotlin | Introduction to KOTLIN: Actors</a>
+</m>
+</td>
+</tr>
 
-</m></pre>
-</m></td>
+ <tr>
+<td style="width:50%" >
+<h3>QActor</h3>
+ <img src="./img/QActor.png" alt="QActor.png" width="30%"  /> 
+<m> 
+</m>
+</td>
+<td><m> 
+<em>QActor</em> is an abstraction implements by the kotlin class <ks>ActorBasicFsm</ks> that extends <em>ActorBasic</em> 
+It works as a FSM, i.e. in a message-based way.<br/>
+It is  part of a context of type <em>QakContext</em> and interacts with other QActor by means of dispatch, request or events.
+<br/><br/>
+See 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.qakintro2020/userDocs/LabQakIntro2020.html" target="web">
+LabQakIntro2020.html</a>
+</m>
+</td>
+</tr>
+
+
+
+<tr>
+<td style="width:50%" >
+<h3>The robotSupport and the sonar pipe</h3>
+<img src="./img/sonarpipe.png" alt="sonarpipe.png" width="100%"  />
+<m>
+ 
+</m>
+</td>
 <td><m>
+ 
+<ul>
+<li><em>robotAdapterQaStream</em>: a QActor that provides an 'adapter-utility' to send commands the robot actuators
+and works as an observable sonar data source.
+<br/><br/>
+</li>
+<li><em>sonardh</em>: an ActorBasic that eliminates 'wrong' sonar data
+<br/>See <a href="../resources/itunibo/robot/rx/sonardsh.kt" target="code">sonardsh.kt</a> 
+<br/><br/></li>
+<li><em>filter</em>: : an ActorBasic that detects obstacles and emits (using the <em>robotAdapterQaStream</em>) the <k>obstacle</k> event.
+ It is the end of a built-in pipe that can be extended by the application designer.
+<br/><br/>
+</li>
+<li><em>sonarforradar</em>: : an ActorBasic defined by the application designer
+that emits <k>polar</k> events.
+ <br/><br/>
+</li>
+</ul>
  </m>
 </td>
 </tr>
+
+
+<tr>
+<td style="width:50%" >
+<h3>The basicrobot layer</h3>
+<img src="./img/basicrobot.png" alt="basicrobot.png" width="100%"  />
+<m>
+See <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.basicrobot2020/userDocs/LabNanoRobot.html#basicrobot" target="web">
+LabNanoRobot | The basicrobot </a>
+</m>
+</td>
+<td><m>
+The <em>basicrobot</em>:
+<ul>
+<li>accepts commands for the actuators (motors) via MQTT or via the TCP-port 8018</li>
+<li>handles sensor data (sonar) by using a reactive pipe (made of components of <tt>ActorBasic</tt> type) and emits events related
+to the perceived distance.</li>
+<li>can be used by means of a console working as a TCP-client or as a MQTT-publisher
+<center><img src="./img/jupConsole.png" alt="jupConsole.png" width="40%"  /> </center>
+</li>
+</ul>
+ </m>
+</td>
+</tr>
+
+
+<tr>
+<td style="width:50%" >
+<h3>The smartrobot layer</h3>
+<img src="./img/smartrobot.png" alt="smartrobot.png" width="100%"  />
+<m>
+The model: <a href="../src/smartrobot.qak" target="code">smartrobot.qak</a>  
+</m></td>
+<td><m>
+The  <em>smartrobot</em>
+<ul>
+<li> works as a new layer built upon the <em>basicrobot</em> that adds the new command <ks>step</ks>.</li>
+<li>can be used by means of a console working as a TCP-client (port <tt>8020</tt>)  or as a MQTT-publisher</li>
+</ul>
+
+ </m>
+ </td>
+</tr>
+
+
+<tr>
+<td style="width:50%" >
+<h3>The system as a (CoAP) resource</h3>
+<img src="./img/smartrobotcoap.png" alt="smartrobotcoap.png" width="100%"  />
+<m>
+The resources: <br/>
+<a href="../resources/kotlincode/resRobotPosition.kt" target="code">resRobotPosition.kt</a>   <br/>
+<a href="../resources/kotlincode/resRobotSonar.kt" target="code">resRobotSonar.kt</a>
+</m></td>
+<td><m>
+The  <em>smartrobot</em>:
+<ul>
+<li>accepts commands on the url-path <ks>robot/pos</ks></li>
+<li>updates distance on the url-path <ks>robot/sonar</ks>.
+<li>can be used by means of a console working as a CoAP-client <br/>
+ <img src="./img/userconsole.png" alt="userconsole.png" width="40%"  /> 
+ <a href="../resources/consolegui/consoleGui.kt" target="code">consoleGui.kt</a> 
+<img src="./img/copper.png" alt="copper.png" width="40%"  /> 
+</li>
+</ul>
+ </m>
+ </td>
+</tr>
+
+<tr>
+<td style="width:50%" >
+<h3>A Web-frontend server (in Node)</h3>
+<img src="./img/smartrobotfrontendcoap.png" alt="smartrobotfrontendcoap.png" width="100%"  />
+<m>
+See the project  <ks>it.unibo.frontend20</ks>
+</m></td>
+<td>
+ <img src="./img/webpage.png" alt="webpage.png" width="40%"  /> <br/>
+<m>
+The Web-page uses a <ks>socket-io</ks> and is updated by a CoAP client observer written in Node
+that sends the received information on the <ks>socket-io</ks>.
+<br/><br/>
+It could be updated also by a mqtt support, but the usage of the CoAP resource will exclude the knowledge of
+any implementation detail (e.g. the topic <tt>unibo/qak/events</tt>).
+<!--
+as follows:
+<ol>
+<li>the frontend server mqtt-subscribes on the topic <tt>unibo/qak/events</tt></li>
+<li>when the mqtt support receives an event, it sends information on the <ks>socket-io</ks> </li>
+</ol>
+
+It could use also a CoAP client observer written in Node.
+-->
+ </m>
+
+ 
+ </td>
+</tr>
+
+
 </tbody>
 </table>
+<h2>Architecture</h2>
+<hr/> 
+<center><img src="./img/smartrobotall.png" alt="smartrobotall.png" width="80%"  /></center>
+<hr/> 
+
+<br/><br/> 
 			   
 </div>  
 

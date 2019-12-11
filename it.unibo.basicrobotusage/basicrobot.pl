@@ -1,6 +1,8 @@
 %====================================================================================
 % basicrobot description   
 %====================================================================================
-context(ctxrobot, "localhost",  "TCP", "8018").
- qactor( robot, ctxrobot, "it.unibo.robot.Robot").
-  qactor( robotcallersimulator, ctxrobot, "it.unibo.robotcallersimulator.Robotcallersimulator").
+mqttBroker("localhost", "1883").
+context(ctxbasicrobot, "localhost",  "MQTT", "8018").
+ qactor( robotadapter, ctxbasicrobot, "itunibo.robot.robotAdapterQaStream").
+  qactor( basicrobot, ctxbasicrobot, "it.unibo.basicrobot.Basicrobot").
+  qactor( sentinel, ctxbasicrobot, "it.unibo.sentinel.Sentinel").

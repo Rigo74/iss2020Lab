@@ -32,6 +32,7 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("work") { //this:State
 					action { //it:State
+						println("basicrobot waiting ... ")
 					}
 					 transition(edgeName="t00",targetState="handleCmd",cond=whenDispatch("cmd"))
 					transition(edgeName="t01",targetState="handleUserCmd",cond=whenEvent("userCmd"))

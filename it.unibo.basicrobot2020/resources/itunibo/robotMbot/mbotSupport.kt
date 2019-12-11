@@ -18,7 +18,7 @@ object mbotSupport{
 	var dataSonar        : Int = 0 ; //Double = 0.0
  			
 	fun create( owner: ActorBasic, port : String   ){
-		this.owner = owner
+		this.owner = owner	//
 		initConn( port   )
 	}
 	

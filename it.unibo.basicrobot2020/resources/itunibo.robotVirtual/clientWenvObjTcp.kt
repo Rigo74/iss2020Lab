@@ -41,15 +41,15 @@ import alice.tuprolog.*
 //			val ts = t.getArg(0).toString()
 //			when( ts ){
 			when( v ){
-				"w"  -> outS = "{'type': 'moveForward',  'arg': -1 }"
-    			"s"  -> outS = "{'type': 'moveBackward', 'arg': -1 }"
-				"a"  -> outS = "{'type': 'turnLeft', 'arg': 400 }"
- 				"d"  -> outS = "{'type': 'turnRight', 'arg': 400 }"
-//				"l"  -> outS = "{'type': 'turnLeft', 'arg': 400 }"
-// 				"r"  -> outS = "{'type': 'turnRight', 'arg': 400 }"
-//				"x"  -> outS = "{'type': 'turnLeft', 'arg': 400 }"
-// 				"z"  -> outS = "{'type': 'turnRight', 'arg': 400 }"
-   			    "h"  -> outS = "{'type': 'alarm', 'arg': 0 }"
+				"w"  -> outS = "{'type': 'moveForward',  'arg': -1  }"
+    			"s"  -> outS = "{'type': 'moveBackward', 'arg': -1  }"
+				"a"  -> outS = "{'type': 'turnLeft',     'arg': -1  }"
+ 				"d"  -> outS = "{'type': 'turnRight',    'arg': -1  }"
+				"l"  -> outS = "{'type': 'turnLeft',     'arg': 400 }"
+ 				"r"  -> outS = "{'type': 'turnRight',    'arg': 400 }"
+				"x"  -> outS = "{'type': 'turnLeft',     'arg': 400 }"
+ 				"z"  -> outS = "{'type': 'turnRight',    'arg': 400 }"
+   			    "h"  -> outS = "{'type': 'alarm',        'arg': 0   }"
  			}
 			val jsonObject = JSONObject(outS)
 			val msg= "$sep${jsonObject.toString()}$sep"

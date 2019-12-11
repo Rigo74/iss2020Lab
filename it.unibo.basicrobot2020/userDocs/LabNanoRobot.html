@@ -259,6 +259,73 @@ to generate qak-events for those data only.
 Moreover, we can easily add to this data-pipe another filter able to generate other events, e.g. <m><ks>obstacle : obstacle( D )</ks></m>
 when the sonar distance is under a prefixed limit.
 
+
+<br/><br/>
+
+<table style="width:98%">
+<tbody>	
+
+<tr>
+<td style="width:50%" >
+<h3>The robotSupport and the sonar pipe</h3>
+<img src="./img/sonarpipe.png" alt="sonarpipe.png" width="100%"  />
+<m>
+ 
+</m>
+</td>
+<td><m>
+ 
+<ul>
+<li><em>robotAdapterQaStream</em>: a QActor that provides an 'adapter-utility' to send commands the robot actuators
+and works as an observable sonar data source.
+<br/>See <a href="../resources/itunibo/robot/robotAdapterQaStream.kt" target="code">robotAdapterQaStream.kt</a> 
+<br/><br/>
+</li>
+<li><em>sonardh</em>: an ActorBasic that eliminates 'wrong' sonar data
+<br/>See <a href="../resources/itunibo/robot/rx/sonardsh.kt" target="code">sonardsh.kt</a> 
+<br/><br/></li>
+<li><em>filter</em>: : an ActorBasic that detects obstacles and emits (using the <em>robotAdapterQaStream</em>) the <k>obstacle</k> event.
+It is the end of a built-in pipe that can be extended by the application designer.
+<br/>See <a href="../resources/itunibo/robot/rx/sonaractorfilter.kt" target="code">sonaractorfilter.kt</a>.
+<br/><br/>
+</li>
+<li><em>sonarforradar</em>: : an ActorBasic defined by the application designer
+that emits <k>polar</k> events.
+ <br/><br/>
+</li>
+</ul>
+ </m>
+</td>
+</tr>
+
+
+<tr>
+<td style="width:50%" >
+<h3>The basicrobot layer</h3>
+<img src="./img/basicrobot.png" alt="basicrobot.png" width="100%"  />
+<m>
+The model:  <a href="../src/basicrobot.qak" target="code">basicrobot.qak</a>   
+</m>
+</td>
+<td><m>
+The <em>basicrobot</em>:
+<ul>
+<li>accepts commands for the actuators (motors) via MQTT or via the TCP-port 8018</li>
+<li>handles sensor data (sonar) by using a reactive pipe (made of components of <tt>ActorBasic</tt> type) and emits events related
+to the perceived distance.</li>
+<li>can be used by means of a console working as a TCP-client or as a MQTT-publisher
+<center><img src="./img/jupConsole.png" alt="jupConsole.png" width="40%"  /> </center>
+</li>
+</ul>
+ </m>
+</td>
+</tr>
+
+</tbody>
+</table>
+
+
+
 <h2>High-level models</h2>
 <ol>
 <li>The basic robot (project model): <a href="../src/basicrobot.qak" target="code">basicrobot.qak</a> on Raspberry

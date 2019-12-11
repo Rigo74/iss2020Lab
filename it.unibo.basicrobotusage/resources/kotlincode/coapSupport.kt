@@ -15,13 +15,14 @@ lateinit var host   : String
 	
 	private fun setClientForPath( path : String ){
 		val url = host + "/" + path
+		println("coapSupport | setClientForPath url=$url")
 		client = CoapClient( url )
 		client.setTimeout( 1000L )
 	}
 	
 	fun updateResource( owner : ActorBasic, path: String, msg : String ){
 		setClientForPath( path )
-		//println("coapSupport | updateResource $msg")
+		//println("coapSupport | updateResource $msg $client")
 		val resp : CoapResponse = client.put(msg, MediaTypeRegistry.TEXT_PLAIN)
 		//println("coapSupport | updateResource respCode=${resp.getCode()}")
 	}

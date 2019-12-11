@@ -25,7 +25,7 @@ val v3 = exec23{ x:Int, y:Int -> x-y } //() can be removed
 
 val v4 = exec23{ x,y -> x-y } //arg types inferred
 
-val v5 = p2{it}
+val v5 = p2{ it }
 
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 @kotlinx.coroutines.ExperimentalCoroutinesApi

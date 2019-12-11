@@ -18,6 +18,7 @@ class resRobotPosition( val owner: ActorBasic, name : String) : CoapResource( na
  	var pos        = Pair<Int,Int>(0,0)
 	var direction  = Direction.SUD
 	var moving     = false
+	val stepTime   = 1000    //370 for virtual
 	
 	init{
 		setObservable(true)
@@ -27,36 +28,57 @@ class resRobotPosition( val owner: ActorBasic, name : String) : CoapResource( na
 		//println("resource $name  | GET: ${exchange.getRequestText()} pos=$pos moving=$moving" )
 //		if( moving ) exchange.respond( "pos unknown / $direction / moving=$moving" )
 //		else
-			exchange.respond( "$pos / $direction"  )  // moving=$moving" 
-	}
+			exchange.respond( "pos$pos,dir($direction)" )  // moving=$moving" , $pos dir($direction)
+	} 
 //	override fun handlePOST( exchange : CoapExchange ) {
 //	}
 	override fun handlePUT( exchange : CoapExchange) {
 		val msg = exchange.getRequestText()
 		println("resource $name  | PUT: $msg")
 		when( msg ){
-			"p" ->  { moving = true;   stepTheOwner( )  }
-			"a" ->  { moving = false;  rotateLeft( )    }
-			"d" ->  { moving = false;  rotateRight()    }
+			"0" ->  { moving = false;  resetPos()       }
+			"a" ->  { moving = false;  cmdToOwner("a")  }
+			"d" ->  { moving = false;  cmdToOwner("d")  }
 			"h" ->  { moving = false;  cmdToOwner("h")  }
 			"w" ->  { moving = true;   cmdToOwner("w")  }
 			"s" ->  { moving = true;   cmdToOwner("s")  }
+			"l" ->  { moving = false;  cmdToOwner("l")  }
+			"r" ->  { moving = false;  cmdToOwner("r")  }
+			"b" ->  { moving = true;   emit("boundary","boundary(do)")  }
+			"p" ->  { moving = true;   stepTheOwner( )  }
+			"k" ->  { moving = true;   stopTheOwner( )  }
 			"up" -> { updatePos()                       }
-			"ua" -> { rotateLeft( )                     }
-			"ud" -> { rotateRight()                     }
+			"ul" -> { rotateLeft( )                     }
+			"ur" -> { rotateRight()                     }
+			"ustop" -> {stepStopped() }
  			//else -> println("")
 		}
 		changed()	// notify all CoAp observers
  		exchange.respond(CHANGED)
 	}
 	
+	fun resetPos(){
+		pos = Pair<Int,Int>(0,0)
+		direction  = Direction.SUD
+	}
+	
 	fun cmdToOwner(msg: String){
 		owner.scope.launch{ MsgUtil.sendMsg("cmd","cmd($msg)",owner) }
 	}
+	
+	fun emit(evId: String, payload : String ){
+		owner.scope.launch{  owner.emit(evId,payload) }
+	}
+	
 	fun stepTheOwner( ){
-		val msg = MsgUtil.buildDispatch(owner.name,"step","step(370)",owner.name )
+		val msg = MsgUtil.buildDispatch(owner.name,"step","step($stepTime)",owner.name ) 
 		owner.scope.launch{ MsgUtil.sendMsg(msg,owner) }
 		//The result of the move is given by the position of the robot
+	}
+	
+	fun stopTheOwner(){
+		val msg = MsgUtil.buildDispatch(owner.name,"stop","stop(user)",owner.name )
+		owner.scope.launch{ MsgUtil.sendMsg(msg,owner) }		
 	}
 	
 	fun updatePos( ){
@@ -86,6 +108,12 @@ class resRobotPosition( val owner: ActorBasic, name : String) : CoapResource( na
 			Direction.NORTH  -> direction =  Direction.EAST
 			Direction.WEST   -> direction =  Direction.NORTH 
 		}
+	}
+	
+	fun stepStopped(){
+		println("resource $name  | stepStopped")
+		val ev = MsgUtil.buildEvent("resource","modelContent","content(robot(state(pos(stepstopped))))" )
+		emit( ev.msgId(), ev.msgContent() )
 	}
 	
 //	override fun handleDELETE( exchange : CoapExchange) {

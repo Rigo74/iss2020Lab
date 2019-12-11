@@ -5,6 +5,7 @@ import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.channels.SendChannel
 
 
 class CounterMsg(
@@ -12,7 +13,7 @@ class CounterMsg(
         val response: CompletableDeferred<Int>?=null){
 }
 
-val counterActor = GlobalScope.actor<CounterMsg> {
+val counterActor : SendChannel<CounterMsg> = GlobalScope.actor<CounterMsg> {
     var localCounter = 0 // actor state
     //val v = channel.receive()
     for (msg in channel) { // iterate over incoming messages

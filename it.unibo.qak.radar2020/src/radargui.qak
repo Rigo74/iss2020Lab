@@ -13,7 +13,7 @@ mqttBroker "localhost" : 1883
 Request  polar        : polar(D,A) 
 Dispatch polar        : polar(D,A) 
 Event    polar        : polar(D,A) 
-Reply    fromRadarGui : fromRadarGui(X)    
+Reply    fromRadarGui : fromRadarGui(X)     
  
 Context ctxRadarGui ip [ host= "localhost"   port= 8038 ] +mqtt
   
@@ -85,7 +85,7 @@ QActor radargui context ctxRadarGui{
  * A simulator of sonar-data values that helps debugging
  */
 QActor sonarsimulator context ctxRadarGui {
-[" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store the results of run
+[" val ResultMap =   hashMapOf( \"key1\" to \"item1\" ) "]  //init a map to store results of run
 	State s0 initial{
 		println("demo STARTS working using dispatch on 45")
 		delay 4000 //give time to start the GUI

@@ -16,26 +16,40 @@ class Walker ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
 		var NumOfRotations = 0
+		  var Stopped   = false 
+		  var RobotPos  : String
+		  var RobotDir  : String
+		  var PosChanged = false
+		  val ResultMap =   hashMapOf( 1 to "-", 2 to "-" )
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
 						println("walker ON")
 					}
-					 transition(edgeName="t08",targetState="walk",cond=whenEvent("boundary"))
+					 transition(edgeName="t011",targetState="walk",cond=whenEvent("boundary"))
 				}	 
 				state("walk") { //this:State
 					action { //it:State
+						PosChanged  = false 
+						delay(300) 
+						 kotlincode.coapSupport.readPos( "robot/pos", ResultMap ) 
+						           RobotPos = ResultMap.get(1)!!
+						           RobotDir = ResultMap.get(2)!!
+						forward("step", "step(370)" ,"smartrobot" ) 
 						delay(500) 
-						request("step", "step(370)" ,"smartrobot" )  
+								  
+						          kotlincode.coapSupport.readPos( "robot/pos", ResultMap ) 
+						          PosChanged = ResultMap.get(1)!! != RobotPos
+						          println( "RobotPos = ${ResultMap.get(1)}, PosChanged=$PosChanged" )
 					}
-					 transition(edgeName="t09",targetState="walk",cond=whenReply("stepdone"))
-					transition(edgeName="t010",targetState="rotate",cond=whenReply("stepfail"))
+					 transition( edgeName="goto",targetState="walk", cond=doswitchGuarded({PosChanged}) )
+					transition( edgeName="goto",targetState="rotate", cond=doswitchGuarded({! PosChanged}) )
 				}	 
 				state("rotate") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						NumOfRotations++
-						forward("cmd", "cmd(a)" ,"smartrobot" ) 
+						forward("cmd", "cmd(l)" ,"smartrobot" ) 
 						delay(1000) 
 					}
 					 transition( edgeName="goto",targetState="s0", cond=doswitchGuarded({(NumOfRotations==4)}) )

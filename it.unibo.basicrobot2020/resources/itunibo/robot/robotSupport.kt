@@ -19,11 +19,11 @@ import itunibo.robot.rx.ApplActorDataStream
  
 object robotSupport{
 	lateinit var robotKind  :  String
-	var datastreamhandler   :  ActorBasic? = null 
+	var endPipehandler      :  ActorBasic? = null 
 	
-	fun create( actor: ActorBasic, robot : String, port: String, dsh: ActorBasic? = null ){
-		robotKind              = robot
-		datastreamhandler      =  dsh
+	fun create( actor: ActorBasic, robot : String, port: String, endPipe: ActorBasic? = null ){
+		robotKind           = robot
+		endPipehandler      =  endPipe
 		println( "		--- robotSupport | CREATED for $robotKind" )
 		when( robotKind ){
 			"virtual"    ->  { clientWenvObjTcp.initClientConn( actor, "localhost", port) }
@@ -35,7 +35,7 @@ object robotSupport{
 	}
 	
 	fun subscribe( obj : ActorBasic ) : ActorBasic {
-		if( datastreamhandler != null ) datastreamhandler!!.subscribe( obj )
+		if( endPipehandler != null ) endPipehandler!!.subscribe( obj )
 		return obj
 	}
 	

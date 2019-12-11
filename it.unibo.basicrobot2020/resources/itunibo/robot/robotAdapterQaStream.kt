@@ -17,7 +17,7 @@ import itunibo.robot.rx.sonardsh
 
 class robotAdapterQaStream( name : String ) : ActorBasic( name ){  
     init{
-		println("	--- robotAdapterQaStream | start")
+		println("	--- robotAdapterQaStream | start in ctx=${this.context}")
 		val sol1 = pengine.solve( "consult('basicRobotConfig.pl')." )
 		if( ! sol1.isSuccess() ){
 			println("	--- robotAdapterQaStream | ERROR in basicRobotConfig.pl")
@@ -32,8 +32,10 @@ class robotAdapterQaStream( name : String ) : ActorBasic( name ){
 				//defines a filter
 				val filter   = itunibo.robot.rx.sonaractorfilter("filter", this)
 				dsh.subscribe( filter )
-				//give the end of the PIPE to the robotSupport
-				itunibo.robot.robotSupport.create( this,host,port,filter  )
+				//gives the end of the PIPE to the robotSupport
+				//filter is the endpipe. It propagates to subscribers set by robotSupport.
+				//filter owns this and uses it to emit obstacle events
+				itunibo.robot.robotSupport.create( this,host,port,filter  )   
 			}
 		}		  		      
     }
