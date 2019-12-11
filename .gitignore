@@ -112,6 +112,8 @@ target/
 
 # Log file
 
+.directory
+
 # BlueJ files
 
 # Mobile Tools for Java (J2ME)
