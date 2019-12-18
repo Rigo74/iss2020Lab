@@ -52,21 +52,26 @@ fun main() = runBlocking{
     println("BEGINS CPU=$cpus ${curThread()}")
 /*
     runBlockThread()                             //(1)
+
     GlobalScope.launch{ runBlockThread() }       //(2)
     println("BYE")                               //(2)
+
     Thread.sleep(1600) // To see the output      //(2)
+ 
     launch{  runBlockThread()  }                 //(3)
     println("BYE")                               //(3)
+	Thread.sleep(3000)
+ 
     val job = launch{  runBlockThread()  }       //(4)
     job.join()                                   //(4)
     println("BYE")                               //(4)
 
-    println("---------------------------------")
     ioBoundFun()                              //(5)
     launch{ ioBoundFun() }                    //(6)
 */
-    println("---------------------------------")
-    activate()
+     activate()                              //(7)
+/*
     println("BYE")
+ */
     println("ENDS ${curThread()}")
 }

@@ -28,7 +28,7 @@ Context ctxSmartRobot ip [ host= "localhost"     port= 8020 ] +mqtt
 Context ctxBasicRobot ip [ host= "127.0.0.1"   port= 8018 ] +mqtt      
 
 ExternalQActor basicrobot context ctxBasicRobot   
- 
+   
  
  /*
  * ====================================================================
@@ -234,7 +234,7 @@ QActor walker context ctxSmartRobot{
           PosChanged = ResultMap.get(1)!! != RobotPos
           println( \"RobotPos = ${ResultMap.get(1)}, PosChanged=$PosChanged\" )
 		"]
-		
+		 
 	}
 	Goto walk if "PosChanged" else rotate
 //	Goto lookAtRobotPos

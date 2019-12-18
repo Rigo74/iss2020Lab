@@ -34,11 +34,12 @@ suspend fun CoroutineScope.massiveRun( action: suspend () -> Unit ) {
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 fun main() = runBlocking{
     println("BEGINS CPU=$cpus ${curThread()}")
-/*
+	/*
     GlobalScope.massiveRun { counter++ }
     println("BYE with Counter = $counter")
 */
     GlobalScope.massiveRun{counterAtomic.incrementAndGet()}
+ 
     println("BYE with Counter = $counterAtomic")
     println("ENDS ${curThread()}")
 }

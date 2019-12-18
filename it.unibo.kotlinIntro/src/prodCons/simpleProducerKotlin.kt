@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.delay
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 @kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -19,12 +20,13 @@ val simpleProducer : ReceiveChannel<Int> = GlobalScope.produce{
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 @kotlinx.coroutines.ObsoleteCoroutinesApi
 suspend fun consume(){
+	//delay( 1000 )
     val v = simpleProducer.receive()
     println( "consume receives ${v} in ${curThread()}" )
-    /*
+    
     simpleProducer.consumeEach {
         println( "consume receives $it in ${curThread()}" )
-    }*/
+    } 
 }
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,5 +34,7 @@ suspend fun consume(){
 fun main() = runBlocking{
     println("BEGINS CPU=$cpus ${kotlindemo.curThread()}")
     consume()
+	//Thread.sleep( 1000 )
+
     println("ENDS ${kotlindemo.curThread()}")
 }

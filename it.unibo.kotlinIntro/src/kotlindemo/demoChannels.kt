@@ -54,7 +54,8 @@ suspend fun consume(){
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 fun main() = runBlocking{
     println("BEGINS CPU=$cpus ${curThread()}")
-    //channelTest()
-    consume()
+    //channelTest()     //(1)
+    consume()       //(2)
+	Thread.sleep( 3000 )
     println("ENDS ${curThread()}")
 }

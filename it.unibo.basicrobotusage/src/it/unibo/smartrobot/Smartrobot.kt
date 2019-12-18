@@ -38,7 +38,7 @@ class Smartrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("activateResource") { //this:State
 					action { //it:State
 						kotlincode.resServer.init(myself)
-						kotlincode.coapSupport.init( "coap://192.168.43.229:5683"  )
+						kotlincode.coapSupport.init( "coap://localhost:5683"  )
 						delay(1000) 
 						kotlincode.resourceObserver.init( "coap://localhost:5683", "robot/pos"  )
 					}

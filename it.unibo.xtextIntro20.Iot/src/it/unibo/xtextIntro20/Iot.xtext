@@ -1,0 +1,21 @@
+grammar it.unibo.xtextIntro20.Iot with org.eclipse.xtext.common.Terminals
+
+generate iot "http://www.unibo.it/xtextIntro20/Iot"
+
+IotSystem: "System" spec=IotSystemSpec ;
+//terminal VARID  :  ('A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+//QualifiedName : ID ('.' ID)* ;
+
+IotSystemSpec : name=ID  			    
+	 (mqttBroker = BrokerSpec)     // Optional
+	 (message   += Message   )*     // N >=0
+;
+BrokerSpec : "mqttBroker" brokerHost=STRING ":" brokerPort=INT ;
+
+Message :  Event | Dispatch | Request ;
+
+Event: 	  "Event"    name=ID  ":" msg = STRING  ;
+Dispatch: "Dispatch" name=ID  ":" msg = STRING  ;
+Request:  "Request"  name=ID  ":" msg = STRING  ;
+	
+

@@ -1,0 +1,677 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+
+
+<SCRIPT SRC='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></SCRIPT>
+<SCRIPT>MathJax.Hub.Config({ tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}})</SCRIPT>
+<style type="text/css">
+ 
+
+<!--
+
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+
+a:hover {
+    background-color: #cccccc;
+}
+
+
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+k{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #990000;
+	 
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	 
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	 
+}
+pre{
+	font-family: "Helvetica";
+	font-size: 70%;
+	background-color: #fcf8c7; 
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}    
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}    
+div.remark{
+	background-color: #FFFC33;     
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}  
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+  -->
+</style>
+    
+<head>
+   
+<title>Lab15ISS</title></head>
+    
+<body>
+
+<div class="body"> 
+
+<h1>LABXtextIntro20 | Towards Software Factories  </h1> 
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/LectureBologna1819.html" target="isslm">LabISS-lectures site</a></font> 
+ 
+ <h2>Overview</h2>
+The goal of this section is to introduce the main ideas related to <bc>Model Driven Software Development (MDSD)</bc>, by
+starting from the <bc>Xtext framework</bc>. Moreover, the description of the <bc>qak</bc> language is given. <br/><br/>
+
+
+ <ol>
+<li><a href="#platform">Platforms</a></li>
+<li><a href="#topdown">Top Down process</a></li>
+<li><a href="#microserv">Microservices</a></li>
+<li><a href="#mdsd">Model Driven Software Development</a></li>
+<li><a href="#domains">Domains</a></li>
+<li><a href="#iot">IoT</a></li>
+<li><a href="#ddd">Domain Driven Design</a></li>
+<li><a href="#dsl">Domain Specific Languages</a></li>
+<li><a href="#iot">A domain: IoT</a></li>
+<li><a href="#mtocode">From models to code</a></li>
+<li><a href="#xtext">The Xtext framework</a></li>
+
+ </ol>
+ 
+ 
+
+<h2 id="softdev">Software Development</h2>
+
+<h3 id="platform">BottomUp - Starting from the Platform</h3>
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:70%">
+ 	<center><img src="./img/platforms.png" alt="domains" width="95%" height="52%"/></center>
+ 
+	</td>
+	<td>
+	<m>
+	<h4>Platform first? (bottom up)</h4>
+	<li>Software as a service <a href="https://it.wikipedia.org/wiki/Software_as_a_service" target="web">SaaS</a></li>
+	<li>Platform as a service <a href="https://it.wikipedia.org/wiki/Platform_as_a_service" target="web">PaaS</a></li>
+	<li>Infrastructure as a service <a href="https://en.wikipedia.org/wiki/Infrastructure_as_a_service" target="web">IaaS</a></li>
+	
+	</m>
+ 	</td>
+	</tr>
+
+	 </table>
+	</center> 
+
+<h3 id="topdown">TopDown - Starting from the problem</h3>
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:70%">
+ 	<center><img src="./img/topdownprocess.png" alt="topdownprocess" width="100%" height="52%"/></center>
+ 	<li> </li>
+	</td>
+	<td>
+	<m>
+	<h4>Problem first? (top down)</h4>
+	<li><a href="https://en.wikipedia.org/wiki/Requirements_analysis" target="web">Requirements_analysis</a></li>
+	<li><a href="https://www.eclipse.org/rmf/" target="web">Eclipse rmf</a></li>
+
+	</m>
+	<td>
+ 	</td>
+	</tr>
+	 </table>
+	</center> 
+
+<h3 id="topdown">Agile development</h3>
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:70%">
+ 	<center><img src="./img/overviewScrum.jpg" alt="overviewScrum" width="100%" height="52%"/></center>
+ 	<li> </li>
+	</td>
+	<td>
+ 
+ 	</td>
+	</tr>
+	 </table>
+	</center> 
+
+<h3 id="microserv">Microservices</h3> 	
+	
+    	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:80%">
+	<center><img src="./img/microservices.png" alt="microservices" width="100%" height="52%"/></center>
+	</td>
+	<td>
+	<center><img src="./img/microservBook.png" alt="microservBook" width="100%" height="52%"/ 
+		<m>
+		
+		</m>
+	</td>
+	</tr>
+
+	 </table>
+	</center> 
+
+ 
+
+<h2 id="mdsd">Model Driven Software Development</h2>
+   	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:80%">
+	<center><img src="./img/mdsdpng.png" alt="mdsdpng.png" width="100%" height="52%"/></center>  
+	</td>
+	<td>
+		<m>
+		<div class="remark">
+		See <li> <a href="UMLHarelRumpe.pdf" target="lecture">On semantics</a></li>    
+<li> <a href="Whatmodelsmean.pdf" target="lecture">What models mean</a></li>   
+		</div>
+
+	<!--	
+		<h4>Analysis (what)</h4>
+		<ul>
+		<li>Feasibility</li>
+		<li>Test plans</li>
+		<li>Logic architecture</li>
+		<li>Evaluation of costs, time, resources</li>
+		<li>Technology aware (but independent)</li>
+		</ul>
+		<h4>Design (how)</h4>
+		<ul>
+		<li>Design patterns</li>
+		<li>Architecture refinement</li>
+		<li>Working prototype</li>
+		<li>Selection of appropriate technologies</li>
+		<li>Prototype refinement</li>
+		</ul>
+		<h4>Development</h4>
+		<h4>Testing</h4>
+		<h4>Deployment</h4
+	-->	
+		</m>
+	</td>
+	</tr> 
+	 </table>
+	</center> 
+	
+	
+	
+	 
+
+
+	<h3 id="domains">Domains</h3>
+
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:80%">
+ 	<center><img src="./img/domains.png" alt="domains" width="100%" height="52%"/></center>
+ 	<li> </li>
+	</td>
+	<td>
+ 
+ 	</td>
+	</tr>
+	 </table>
+	</center> 
+
+	
+<h3 id="ddd">Domain Driven design</h3>
+   	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:80%">
+ 	<center><img src="./img/ddd.png" alt="ddd.png" width="100%" height="52%"/></center>
+	</td>
+	<td>
+		<m>
+ 	See <a href="https://en.wikipedia.org/wiki/Domain-driven_design" target="web">DDD</a> 	
+		</m>
+		
+	<h4>Hexagonal architectures</h4>
+	<img src="./img/portAdapterArch.png" alt="portAdapterArch" width="100%" />
+	
+		<m>
+<!--		
+	See 	
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/it.unibo.eclipse.qak.robot/userDocs/Lab11.html#domainmodel"
+target="lecture">Lab11: Resource model</a>	-->
+	
+	
+	<br/><br/>
+ 		</m>
+	</td>
+	</tr>
+	 </table>
+	</center> 
+
+	
+<h3 id="dsl">Domain Specific Languages</h3>
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:100%">
+ 	<center><img src="./img/dslSlide.png" alt="dslSlide" width="100%" height="52%"/></center><br/>
+ 	<li><a href="https://www.slideshare.net/zirrus/domainspecific-langauges" target="web">Domain-specific
+Languages, by Javier Luis Cánovas Izquierdo</a>, Inria <br/></li>
+<li><a href="https://www.slideshare.net/mariofusco/real-world-dsl" target="web">Real World DSL, by Mario Fusco</a>, Red Hat <br/></li>
+ 
+<!-- https://www.slideshare.net/peterfriese/the-unbearable-stupidity-of-modeling -->
+<div class="remark">
+For an example of internal DSL in Kotlin see
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.kotlin.dsl/userDocs/LabDsl.html"
+target="lecture">LabDsl.html</a>
+</div>
+ 
+	</td>
+	</tr>
+
+	 </table>
+	</center> 
+	
+	
+<h3 id="iot">A domain: IoT</h3>
+
+ 	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<center><img src="./img/iot3.png" alt="iot0" width="145%" height="145%"/> </center>
+<!--	
+	See:
+<a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2019Lab/blob/master/it.unibo.eclipse.qak.robot/userDocs/Lab11.html#lab11iot"
+target="lecture">Lab11: The Application Domain</a>	 -->
+	</td>
+	<td>
+	<center><img src="./img/iot0.png" alt="iot0" width="100%" height="100%"/> </center>
+	<m></m>
+ 	</td>
+	</tr>
+	 </table>
+	</center> 
+
+  
+<h3 id="topdown">Architectures</h3>
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<center><img src="./img/vision.png" alt="vision" width="100%" /></center>
+ 	<li><k>ZOOMIMG</k> - See: <a href="https://www.youtube.com/watch?v=0fKBhvDjuy0" target="web">Powers of Ten</a> </li>
+	</td>
+	<td>
+ 	<img src="./img/portAdapterArch.png" alt="portAdapterArch" width="100%" />
+
+ 	</td>
+	</tr>
+	 </table>
+	</center> 
+
+
+<h2 id="mtocode">From models to code</h2>
+ 	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<center><img src="./img/dimensions.png" alt="dimensions" width="100%" height="52%"/></center>
+	
+	See:
+	</td>
+	<td>
+	<center><img src="./img/softwareFactory.png" alt="softwareFactory.png" width="100%" height="52%"/></center>
+	<m>
+	</m>
+ 	</td>
+	</tr>
+	 </table>
+	</center> 	
+	
+
+	
+<h3 id="xtext">The Xtext framework</h3>
+
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:60%">
+ 	<center><img src="./img/bookbettini.png" alt="bookbettini.png" width="45%" height="32%"/></center>
+ 	</td>
+	<td>
+ 
+	<m> 
+<h4>Basic </h4>   
+<li> <a href="UMLHarelRumpe.pdf" target="lecture">On semantics</a></li>    
+<li> <a href="Whatmodelsmean.pdf" target="lecture">What models mean</a></li>   
+
+<h4>On Xtext </h4>   
+<li> <a href="IntroXtext2013.pdf" target="lecture">IntroXtextISS.pdf</a></li>    
+<li> <a href="MOF-UML.pdf" target="lecture">MOF-UML.pdf</a></li>    
+<li> <a href="CustomGenXtext.pdf" target="lecture">CustomGenXtext.pdf</a></li> 
+
+ 
+<h4>On Tools</h4>
+<li> <a href="https://www.eclipse.org/ecoretools/overview.html" target="web">Ecore tools</a></li>    
+<li> <a href="XtendUserGuide.pdf" target="lecture">XtendUserGuide.pdf</a></li>    
+
+
+	</m>
+	</td>
+	 </table>
+	</center> 
+
+<h3 id="xtextexample">An example: startup</h3>	
+<ol>
+<li>Create a new <bc>Xtext project</bc> named <ks>it.unibo.xtext.intro20.Iot</ks> (extension <k>iot</k>):
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<center><img src="./img/xtextiotstart.png" alt="xtextiotstart.png" width="75%" height="32%"/></center>
+ 	</td>
+	<td style="width:50%">
+ 	<center><img src="./img/xtextiotstartcode.png" alt="xtextiotstartcode.png" width="95%" height="32%"/></center>
+ 	</td>
+	 </table>
+	</center> 
+ 
+</li>
+<li>Insert in <bc>Xtext project</bc> the description of the language and generate the artifacts:
+
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+<pre>
+grammar it.unibo.xtext.intro20.Iot with org.eclipse.xtext.common.Terminals
+
+generate iot "http://www.unibo.it/xtext/intro20/Iot"
+
+terminal VARID  :  ('A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'_'|'0'..'9')*;
+QualifiedName : ID ('.' ID)* ;
+
+<ks>IotSystem</ks>: "<k>System</k>" spec=IotSystemSpec ;
+
+<ks>IotSystemSpec</ks> : name=ID  			 
+	 (mqttBroker = BrokerSpec)?     <kc>// Optional</kc>
+	 (message   += Message   )*     <kc>// N >=0</kc>
+;
+<ks>BrokerSpec</ks> : "mqttBroker" brokerHost=STRING ":" brokerPort=INT ;
+
+<ks>Message</ks> :  Event | Dispatch  | Request;
+
+<ks>Event</ks>:    "<k>Event</k>"     name=ID  ":" msg = STRING  ;
+<ks>Dispatch</ks>: "<k>Dispatch</k>"  name=ID  ":" msg = STRING  ;
+<ks>Request</ks>:  "<k>Request</k>"   name=ID  ":" msg = STRING  ;
+</pre> 	
+</td>
+	<td>
+	<m><ul>
+	<li>On <k>Iot.xtext</k>, RunAs <ks>Generate Xtext Artifacts</ks> </li>
+	<li>On <k>Iot.xtext</k>, RunAs <ks>Generate Xtext Artifacts</ks> </li>
+	</ul>
+	<br/><br/>
+	<k>WARNING:</k> you should be connected to the network, to allow the system to load the correct version of <ks>ANT</ks>.
+ 	</m>
+	</td>
+	 </table>
+	</center> 
+
+</li>
+
+<li>
+Generate a new <tt>Eclipse application</tt> run configuration named <bc>Iot</bc>:
+<br/>
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:70%">
+ 	<center><img src="./img/iotrunconfig.png" alt="iotrunconfig.png" width="75%" height="52%"/></center>
+ 	</td>
+	<td>
+ 	<m><ul>
+	<li>Run the <k>Iot</k> configuration: a new Eclipse workspace will appear. </li>
+	<li>Create a new Java (or Kotlin) project <k>iotTest</k>, and create the file <ks>src/sys1.iot</ks>.</li>
+	<li>Convert, as required, the project into an Xtext project.</li>
+	<li>Write the code of the model, by exploiting the given syntax.driven editor.</li>
+	</ul>
+ 	</m>
+  	</td>
+	 </table>
+	</center> 
+
+
+</li>
+<li>
+Save the model, if it is correctly written
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<center><img src="./img/xtextiotsys1.png" alt="xtextiotsys1.png" width="85%" height="52%"/></center>
+ 	</td>
+	<td>
+	<pre>
+System sys1
+
+mqttBroker "localhost" : 1883  //could be omitted
+
+Event    alarm : "alarm"
+Dispatch info  : "info"
+Request  move  : "w"
+	</pre>
+ 	<m>Our first iot system defines an event and a dispatch. <br/>
+	
+	At the moment we do not have any structure, neither behavior.<br/>
+	
+	Moreover, we have not yet defined any code generator.  
+	
+ 	</m>
+  	</td>
+	 </table>
+	</center> 
+
+
+</li>
+ 
+</ol>
+	
+<h3 id="xtextexamplegen">Example: model validation rules</h3>	
+The generated Xtext artifacts include a file named <ks>IotValidator.xtend</ks> (in the package <tt>it.unibo.xtext.intro20.validation</tt>) and a
+file named <ks>IotGenerator.xtend</ks> (in the package <tt>it.unibo.xtext.intro20.generator</tt>  ).
+ 	<br/><br/>		
+The file <ks>IotValidator.xtend</ks> allows an user to define model-checking rules. For example, .
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<pre> 
+@Check
+def checkName(Message m){
+ <kc>//the attribute <tt>name</tt> is defined in the root class <ks>Message</ks></kc>	
+	if( ! m.name.toLowerCase.equals(m.name) )
+		//error("Uppercase letters not allowed in message", null )  
+		error("Uppercase letters not allowed in message", 
+				IotPackage.Literals.MESSAGE__NAME )  
+}	
+ 	 </pre>
+	 
+ 	</td>
+	<td><m>the check rule  states that a user-model is correct only if  the name of a Message starts with a low-case letter.</m>
+  	</td>
+	 </table>
+	</center> 	
+
+<h3 id="xtextexamplegen">Example: the code generation</h3>	
+
+The file <ks>IotGenerator.xtend</ks> constitutes the main entry for the user-defined generation
+process related to the custom language/metamodel. It takes the following form:
+
+  	<center><table style="width:95%">
+	<tbody>	
+	<tr>
+	<td style="width:50%">
+ 	<pre> class IotGenerator extends AbstractGenerator {
+
+	override void doGenerate(Resource resource, 
+		IFileSystemAccess2 fsa, IGeneratorContext context) {<kc>
+//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
+//			resource.allContents
+//				.filter(Greeting)
+//				.map[name]
+//				.join(', '))</kc>
+	}
+} 	 </pre>
+	 
+ 	</td>
+	<td><m>For the sake of clearness and modularity, we use this class just as an entry point for our
+custom generation processes.</m>
+  	</td>
+	</tr>	
+	
+	<tr>
+	<td style="width:50%">
+ 	<pre> class IotGenerator extends AbstractGenerator {
+
+	override void doGenerate(Resource resource, 
+		IFileSystemAccess2 fsa, IGeneratorContext context) {<kc></kc>
+			mygenerate(resource, fsa);
+	}
+	def mygenerate(Resource resource, IFileSystemAccess fsa) {
+		GenUtils.setFsa(fsa)
+		GenUtils.setFileExtension(resource.URI.fileExtension)
+		for(system: resource.allContents.toIterable.filter( typeof(QActorSystemSpec) )) {			
+			genQActorSystem.doGenerate(system, kb)
+			new GenSite().doGenerate( system  )
+		}		
+	}
+	
+} 	 </pre>
+	 
+ 	</td>
+	<td><m>The  class <ks>GenUtils</ks> is introduced to provide methods useful in the generation process.</m>
+  	</td>
+	</tr>	
+		
+	
+	
+	 </table>
+	</center> 		
+ 	<br/><br/>	
+	
+ 	
+</div>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:100%;text-align:center;font-size:small;color:white">
+By AN Unibo-DISI    
+</div> 
+</body>
+</html>
