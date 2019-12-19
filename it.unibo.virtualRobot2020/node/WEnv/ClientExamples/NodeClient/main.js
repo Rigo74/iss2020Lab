@@ -5,7 +5,12 @@ const SEPARATOR = ";"
 const client = new Client({ip: readIpFromArguments(), port: readPortNumberFromArguments()})
 
 const msg = `{ "type": "moveForward", "arg": 1000 }`
-client.send( msg )
+const rm  = `{ "type": "remove",      "arg": "p1" }`
+ 
+//client.send( msg )
+
+client.send( rm )
+
 
 function Client({ port, ip }) {
     const self = this

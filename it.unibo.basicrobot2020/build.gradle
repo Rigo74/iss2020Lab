@@ -55,6 +55,9 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver
 	//compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.8.2'
 
+// https://mvnrepository.com/artifact/it.unibo.alice.tuprolog/2p-core
+//compile group: 'it.unibo.alice.tuprolog', name: '2p-core', version: '4.1.1'  //Thancks Ciatto
+
 //CUSTOM
     compile name: 'uniboInterfaces'
     compile name: '2p301'

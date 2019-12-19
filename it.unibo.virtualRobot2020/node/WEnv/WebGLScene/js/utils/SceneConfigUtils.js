@@ -1,6 +1,7 @@
 export function parseConfiguration(config) {
     const clone = JSON.parse(JSON.stringify(config))
-
+//console.log(  " parseConfiguration  " + clone.staticObstacles[3].size.x )
+ 
     const { floor, player, sonars, movingObstacles, staticObstacles } = clone
 
     checkConfigValidity(clone)
@@ -29,19 +30,34 @@ export function parseConfiguration(config) {
     return clone
 }
 
+/*
+---------------------------------------
+DEC 2019 by AN to remove objects
+---------------------------------------
+*/
+var inialsceneConstants
+export function injectsceneConstants(sceneConstants){
+	inialsceneConstants = sceneConstants
+	//console.log(inialsceneConstants)
+}
+
+export function getinitialsceneConstants(){
+	return inialsceneConstants
+}
+/*
+------------------- END DEC 2019
+*/
 export function mapConfigurationToGUI(sceneConstants, sceneConfiguration, controls, datGui, object, folder) {
-    for(let key in object) {
+     for(let key in object) {
         if(typeof object[key] === 'object') {
             const newFolder = folder ? folder.addFolder(key) : datGui.addFolder(key)
-
             mapConfigurationToGUI(sceneConstants, sceneConfiguration, controls, datGui, object[key], newFolder)
         } else {
             const scale = ( ( key === 'x' || key === 'y' ) && folder.parent.name !== 'floor' ) ? 1 : 100
             const controller = folder ? folder.add( object, key, 0, 1 *scale ) : datGui.add( object, key, 0, 1 *scale )
-
             controller.onChange( value => { 
                 updateSceneConstants(sceneConstants, parseConfiguration(sceneConfiguration))
-                controls.resetPosition()
+                //controls.resetPosition()   //DEC 2019
             })
         }
     }
@@ -91,7 +107,7 @@ function checkConfigValidity(config) {
     }
 }
 
-function updateSceneConstants(sceneConstants, newSceneConstants) {
+export  function updateSceneConstants(sceneConstants, newSceneConstants) {
     const { floor, player, sonars, movingObstacles, staticObstacles } = newSceneConstants
 
     sceneConstants.floor.size.x = floor.size.x
@@ -120,6 +136,7 @@ function updateSceneConstants(sceneConstants, newSceneConstants) {
     }
 
     for(let i=0; i<sceneConstants.staticObstacles.length; i++) {
+    
         sceneConstants.staticObstacles[i].centerPosition.x = staticObstacles[i].centerPosition.x
         sceneConstants.staticObstacles[i].centerPosition.y = staticObstacles[i].centerPosition.y
 

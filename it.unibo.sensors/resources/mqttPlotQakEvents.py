@@ -17,9 +17,9 @@ def on_message(client, userdata, message) :   #define callback
     #msg(g521,event, gyroSender, none, g521(TYPE,X,Y,Z),MSGNUM)
     evMsg = str( message.payload.decode("utf-8")  )
     msgitems = evMsg.split(",")
-    if msgnum < 40  :
-        if msgnum % 20 == 0  :
-            print("evMsg=", evMsg, "msgnum=", msgnum )
+    if msgnum < 30  :
+        #if msgnum % 10 == 0  :
+        print("evMsg=", evMsg, "msgnum=", msgnum )
         msgnum = msgnum + 1
         x.append( float( msgitems[5] ) )
         y.append( float( msgitems[6] ) )

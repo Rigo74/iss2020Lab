@@ -11,14 +11,14 @@ import Sonars from './sceneSubjects/Sonars.js'
 
 import sceneConfiguration from '../sceneConfig.js'
 import { parseConfiguration, mapConfigurationToGUI } from './utils/SceneConfigUtils.js'
-
+import {injectsceneConstants} from './utils/SceneConfigUtils.js'  					//DEC 2019
 import dat from '../node_modules/dat.gui/build/dat.gui.module.js'
 
 export default canvas => {
     const clock = new THREE.Clock()
     
     const screenDimensions = {
-        width: canvas.width,
+        width:  canvas.width,
         height: canvas.height
     }
 
@@ -30,8 +30,13 @@ export default canvas => {
     const {sceneSubjects, controls} = createSceneSubjects(scene, sceneConstants, camera)
 
     const datGui = new dat.GUI()
+    /*
+    	Open a console on the GUI (by AN)
+    */
     mapConfigurationToGUI(sceneConstants, sceneConfiguration, controls, datGui, sceneConfiguration)
-
+    
+    injectsceneConstants(sceneConstants)		//DEC 2019
+  
     function buildScene() {
         const scene = new THREE.Scene()
         scene.background = new THREE.Color('#000')
@@ -94,7 +99,8 @@ export default canvas => {
         return { sceneSubjects, controls }
     }
 
-    function update() {
+    function update() {     
+    
         const elapsedTime = clock.getElapsedTime()
 
         for(let i=0; i<sceneSubjects.length; i++)
@@ -130,3 +136,4 @@ export default canvas => {
         onKeyUp
       }
 }
+

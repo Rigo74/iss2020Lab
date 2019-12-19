@@ -3,6 +3,8 @@
  */
 package it.unibo.xtextIntro20.validation
 
+import org.eclipse.xtext.validation.Check
+import it.unibo.xtextIntro20.iot.BrokerSpec
 
 /**
  * This class contains custom validation rules. 
@@ -21,5 +23,13 @@ class IotValidator extends AbstractIotValidator {
 //					INVALID_NAME)
 //		}
 //	}
+
+	@Check
+	def borkerPortNum( BrokerSpec bs ){
+		if( bs.brokerPort < 1000 || bs.brokerPort > 3000 )
+			warning("Broker port must be between 1000-3000", null)
+	}
+	
+
 	
 }
