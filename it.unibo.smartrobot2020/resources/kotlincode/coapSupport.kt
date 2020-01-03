@@ -17,7 +17,7 @@ lateinit var host   : String
 	
 	private fun setClientForPath( path : String ){
 		val url = host + "/" + path
-		println("coapSupport | setClientForPath url=$url")
+		//println("coapSupport | setClientForPath url=$url")
 		client = CoapClient( url )
 		client.setTimeout( 1000L )
 	}
@@ -33,7 +33,7 @@ lateinit var host   : String
 		setClientForPath( path )
 		val respGet : CoapResponse = client.get( )
 		val v = respGet.getResponseText()
-		println("coapSupport | readResource v=$v")
+		//println("coapSupport | readResource v=$v")
 	}
 	
 	fun readPos(  path : String, result : HashMap<Int,String> ){
@@ -42,7 +42,7 @@ lateinit var host   : String
 		val v = "state("+respGet.getResponseText()+")"
 		val pos = ( Term.createTerm(v) as Struct ).getArg(0).toString()
 		val dir = ( Term.createTerm(v) as Struct ).getArg(1).toString()
-		println("coapSupport | readPos v=$v")
+		//println("coapSupport | readPos v=$v")
 		result.put(1, pos)
 		result.put(2, dir)
 	}

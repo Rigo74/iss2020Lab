@@ -45,7 +45,7 @@ object plannerUtil {
 		RoomMap.getRoomMap().put(x,y, Box(false, false, true) )	
 
 		var dir     = RobotState.Direction.DOWN  //init
-		when( direction ){
+		when( direction ){ 
 			"down"   -> dir = RobotState.Direction.DOWN
 			"up"     -> dir = RobotState.Direction.UP
 			"left"   -> dir = RobotState.Direction.LEFT

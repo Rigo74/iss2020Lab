@@ -13,7 +13,7 @@ import org.eclipse.californium.core.CoapResponse
 class consoleGui : IObserver {
 	
 	companion object{
-		val buttonLabels = arrayOf("f","w", "s", "a", "d", "z", "x", "b", "p", "h")
+		val buttonLabels = arrayOf("f","w", "s", "l", "r", "z", "x", "b", "p", "h")
  		lateinit var msgId    : String
 		lateinit var client   : CoapClient
 		

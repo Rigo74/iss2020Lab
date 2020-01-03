@@ -159,7 +159,7 @@ LabISS-lectures site</a></font>
 
 The <em>supervisor</em> of a waiting room (<em>wroom</em>) of a large train station intends to promote automatic collection of the rubbish, by means of ddr robots.
 To this end, some specialized robot (<em>detector</em>) periodically explores the surface of the <em>wroom</em> in order to collect objects 
-made of recyclable material, for example bottles made of <i>plastic</i> .
+made of recyclable material, in particular bottles made of <i>plastic</i> .
 
  
 
@@ -173,16 +173,15 @@ When the indoor air quality sensor detects a level of <tt>TVOC</tt> higher than 
 
 <br/><br/>
 
-The <em>wroom</em> is also equipped with a collector of plastic-objects (<em>plasticBox</em>).
-The collector is situated along the border of the <em>wroom</em> and works as a smart device, 
+The <em>wroom</em> is also equipped with a collector of plastic-objects (<em>plasticBox</em>)
+that can contain a maximum of <m><k>NPB</k></m> (e.g. <tt>NPB=10</tt>) bottles.
+<br/><br/>
+The <em>detector</em> is initially located in a <em>detectorHome</em>  situated on the (left-up) corner of the <em>wroom</em>. 
+<br/><br/>
+The collector is situated along the border of the <em>wroom</em> behind the <em>detectorHome</em> and works as a smart device, 
 able to expose and update - via CoAP - its content.
 
-
-
-<h3>The detector</h3>
-
-A <em>detector</em> robot is initially located in a <em>detectorHome</em>  situated on the border of the <em>wroom</em>. 
-<br/><br/>
+ <br/><br/>
 	<center><table style="width:98%">
 	<tbody>	
 	<tr>
@@ -196,8 +195,11 @@ A <em>detector</em> robot is initially located in a <em>detectorHome</em>  situa
  	</td>
 	 </table>
 	</center> 	
-<br/><br/>
-The <em>detector</em> is able to recognize if an object is made of  plastic and is equipped with a local container (<em>detectorBox</em>).
+
+<h3>The detector</h3>
+
+The <em>detector</em> is able to recognize if an object is made of  plastic and is equipped with a local container (<em>detectorBox</em>)
+that can contain a maximum of <m><k>NDB&lt;NPB</k></m> (e.g. <tt>NDB=5</tt>) bottles.
 <br/><br/>
 The behavior of the <em>detector</em> is managed by the <em>supervisor</em>, which can tell the robot to perform a set of tasks.
 These tasks are executed when the <em>wroom</em> is <bc>closed</bc> to people and include:

@@ -33,7 +33,9 @@ import alice.tuprolog.*
             }
         }
 
- 
+//      fun remove( obj : String ){
+//			 
+//		}
         fun sendMsg(v: String) {
  			//println("clientWenvObjTcp | sending Msg $v   ")
 			var outS = "{'type': 'alarm', 'arg': 0 }"
@@ -50,8 +52,9 @@ import alice.tuprolog.*
 				"x"  -> outS = "{'type': 'turnLeft',     'arg': 400 }"
  				"z"  -> outS = "{'type': 'turnRight',    'arg': 400 }"
    			    "h"  -> outS = "{'type': 'alarm',        'arg': 0   }"
+ 				else -> outS = "{'type': 'remove',       'arg': \"$v\"  }"  //TODO: define the remove method
  			}
-			val jsonObject = JSONObject(outS)
+			val jsonObject = JSONObject(outS) 
 			val msg= "$sep${jsonObject.toString()}$sep"
 			//println("		--- clientWenvObjTcp | sendMsg $msg   ")
 			outToServer?.println(msg)
@@ -88,13 +91,18 @@ import alice.tuprolog.*
 //								//println("clientWenvObjTcp | emit $m")
 //                                //emitLocalStreamEvent( m )
 //								actor.emit(m)
+								//ADDED DEC2019 - First this and next normal obstaces
+ 								val vobstev= MsgUtil.buildEvent( "sonarsupport","virtualobstacle","virtualobstacle($objectName)")
+ 								println("clientWenvObjTcp | emit $vobstev")
+								actor.emit( vobstev )
+
 								var m1 = "sonar( 6 )"		//EMIT events with delta = 2
 								if( odd ){ m1 = "sonar( 3 )" }								
 								val event = MsgUtil.buildEvent( "sonarsupport","sonarRobot",m1)
 								odd = !odd							
 								//(streaming)
-								actor.emitLocalStreamEvent( event )  
-                           }
+								actor.emitLocalStreamEvent( event )
+						    }
                         }
                     } catch (e: IOException) {
 						println("		--- clientWenvObjTcp | ERROR $e   ")

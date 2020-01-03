@@ -21,8 +21,6 @@ var mqtt   : MqttUtils
 	override fun onLoad( response : CoapResponse ) {
 		val content = response.getResponseText()
 		println("RESOURCE OBSERVER HANDLER | value=" + content)  //content=pos(1, 0),dir(SUD)
-		//val ev = MsgUtil.buildEvent("coaphandler","modelContent","content(robot(state($content)))" )
-		//mqtt.sendMsg(ev,"unibo/qak/events")
 	}
 	override fun onError(){ println("RESOURCE OBSERVER HANDLER | FAILED ")} 
 }

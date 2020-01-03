@@ -34,12 +34,10 @@ class Onestepahead ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 				}	 
 				state("doStep") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("onestep(DURATION)"), Term.createTerm("onestep(T)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								StepTime = payloadArg(0).toLong() 
-											  println("smartrobot | doStep StepTime =$StepTime ")
-											  startTimer()
+								 			  startTimer()
 								forward("cmd", "cmd(w)" ,"basicrobot" ) 
 						}
 						stateTimer = TimerActor("timer_doStep", 
@@ -47,7 +45,8 @@ class Onestepahead ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 					}
 					 transition(edgeName="t01",targetState="endStep",cond=whenTimeout("local_tout_onestepahead_doStep"))   
 					transition(edgeName="t02",targetState="stepStop",cond=whenDispatch("stop"))
-					transition(edgeName="t03",targetState="stepFail",cond=whenEvent("obstacle"))
+					transition(edgeName="t03",targetState="stepFailVirtual",cond=whenEvent("virtualobstacle"))
+					transition(edgeName="t04",targetState="stepFail",cond=whenEvent("obstacle"))
 				}	 
 				state("endStep") { //this:State
 					action { //it:State
@@ -68,6 +67,17 @@ class Onestepahead ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 					action { //it:State
 						Duration=getDuration()
 						answer("onestep", "stepfail", "stepfail($Duration,obstacle)"   )  
+					}
+					 transition( edgeName="goto",targetState="work", cond=doswitch() )
+				}	 
+				state("stepFailVirtual") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("virtualobstacle(OBJNAME)"), Term.createTerm("virtualobstacle(OBJNAME)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								Duration=getDuration()  
+								println("onestepahead | !!!stepFailVirtual dt=$Duration obj=${payloadArg(0)}")
+								answer("onestep", "stepfail", "stepfail($Duration,${payloadArg(0)})"   )  
+						}
 					}
 					 transition( edgeName="goto",targetState="work", cond=doswitch() )
 				}	 

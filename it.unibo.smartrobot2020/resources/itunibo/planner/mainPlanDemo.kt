@@ -4,7 +4,7 @@ import aima.core.agent.Action
 
 
 object mainPlanDemo {
-    fun demo() {
+    fun demo() { 
         println("===== demo")
 
         try {

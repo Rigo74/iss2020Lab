@@ -15,42 +15,27 @@ class Walker ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
-		var NumOfRotations = 0
-		  var Stopped   = false 
-		  var RobotPos  : String
-		  var RobotDir  : String
-		  var PosChanged = false
-		  val ResultMap =   hashMapOf( 1 to "-", 2 to "-" )
+		var NumOfRotations = 0 
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("walker ON")
 					}
-					 transition(edgeName="t011",targetState="walk",cond=whenEvent("boundary"))
+					 transition(edgeName="t08",targetState="walk",cond=whenEvent("boundary"))
 				}	 
 				state("walk") { //this:State
 					action { //it:State
-						PosChanged  = false 
-						delay(300) 
-						 kotlincode.coapSupport.readPos( "robot/pos", ResultMap ) 
-						           RobotPos = ResultMap.get(1)!!
-						           RobotDir = ResultMap.get(2)!!
-						forward("step", "step(370)" ,"smartrobot" ) 
-						delay(500) 
-								  
-						          kotlincode.coapSupport.readPos( "robot/pos", ResultMap ) 
-						          PosChanged = ResultMap.get(1)!! != RobotPos
-						          println( "RobotPos = ${ResultMap.get(1)}, PosChanged=$PosChanged" )
+						delay(1000) 
+						request("onestep", "onestep(380)" ,"smartrobot" )  
 					}
-					 transition( edgeName="goto",targetState="walk", cond=doswitchGuarded({PosChanged}) )
-					transition( edgeName="goto",targetState="rotate", cond=doswitchGuarded({! PosChanged}) )
+					 transition(edgeName="t09",targetState="walk",cond=whenReply("stepdone"))
+					transition(edgeName="t010",targetState="rotate",cond=whenReply("stepfail"))
 				}	 
 				state("rotate") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
+						println("WALKER | ==================================== rotate ")
 						NumOfRotations++
 						forward("cmd", "cmd(l)" ,"smartrobot" ) 
-						delay(1000) 
+						delay(500) 
 					}
 					 transition( edgeName="goto",targetState="s0", cond=doswitchGuarded({(NumOfRotations==4)}) )
 					transition( edgeName="goto",targetState="walk", cond=doswitchGuarded({! (NumOfRotations==4)}) )

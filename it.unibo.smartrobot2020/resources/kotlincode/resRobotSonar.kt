@@ -21,7 +21,7 @@ class resRobotSonar( val owner: ActorBasic, name : String) : CoapResource( name 
 	}
  
 	override fun handlePUT( exchange : CoapExchange) {
-		println(" $name  | PUT: ${exchange.getRequestText()} distance=$distance")
+		//println(" $name  | PUT: ${exchange.getRequestText()} distance=$distance")
 		distance = exchange.getRequestText()
 		changed()	// notify all CoAp observers
 		exchange.respond(CHANGED)

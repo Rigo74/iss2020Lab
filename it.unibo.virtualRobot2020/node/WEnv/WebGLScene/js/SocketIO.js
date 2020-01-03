@@ -67,6 +67,8 @@ export default (onKeyUp, onKeyDown) => {
    			//console.log(" ... "+ v.name)
    			if( v.name == objname ) {
 		      console.log(" SocketIo remove " + v.name  )
+		      v.centerPosition.x = 0
+		      v.centerPosition.y = 0
 		 	  v.size.x = 0
 			  v.size.y = 0
 		      //console.log(  " SocketIo remove " + v.size.x )       
