@@ -7,7 +7,7 @@ from webiopi.clients import *
 from time import sleep
 
 client = PiHttpClient("192.168.1.7")
-client.setCredentials("webiopi", "raspberry")
+#client.setCredentials("webiopi", "raspberry")
 
 # RPi native GPIO
 gpio = NativeGPIO(client)

@@ -229,6 +229,7 @@ patch    -p1   -i  webiopi-pi2bplus.patch
 sudo  ./setup.sh
 webiopi  -h             TEST
 sudo  webiopi  -d  -c  /etc/webiopi/config    RUN
+sudo webiopi -d -c nat/config -s nat/scriptLed17.py -l aaa.txt
 "Ctrl" + "C" then "Ctrl" + "Z" 				  END  WebIOPi running
 
 sudo   nano  /etc/modules

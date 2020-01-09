@@ -1,3 +1,8 @@
+# -------------------------------------------------------------------------------
+# testcoapclient.py
+# Run this on Raspberry /home/pi/nat/cam-robot/WebIOPi-0.7.1/nat
+# -------------------------------------------------------------------------------
+
 from webiopi.protocols.coap import *
 from time import sleep
 

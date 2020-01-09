@@ -150,7 +150,7 @@ table, th, td {
     
 <body>
 <div id="body">
-<h1>LabRaspiWebiopi | Using the webiopi<font size="5"></font> </h1>
+<h1>LabRaspiWebiopi | Using WebIoPi<font size="5"></font> </h1>
 
 
 
@@ -158,183 +158,131 @@ table, th, td {
 
 
 
-<h2>Using webiopi</h2>
-<br/><br/>
-<table style="width:98%">
-<tbody>	
-<tr>
-<td style="width:50%" >
-<!-- <img src="./img/raspSonarCoap.png" alt="raspSonarCoap.png" width="100%"  /> -->
+<h2>Starting</h2>
+
 See 
 <ol>
+<li><a href="http://webiopi.trouch.com/" target="web">WebIoPi </a><br/> </li>
 <li><a href="https://webiopi.trouch.com/Tutorial_Devices.html" target="web">
-WebIoPi Tutorial : Using devices</a><br/><br/></li>
+WebIoPi Tutorial : Using devices</a><br/> </li>
 <li><a href="https://webiopi.trouch.com/DEVICES.html" target="web">
-WebIoPi Device support</a><br/><br/></li>
+WebIoPi Device support</a><br/></li>
 <li><a href="http://webiopi.trouch.com/Tutorial_Basis.html" target="web">
-WebIoPi Tutorial : Framework basis</a><br/><br/></li>
+WebIoPi Tutorial : Framework basis</a><br/></li>
 <li><a href="http://techcofounderdating.com/raspberry-pi-custom-web-control/" target="web">
-WebIoPi video</a><br/><br/>
-
+WebIoPi video</a><br/>
 </li>
 </ol>
 
-</td>
-<td> 
-<pre><m>
-sudo route add default gw 192.168.1.1 wlan0
-sudo rfkill list all
+<table style="width:98%">
+<tbody>	
+<tr>
+<td style="width:50%" >
 
-Download WebIOPi-0.7.1.tar.gz
-tar xvzf WebIOPi-0.7.1.tar.gz
-cd  WebIOPi-0.7.1 
-wget https://raw.githubusercontent.com/doublebind/raspi/master/webiopi-pi2bplus.patch
-patch -p1 -i webiopi-pi2bplus.patch
-sudo ./setup.sh					<kc>//Install</kc>
-Do you want to access WebIOPi over the Internet? [y/n]” ---> n
-reboot
-.........................................................................
-DEBUG MODE
-sudo webiopi -d -c /etc/webiopi/config
-.........................................................................
-sudo /etc/init.d/webiopi start
-sudo /etc/init.d/webiopi stop
+<pre><h3>Download</h3>
+<ks>wget</ks> http://sourceforge.net/projects/webiopi/files/WebIOPi-0.7.1.tar.gz
+<ks>tar</ks> xvzf WebIOPi-0.7.1.tar.gz
+cd  WebIOPi-0.7.1/
+</pre>
 
-sudo update-rc.d webiopi defaults   AUTOMATIC Startup
-sudo update-rc.d webiopi remove  	AUTOMATIC Startup remove
+<h3>RaspberriPi B+</h3> 
+requires to change <kc>BCM2708</kc> with <k>BCM2835</k> (the Broadcom chip used in the Raspberry Pi Model A, B, B+).
+This is done by the <i>webiopi-pi2bplus.patch</i>.
 
-.........................................................................
-http://192.168.1.10:8000/
-username: webiopi
-pswwd   : raspberry
+<pre>
+<ks>wget</ks> https://raw.githubusercontent.com/doublebind/raspi/master/webiopi-pi2bplus.patch
+<ks>patch</ks> -p1 -i webiopi-pi2bplus.patch <m>
+	patching file htdocs/webiopi.js
+	patching file python/native/cpuinfo.c
+	patching file python/native/gpio.c
+	patching file python/webiopi/utils/version.py
+	patching file python/webiopi/protocols/http.py
 </m>
 </pre>
+
+<h3>Set uo the modules</h3> 
+<pre>
+cd WebIOPi-0.7.1/python
+<ks>sudo python3 setup.py install</ks>
+<ks>sudo reboot</ks>
+</pre>
+</td>
+<td>
+<h3>Network</h3>
+<pre>sudo route add default gw 192.168.1.1 wlan0
+</pre>
+<h3>Python version</h3>
+On the RaspberriPi B+ there are pre-installed
+<ul>
+<li>Python 2.7.13</li>
+<li>Python 3.5.3</li>
+</ul>
+
+We will use <ks>pyhton3</ks>.
+
+
+
+<h3>Install Python modules</h3>
+The modules that compose the application WebIOPi-0.7.1 can be installed by using the script 
+<a href="../resources/webiopi/setup.py" target="code"><br/>
+<k>WebIOPi-0.7.1/python/setup.py</k></a>.
+<br/><br/>
+The required modules include the specification of extension modules written in C.
+See <a href="https://www.tutorialspoint.com/python/python_further_extensions.htm" target="web">Python - Extension Programming with C</a>.
+<br/><br/><m>
+Note that <k>pip</k> will use <kc>setup.py</kc> to install the modules; it avoids calling setup.py directly
+</m>
 </td>
 </tr>
-
-
-</tbody>
+ 
+ </tbody>
 </table>
 
+<h2>Launch the built-in application</h2>
 
-
- 
-  
-
-
- <h2>LED control</h2>
- 
- <h3><a href="../resources\webiopi\led17\scriptLed17.py" target="code">scriptLed17.py</a></h3>
- <h3> index.html</h3>
-
- <br/><br/>
 <table style="width:98%">
 <tbody>	
 <tr>
 <td style="width:50%" >
-Stored in <tt>/home/pi/nat/cam-robot/WebIOPi-0.7.1/nat</tt>
- <pre>
-&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 
-   Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-&lt;html>
-&lt;head>
-        &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        &lt;title>WebIOPi | Light Control&lt;/title>
-        &lt;script type="text/javascript" src="/webiopi.js">&lt;/script>
-        &lt;script type="text/javascript">
-        webiopi().ready(function() {
-                // Create a "Light" labeled button for GPIO 17
-                var button = webiopi().createGPIOButton(17, "Light17");
-
-                // Append button to HTML element with ID="controls" using jQuery
-                $("#controls").append(button);
-
-                // Refresh GPIO buttons
-                // pass true to refresh repeatedly of false to refresh once
-                webiopi().refreshGPIO(true);
-        });
-                
-        &lt;/script>
-        &lt;style type="text/css">
-                button {
-                        display: block;
-                        margin: 5px 5px 5px 5px;
-                        width: 160px;
-                        height: 45px;
-                        font-size: 24pt;
-                        font-weight: bold;
-                        color: white;
-                }
-                
-                #gpio17.LOW {
-                        background-color: Black;
-                }
-                
-                #gpio17.HIGH {
-                        background-color: Blue;
-                }
-        &lt;/style>
-&lt;/head>
-&lt;body>
-        &lt;div id="controls" align="center">&lt;/div>
-&lt;/body>
-&lt;/html>
+<pre>
+cd WebIOPi-0.7.1/python
+python3 -m webiopi  -h                                  <kc>//TEST</kc>
+<ks>sudo python3 -m webiopi -d -c ./config</ks>   <kc>//-d LAUNCH IN DEBUG MODE</kc>
 </pre>
+The command <k>python3 -m</k> runs a library module as a script. 
 
 </td>
 <td>
+<m>
+The <kc>TEST</kc> shows that:
+<ul>
+<li><ks>-c</ks> : Load config from file</li>
+<li><ks>-d</ks> : Enable DEBUG</li>
+</ul>
+</m>
+<h3>TO KILL A PROCESS</h3>
+<pre>
+ps -fA | grep python
+sudo kill -s KILL &lt;process number>
+</pre>
+
+ 
+
 </td>
 </tr>
- </tbody>
-</table>
-
-
-<h2>CoAP interaction</h2>
- <br/><br/>
-<table style="width:98%">
-<tbody>	
 <tr>
-<td style="width:50%" >
- <pre>
-# -------------------------------------------------------------------------------
-# testcoapclient.py
-# Run this on Raspberry /home/pi/nat/cam-robot/WebIOPi-0.7.1/nat
-# -------------------------------------------------------------------------------
-
-from protocols.coap import *
-from time import sleep
-
-client = COAPClient()
-client.sendRequest(COAPPost("coap://192.168.1.7/GPIO/17/function/out"))
-state = True
-
-for x in range(0, 6): 
-    response = client.sendRequest(COAPPost("coap://192.168.1.7/GPIO/17/value/%d" % state))
-    if response:
-        print("POST | Received response:\n%s" % response)
-        state = not state
-    else:
-        print("No response received")
-    response = client.sendRequest(COAPGet("coap://192.168.1.7/GPIO/17/value" ))
-    if response:
-        print("GET | Received response: %s" % response.payload)
-    else:
-        print("No response received")
-    sleep(1.0)
-
-</pre>
+<td><img src="./img/webiopi/webiopi0.png" alt="webiopi0" width="60%"/><br/>
+If we click on GPIOList ...
 </td>
 <td>
-</td>
+... we obtain a GUI thet allows us to modify the values of the GPIOs:<br/>
+<img src="./img/webiopi/webiopiGpioList.png" alt="webiopiGpioList" width="60%"/></td>
 </tr>
+ 
  </tbody>
 </table>
-
-
 
 <h2>Native interaction</h2>
-
- <br/><br/>
 <table style="width:98%">
 <tbody>	
 <tr>
@@ -342,7 +290,6 @@ for x in range(0, 6):
 <pre>
 # -------------------------------------------------------------------------------
 # testgpionativeclient.py
-# Run this on Raspberry /home/pi/nat/cam-robot/WebIOPi-0.7.1/nat
 # -------------------------------------------------------------------------------
 
 from webiopi.clients import *
@@ -365,12 +312,373 @@ for x in range(0, 6):
 
 </td>
 <td>
+<h3>Run (in /nat/WebIOPi-0.7.1/nathtdocs)</h3>
+<ol>
+<li>sudo python3 -m webiopi -d -c ./config</li>
+<li>python3 <a href="../resources/webiopi/led17/testgpionativeclient.py" target="code">testgpionativeclient.py</a></li>
+</ol>
+
+
 </td>
 </tr>
  </tbody>
 </table>
 
+<h2>CoAP interaction</h2>
+See <a href="../resources/webiopi/led17/testcoapclient.py" target="code">testcoapclient.py</a>.
+ <br/><br/>
+<table style="width:98%">
+<tbody>	
+<tr>
+<td style="width:50%" >
+ <pre>
+# -------------------------------------------------------------------------------
+# testcoapclient.py
+# -------------------------------------------------------------------------------
+
+from protocols.coap import *
+from time import sleep
+
+client = COAPClient()
+client.sendRequest(COAPPost("coap://192.168.1.4/GPIO/17/function/out")) <kc>#init</kc>
+state = True
+
+for x in range(0, 6): 	<kc>#blink</kc>
+    response = client.sendRequest(
+		COAPPost("coap://192.168.1.7/GPIO/17/value/%d" % state))
+    if response:
+        print("POST | Received response:\n%s" % response)
+        state = not state
+    else:
+        print("No response received")
+    response = client.sendRequest(COAPGet("coap://192.168.1.4/GPIO/17/value" ))
+    if response:
+        print("GET | Received response: %s" % response.payload)
+    else:
+        print("No response received")
+    sleep(1.0)
+
+</pre>
+</td>
+<td>
+<h3>A test (in /nat/WebIOPi-0.7.1/nathtdocs)</h3>
+
+<ol>
+<li>sudo python3 -m webiopi -d -c ./config</li>
+<li>Open a browser on <tt>http://192.168.1.4:8000/app/gpio-list</tt>. <br/>
+<img src="./img/webiopi/webiopiGpioList.png" alt="webiopiGpioList" width="30%"/><br/>
+and set <kc>pin 17</kc> to the state <ks>IN</ks>.<br/><br/>
+</li>
+<li>Execute  <ks>python3 testcoapclient.py</ks>.<br/><br/></li>
+<li>You will see <kc>pin 17</kc> to become <ks>OUT</ks> and the Led blinking for a while</li>
+</ol>
+</td>
+</tr>
+ </tbody>
+</table>
+
+<h2>User-defined applications</h2>
+
+ <br/><br/>
+<table style="width:98%">
+<a href="../resources/webiopi/led17/config" target="code">config</a><br/>
+<a href="../resources/webiopi/led17/index.htmltxt" target="code">index.html</a><br/>
+<a href="../resources/webiopi/led17/scriptLed17.py" target="code">scriptLed17.py</a><br/>
+
+<tbody>	
+<tr>
+<td style="width:50%" >
+<pre>
+python3 -m webiopi -c /home/pi/nat/WebIOPi-0.7.1/nathtdocs/config
+python -m webiopi -d -c /home/pi/nat/WebIOPi-0.7.1/tutorials/1.basis/config    
+-s nat/scriptLed17.py
+</pre> 
+
+</td>
+<td>
+</td>
+</tr>
+ </tbody>
+</table>
+
+ <br/><br/>
+
+<h1>The WebIoPi setup script</h1>
+
+ <br/><br/>
+<table style="width:98%">
+<tbody>	
+<tr>
+<td style="width:50%" >
+The  script <a href="../resources/webiopi/setup.sh" target="code">
+<k>WebIOPi-0.7.1/python/setup.sh</k></a> performs in automatic way:
+<ol>
+<li>The installation of the Python WebIoPi modules under all the versions of Python found in the current RaspberryPi.</li>
+<li>The selection of the grater Python version.</li>
+<li>The copy of resources on proper <tt>/usr</tt> and <tt>/etc</tt> directories. In particular:
+<m>
+<ul>
+<li><kc>HTML resources</kc>: <ks>WebIOPi-0.7.1/htdocs</ks> into <k>/usr/share/webiopi</k></li>
+<li><kc>config file</kc>: <ks>WebIOPi-0.7.1/python/config</ks> into <k>/etc/webiopi/config</k></li>
+<li><kc>passwd file</kc>:<ks>WebIOPi-0.7.1/python/passwd</ks> into <k>/etc/webiopi/passwd</k></li>
+<li><kc>service daemon script</kc>:<ks>WebIOPi-0.7.1/python/webiopi.init.sh</ks> into <k>/etc/init.d/webiopi</k></li>
+<li><kc>webiopi command</kc>:<ks>WebIOPi-0.7.1/python/webiopi.sh</ks> into <k>/usr/bin/webiopi</k></li>
+<li><kc>webiopi-passwd command</kc>:<ks>WebIOPi-0.7.1/python/webiopi-passwd.py</ks> into <k>/usr/bin/webiopi-passwd</k></li>
+</ul>
+</m>
+</li>
+<li>The display of the WebIoPi usage.</li>
+</ol>
+
+
+<pre>
+cd WebIOPi-0.7.1
+<ks>./setUp.sh</ks>
+<kc>Do you want to access WebIOPi over the Internet? [y/n]” ---></kc> <k>n</k>
+<ks>reboot</ks>
+</pre> 
+
+</td>
+<td>
+The answer <k>n</k> to the final question leads to the installation of the service
+<a href="https://iotpoint.wordpress.com/weaved-on-raspberry-pi/" target="web">Weaved on Raspberry Pi</a>.
+
 <br/><br/>
+After the execution of this script, we can launch the built-in application in debug mode by writing:
+
+<pre>
+sudo webiopi -d -c /etc/webiopi/config
+</pre>
+
+<h3>ADD webiopi COMMAND</h3>
+Let us report here the part of the script that defines a <ks>webiopi</ks> command: 
+<pre>
+cp -rf python/webiopi.sh /usr/bin/webiopi
+sed -i "s/python/$python/g" /usr/bin/webiopi
+chmod 0755 /usr/bin/webiopi
+</pre>
+<m>
+<ks>sed</ks> is a commaned related to the Linux text stream editor. See for example:
+<a href="https://www.geeksforgeeks.org/sed-command-in-linux-unix-with-examples/" target="web">Sed Command in Linux/Unix with examples</a>.
+</m>
+</td>
+</tr>
+
+<tr>
+<td>
+<h3>Service start</h3>
+<pre>
+sudo /etc/init.d/webiopi start
+sudo /etc/init.d/webiopi stop
+</pre>
+
+<h3>AUTOMATIC Service Startup</h3>
+<pre>
+sudo update-rc.d webiopi defaults   <kc>//Startup</kc>
+sudo update-rc.d webiopi remove  	<kc>//Startup remove</kc>
+</pre>
+</td>
+<td>
+<h3>Usage</h3>
+<pre>
+http://192.168.x.y:8000/
+username: webiopi
+pswwd   : raspberry
+</pre></td>
+</tr>
+ </tbody>
+</table>
+
+
+
+ 
+ 
+<h1>WebIoPi behavior</h1>
+
+The output of WebIoPi is mainly related to the usage of the Python logger 
+(see <a href="https://docs.python.org/3.5/howto/logging-cookbook.html" target="web">Logging Cookbook</a>) from 
+ <a href="../resources/webiopi/logger.py" target="code">WebIOPi-0.7.1\python\webiopi\utils\logger.py</a>.
+ <br/><br/>
+ 
+<table style="width:98%">
+<tbody>	
+<tr>
+<td style="width:50%" >
+1) The user writes:
+<pre>
+sudo python3 -m webiopi -c ./config
+</pre> 
+</td>
+<td>
+The commands puts in execution the <a href="../resources/webiopi/__main__.py" target="code">WebIOPi-0.7.1\python\webiopi\__main__.py</a>
+of the module <i>webiopi</i> that:
+<ol>
+<li>prints the python version (e.g. <tt>WebIOPi - INFO - Starting WebIOPi/0.7.1/Python3.5</tt>)</li>
+<li>executes:
+<pre>
+ server = Server(port=port, configfile=configfile, scriptfile=scriptfile)
+ runLoop()		<kc>//defined in utils.thread</kc>
+ server.stop()
+</pre>
+</li>
+
+
+</ol>
+</td>
+</tr>
+
+<tr>
+<td style="width:50%" >
+2) The server:
+<ol>
+<li>calls the function <k><m>addDeviceInstance</m></k><tt>(("GPIO", NativeGPIO(), []))</tt> of 
+<kc>webiopi\devices\manager.py</kc> that prints messages like:
+<pre>
+DEBUG - <ks>Mapping GPIO.digitalRead</ks> to REST GET /GPIO/%(channel)d/value
+...
+DEBUG - Mapping GPIO.wildcard to REST GET /GPIO/*
+INFO - GPIO - Native mapped to REST API /GPIO
+</pre>
+The <ks>GPIO.digitalRead</ks> <kc>webiopi.devices.digital.gpio.NativeGPIO</kc>.<br/><br/>
+<k>/usr/local/lib/python3.5/dist-packages/WebIOPi-0.7.1-py3.5-linux-armv7l.egg/_webiopi/GPIO.cpython-35m-arm-linux-gnueabihf.so</k>
+<br/><br/>
+ </li>
+<li>looks (using <tt>webiopi\utils\config.py</tt> ) information written in the given <ks>config</ks> file and prints:
+<pre>
+logger.info("Loading configuration from %s" % configfile)
+</pre>
+</li>
+
+<li>looks at the passwd file and prints some message, e.g.
+<pre>
+ERROR - Passwd file /etc/webiopi/passwd not found
+WARNING - Access unprotected
+</pre>
+</li>
+
+<li>
+Activates the <ks>HTTPServer</ks> by calling
+<k><m>HTTPServer</m></k><tt>(self.host, http_port, self.restHandler, context, docroot, index, auth, realm)</tt>
+of <tt>webiopi\protocols\http.py</tt>:
+<pre>
+INFO - HTTP Server binded on http://192.168.1.4:8000/
+</pre>
+</li>
+
+<li>
+Activates the <ks>CoapServer</ks> by calling
+<k><m>COAPServer</m></k><tt>(self.host, coap_port, self.restHandler)</tt>
+of <tt>webiopi\protocols\coap.py</tt>:
+<pre>
+INFO - CoAP Server binded on coap://192.168.1.4:5683/
+</pre>
+
+</li>
+
+</ol>
+If the user hits <ks>CTRL-C CTRL-Z</ks>, the server prints:
+<ul><li>
+<pre>
+WebIOPi - INFO - Stopping...
+WebIOPi - DEBUG - Closing device GPIO - GPIO
+WebIOPi - INFO - CoAP Server stopped
+</pre>
+</li></ul>
+
+  
+</td>
+<td>
+<pre><m><h3>Example of OUTPUT at starting time</h3>
+2020-01-06 22:30:50 - WebIOPi - INFO - Starting WebIOPi/0.7.1/Python3.5
+
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.digitalCount to REST GET /GPIO/count
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.digitalRead to REST GET /GPIO/%(channel)d/value
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.digitalWrite to REST POST /GPIO/%(channel)d/value/%(value)d
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.getFunctionString to REST GET /GPIO/%(channel)d/function
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.getPulse to REST GET /GPIO/%(channel)d/pulse
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.outputSequence to REST POST /GPIO/%(channel)d/sequence/%(args)s
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.portRead to REST GET /GPIO/*/integer
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.portWrite to REST POST /GPIO/*/integer/%(value)d
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.pulse to REST POST /GPIO/%(channel)d/pulse/
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.pulseAngle to REST POST /GPIO/%(channel)d/pulseAngle/%(value)f
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.pulseRatio to REST POST /GPIO/%(channel)d/pulseRatio/%(value)f
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.setFunctionString to REST POST /GPIO/%(channel)d/function/%(value)s
+2020-01-06 22:30:50 - WebIOPi - DEBUG - Mapping GPIO.wildcard to REST GET /GPIO/*
+2020-01-06 22:30:50 - WebIOPi - INFO - GPIO - Native mapped to REST API /GPIO
+
+2020-01-06 22:30:50 - WebIOPi - INFO - Loading configuration from ./config
+
+2020-01-06 22:30:50 - WebIOPi - ERROR - Passwd file /etc/webiopi/passwd not found
+2020-01-06 22:30:50 - WebIOPi - WARNING - Access unprotected
+
+2020-01-06 22:30:50 - WebIOPi - INFO - HTTP Server binded on http://192.168.1.4:8000/
+
+2020-01-06 22:30:50 - WebIOPi - INFO - CoAP Server binded on coap://192.168.1.4:5683/
+2020-01-06 22:30:50 - WebIOPi - INFO - CoAP Server binded on coap://224.0.1.123:5683/ (MULTICAST)
+</m></pre>
+</td>
+</tr>
+
+<tr>
+<td style="width:50%" >
+<h3>Human interaction</h3>
+3) The user opens a browser and ... <br/>
+3a) ... writes: <ks><m>http://192.168.1.4:8000/</m></ks>. The server prints:
+<pre>
+HTTP - DEBUG - "GET / HTTP/1.1" - 200 OK 
+	<m>(Client: ::ffff:192.168.1.6 &lt;Mozilla/5.0 (...) Chrome/79.0.3945.79 Safari/537.36>)</m>
+</pre> 
+3b) ... writes: <ks><m>http://192.168.1.4:8000/GPIO/17/value</m></ks>. The server prints:
+<pre>
+HTTP - DEBUG - "GET /GPIO/17/value HTTP/1.1" - 200 OK ... 
+</pre> 
+</td>
+<td>
+</td>
+</tr>
+
+<tr>
+<td style="width:50%" >
+<h3>Internal behavior: an example</h3>
+The user writes: <tt>http://192.168.1.4:8000/GPIO/17/value</tt>
+<pre>
+http.py | processRequest ['/GPIO/17/value']
+
+rest.py | do_GET GPIO/17/value
+rest.py | callDeviceFunction method=GET path=GPIO/17/value
+
+rest.py | <ks>getDeviceRoute</ks> deviceName=GPIO 
+	instance=&lt;module 'webiopi.devices.instance' 
+	     from '/home/pi/nat/WebIOPi-0.7.1/python/webiopi/devices/instance.py'> 
+	method=GET
+rest.py | getDeviceRoute functionName=17/value
+
+rest.py | <k>callDeviceFunction</k> func=&lt;bound method <ks>GPIOPort.digitalRead</ks> of 
+    &lt;<ks>webiopi.devices.digital.gpio.NativeGPIO</ks> object at 0x769907f0>> 
+	args={'channel': 17}
+rest.py | callDeviceFunction result=True	
+rest.py | callDeviceFunction response=1
+
+http | processRequest result=(200, '1', 'text/plain')
+
+HTTP - DEBUG - "GET /GPIO/17/value HTTP/1.1" - 200 OK (Client: ...
+</pre> 
+</td>
+<td>
+</td>
+</tr>
+
+ </tbody>
+</table>
+
+
+<!--
+An @ symbol at the beginning of a line is used for class, function and method decorators.
+Decorators dynamically alter the functionality of a function, method, or class without having to directly use subclasses 
+or change the source code of the function being decorated.<br/>
+See <a href="https://en.wikipedia.org/wiki/Python_syntax_and_semantics#Decorators" target="web">Python Decorators</a>
+-->
+  <br/><br/>
 
 
  <br/><br/>
@@ -398,5 +706,79 @@ By AN Unibo-DISI
 </body>
 </html>
 
+<!--
+<h2>INSTALL PYTHON</h2>
+ <br/><br/>
 
+<table style="width:98%">
+<tbody>	
+<tr>
+<td style="width:70%" > 
+ <pre>
+---------------------  INSTALL PYTHON
+DEPENDENCIES
+sudo apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev 
+libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libffi-dev 
+
+
+wget https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tar.xz
+tar xf Python-3.7.6.tar.xz
+cd Python-3.7.6
+./configure --enable-optimizations
+make -j 4
+sudo make altinstall
+# It will created the binary and lib dirs with the version in /usr/local. 
+# This way you can choose which python you want at run time.
+python3.7 -V       #check the version
+
+sudo ./configure --enable-optimizations
+sudo make -j 4
+sudo make altinstall 
+# It will created the binary and lib dirs with the version in /usr/local. 
+# This way you can choose which python you want at run time.
+python3.8 -V #check the version 
+
+
+
+wget https://www.python.org/ftp/python/3.8.1/Python-3.8.1.tar.xz
+tar xf Python-3.8.1.tar.xz
+cd Python-3.8.1
+//To overcome the problem No module named '_ctypes'.
+git clone https://github.com/python/cpython.git
+
+ 
+ 
+</pre>
+<pre> 
+/home/pi/nat/cam-robot/WebIOPi-0.7.1/<ks>python/webiopi/__main__.py</ks>
+
+
+	server = Server(port=8000, configfile=configfile, scriptfile=scriptfile)
+Configuration file in <ks>python/config</ks>  (<kc>HTTP, COAP</kc> enabled) See also <kc>python\webiopi\utils\config.py</kc>
+			self.restHandler = <ks>rest.RESTHandler()</ks>   //in <kc>python\webiopi\protocols</kc>
+			<ks>http.HTTPServer</ks>(self.host, http_port, self.restHandler, context, docroot, index, auth, realm)
+			<ks>coap.COAPServer</ks>(self.host, coap_port, self.restHandler)
+	runLoop()
+	server.stop()
+
+sudo python3 __main__.py -c /etc/webiopi/config
+
+
+</pre>
+</td>
+<td>
+
+</td>
+</tr>
+
+<tr>
+<td>
+ 
+</td>
+<td></td>
+</tr>
+ </tbody>
+</table>
+ <br/><br/> 
+ -->
  
