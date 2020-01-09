@@ -6,15 +6,18 @@ mqttBroker "localhost" : 1883
 
 Dispatch modelChange  : modelChange( TARGET, VALUE )   
 Dispatch modelUpdate  : modelUpdate( TARGET, VALUE )
-Dispatch onestep       : onestep(DURATION) 
+/*Dispatch step         : step(DURATION) 
 Dispatch stepOk        : stepOk(V)		//TODO eliminate  V
-Dispatch stepFail      : stepFail(R,T) //R=ok | obstacle, T = time
+Dispatch stepFail      : stepFail(R,T)*/ //R=ok | obstacle, T = time
+Request  step      :  step(DURATION)
+Reply    stepdone  :  stepdone(V)  
+Reply    stepfail  :  stepfail(DURATION, CAUSE)
  
 Context ctxBoundaryPlanned    ip [host="localhost" port=8068]                +mqtt
-Context ctxDummyForMind       ip [host="otherresourcelocalhost" port=8035]   +mqtt 
+Context ctxSmartRobot       ip [host="127.0.0.1" port=8020]   +mqtt
 
-ExternalQActor resourcemodel context ctxDummyForMind
-ExternalQActor onestepahead  context ctxDummyForMind
+//ExternalQActor resourcemodel context ctxDummyForMind
+ExternalQActor smartrobot  context ctxSmartRobot
 
 QActor roomboudaryexplorer context ctxBoundaryPlanned{      
 ["
@@ -24,11 +27,11 @@ var Tback       = 0
 var NumStep     = 0
  
 //REAL ROBOT
-var StepTime   = 1000	 
+//var StepTime   = 1000	 
 //var PauseTime  = 500 
 
 //VIRTUAL ROBOT
-//var StepTime   = 330	 
+var StepTime   = 330	 
 //var PauseTime  = 250
 
 //var PauseTimeL  = PauseTime.toLong()
@@ -54,8 +57,8 @@ var StepTime   = 1000
  		printCurrentMessage
    		run itunibo.planner.moveUtils.attemptTomoveAhead(myself, StepTime)
 	}
-	Transition t0   whenMsg stepOk   -> stepDone   
-					whenMsg stepFail -> stepFailed 
+	Transition t0   whenReply stepdone -> stepDone   
+					whenReply stepfail -> stepFailed 
 	 
  	State stepDone{  
  		run itunibo.planner.moveUtils.updateMapAfterAheadOk(myself)
@@ -70,12 +73,16 @@ var StepTime   = 1000
 val MapStr =  itunibo.planner.plannerUtil.getMapOneLine()  
 //println( MapStr ) 
 "]		
- 		forward resourcemodel -m modelUpdate : modelUpdate(roomMap,$MapStr)   
+ 		//forward resourcemodel -m modelUpdate : modelUpdate(roomMap,$MapStr)   
 		
 		//printCurrentMessage		        
- 		onMsg( stepFail : stepFail(Obs,Time) ) { 
+ 		/*onMsg( stepFail : stepFail(Obs,Time) ) { 
  			["Tback=payloadArg(1).toString().toInt() / 4"] //back just a little ..
  			println("stepFailed ${payloadArg(1).toString()}")
+ 		}*/
+ 		onMsg( stepfail : stepfail(Time,Cause) ) { 
+ 			["Tback=payloadArg(0).toString().toInt() / 4"] //back just a little ..
+ 			println("stepFailed ${payloadArg(0).toString()}")
  		}
   		//Return in cell
   	 	//IMPORTANT: the virtual robot could not work without a back step 	

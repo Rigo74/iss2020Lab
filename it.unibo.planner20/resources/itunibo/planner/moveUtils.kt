@@ -146,7 +146,7 @@ object moveUtils{
 		delay( pauseTime.toLong() )
 	}
 	suspend fun rotateLeft90( actor : ActorBasic ){
-		actor.forward("modelChange", "modelChange(robot,l)", "resourcemodel")
+		actor.forward("cmd", "cmd(l)", "smartrobot")
 		delay( 800 )
  		doPlannedMove(actor, "l" )	    //update map	
  	}
@@ -165,18 +165,18 @@ object moveUtils{
 		doPlannedMove(actor, "w" )	//update map	
 		delay( pauseTime.toLong() )
 	} 
-	suspend fun attemptTomoveAhead(actor:ActorBasic,stepTime:Int, dest:String ="onestepahead"){
+	suspend fun attemptTomoveAhead(actor:ActorBasic,stepTime:Int, dest:String ="smartrobot"){
  		//println("moveUtils attemptTomoveAhead stepTime=$stepTime")
-		actor.forward("onestep", "onestep(${stepTime})", dest)
+		actor.request("step", "step(${stepTime})", dest)
    	}
 	fun updateMapAfterAheadOk(actor : ActorBasic ){
 		doPlannedMove(actor  , "w")
 	}
 	suspend fun backToCompensate(actor : ActorBasic, stepTime : Int, pauseTime : Int = PauseTime){
 		println("moveUtils backToCompensate stepTime=$stepTime")
-		actor.forward("modelChange", "modelChange(robot,s)", "resourcemodel")
+		actor.forward("cmd", "cmd(s)", "smartrobot")
 		delay( stepTime.toLong() )
-		actor.forward("modelChange", "modelChange(robot,h)", "resourcemodel")
+		actor.forward("cmd", "cmd(h)", "smartrobot")
 		delay( pauseTime.toLong() )
    	}
 	

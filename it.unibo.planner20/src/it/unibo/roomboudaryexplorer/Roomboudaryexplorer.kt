@@ -22,11 +22,11 @@ class Roomboudaryexplorer ( name: String, scope: CoroutineScope ) : ActorBasicFs
 		var NumStep     = 0
 		 
 		//REAL ROBOT
-		var StepTime   = 1000	 
+		//var StepTime   = 1000	 
 		//var PauseTime  = 500 
 		
 		//VIRTUAL ROBOT
-		//var StepTime   = 330	 
+		var StepTime   = 330	 
 		//var PauseTime  = 250
 		
 		//var PauseTimeL  = PauseTime.toLong()
@@ -51,8 +51,8 @@ class Roomboudaryexplorer ( name: String, scope: CoroutineScope ) : ActorBasicFs
 						println("$name in ${currentState.stateName} | $currentMsg")
 						itunibo.planner.moveUtils.attemptTomoveAhead(myself ,StepTime )
 					}
-					 transition(edgeName="t00",targetState="stepDone",cond=whenDispatch("stepOk"))
-					transition(edgeName="t01",targetState="stepFailed",cond=whenDispatch("stepFail"))
+					 transition(edgeName="t00",targetState="stepDone",cond=whenReply("stepdone"))
+					transition(edgeName="t01",targetState="stepFailed",cond=whenReply("stepfail"))
 				}	 
 				state("stepDone") { //this:State
 					action { //it:State
@@ -67,11 +67,10 @@ class Roomboudaryexplorer ( name: String, scope: CoroutineScope ) : ActorBasicFs
 						
 						val MapStr =  itunibo.planner.plannerUtil.getMapOneLine()  
 						//println( MapStr ) 
-						forward("modelUpdate", "modelUpdate(roomMap,$MapStr)" ,"resourcemodel" ) 
-						if( checkMsgContent( Term.createTerm("stepFail(R,T)"), Term.createTerm("stepFail(Obs,Time)"), 
+						if( checkMsgContent( Term.createTerm("stepfail(DURATION,CAUSE)"), Term.createTerm("stepfail(Time,Cause)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								Tback=payloadArg(1).toString().toInt() / 4
-								println("stepFailed ${payloadArg(1).toString()}")
+								Tback=payloadArg(0).toString().toInt() / 4
+								println("stepFailed ${payloadArg(0).toString()}")
 						}
 						itunibo.planner.moveUtils.backToCompensate(myself ,Tback, Tback )
 						itunibo.planner.plannerUtil.wallFound(  )

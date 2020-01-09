@@ -3,7 +3,6 @@
 %====================================================================================
 mqttBroker("localhost", "1883").
 context(ctxboundaryplanned, "localhost",  "MQTT", "8068").
-context(ctxdummyformind, "otherresourcelocalhost",  "MQTT", "8035").
- qactor( resourcemodel, ctxdummyformind, "external").
-  qactor( onestepahead, ctxdummyformind, "external").
+context(ctxsmartrobot, "127.0.0.1",  "MQTT", "8020").
+ qactor( smartrobot, ctxsmartrobot, "external").
   qactor( roomboudaryexplorer, ctxboundaryplanned, "it.unibo.roomboudaryexplorer.Roomboudaryexplorer").

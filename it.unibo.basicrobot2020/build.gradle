@@ -27,7 +27,7 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     flatDir { //grazie Mattia Piretti
-       dirs '/C:/Didattica2018Work/iss2019Lab/libs'	//full path
+       dirs '/home/stefano/University/lss/iss2020Lab/it.unibo.issLabStart/resources'	//full path
    }
 }
 
